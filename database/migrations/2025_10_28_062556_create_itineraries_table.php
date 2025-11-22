@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('itineraries', function (Blueprint $table) {
-            $table->id();
+            $table->id('itineraryID');
+            $table->foreignId('planID')->constrained('travel_plans', 'planID')->onDelete('cascade');
+            $table->string('itineraryName');
             $table->timestamps();
         });
     }

@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('shared_plans', function (Blueprint $table) {
-            $table->id();
+            $table->id('shareID');
+            $table->foreignId('planID')->constrained('travel_plans', 'planID')->onDelete('cascade');
+            $table->string('sharedWith');
+            $table->string('method', 50);
             $table->timestamps();
         });
     }

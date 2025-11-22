@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('promotions', function (Blueprint $table) {
-            $table->id();
+            $table->id('promotionID');
+            $table->string('description');
+            $table->decimal('discountValue', 5, 2); // misal 0.10
+            $table->date('validUntil')->nullable();
             $table->timestamps();
         });
     }

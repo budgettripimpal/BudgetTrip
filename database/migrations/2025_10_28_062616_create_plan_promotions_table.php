@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('plan_promotions', function (Blueprint $table) {
-            $table->id();
+            $table->foreignId('planID')->constrained('travel_plans', 'planID')->onDelete('cascade');
+            $table->foreignId('promotionID')->constrained('promotions', 'promotionID')->onDelete('cascade');
             $table->timestamps();
+
+            // Composite Key
+            $table->primary(['planID', 'promotionID']);
         });
     }
 

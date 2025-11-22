@@ -51,7 +51,6 @@
                     <div class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg">
                         {{ substr(Auth::user()->name, 0, 1) }}
                     </div>
-                    
                     <div class="absolute top-10 right-0 w-48 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -67,7 +66,7 @@
 
     <div class="min-h-screen bg-gray-50 pb-12 pt-20">
         
-        <div class="bg-white shadow-sm py-8 mb-8">
+        <div class="bg-white shadow-sm py-8 mb-8 sticky top-20 z-40">
             <div class="container mx-auto px-6">
                 <div class="flex items-center justify-between max-w-6xl mx-auto">
                     
@@ -148,41 +147,48 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-[2.5rem] flex flex-col lg:flex-row border border-gray-100 relative">
                 <div class="w-full lg:w-2/3 p-8 md:p-12">
                     <div class="mb-10">
-                        <h1 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Mulai Perjalananmu ✈️</h1>
+                        <h1 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">
+                            {{ isset($plan) ? 'Edit Rencana Perjalanan' : 'Mulai Perjalananmu ✈️' }}
+                        </h1>
                         <p class="text-gray-500 leading-relaxed">Isi detail dasar di bawah ini agar kami bisa mencarikan rekomendasi terbaik sesuai kantongmu.</p>
                     </div>
 
-                    <form action="{{ route('travel-plan.store') }}" method="POST" novalidate>
+                    <form action="{{ isset($plan) ? route('travel-plan.update', $plan->planID) : route('travel-plan.store') }}" method="POST" novalidate>
                         @csrf
+                        @if(isset($plan))
+                            @method('PUT')
+                        @endif
+
                         <div class="space-y-8 mb-12">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Nama Rencana</label>
-                                <input type="text" name="planName" value="{{ old('planName') }}" class="w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 outline-none {{ $errors->has('planName') ? 'border-red-500 bg-red-50' : '' }}" placeholder="Contoh: Liburan Akhir Tahun" required autofocus>
+                                <input type="text" name="planName" value="{{ old('planName', $plan->planName ?? '') }}" class="w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 outline-none {{ $errors->has('planName') ? 'border-red-500 bg-red-50' : '' }}" placeholder="Contoh: Liburan Akhir Tahun" required autofocus>
                                 <x-input-error :messages="$errors->get('planName')" class="mt-2" />
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Total Budget Kamu</label>
                                 <div class="relative">
                                     <span class="absolute left-5 top-4 text-gray-400 font-bold">Rp</span>
-                                    <input type="number" id="budget" name="amount" value="{{ old('amount', 5000000) }}" class="w-full pl-14 pr-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 font-bold text-xl outline-none {{ $errors->has('amount') ? 'border-red-500 bg-red-50' : '' }}" required>
+                                    <input type="number" id="budget" name="amount" value="{{ old('amount', $plan->amount ?? 5000000) }}" class="w-full pl-14 pr-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 font-bold text-xl outline-none {{ $errors->has('amount') ? 'border-red-500 bg-red-50' : '' }}" required>
                                 </div>
                                 <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                                 <div class="mt-6 px-2">
-                                    <input type="range" min="0" max="20000000" step="100000" value="{{ old('amount', 5000000) }}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('budget').value = this.value">
+                                    <input type="range" min="0" max="20000000" step="100000" value="{{ old('amount', $plan->amount ?? 5000000) }}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('budget').value = this.value">
                                     <div class="flex justify-between text-xs font-semibold text-gray-400 mt-2"><span>Rp 0</span><span>Rp 20 Juta+</span></div>
                                 </div>
                             </div>
                         </div>
+
                         <div class="space-y-8 mb-12">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-2">Dari Mana?</label>
                                     <div class="relative">
                                         <select name="originCityID" style="background-image: none !important;" class="no-arrow w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 text-gray-700 outline-none cursor-pointer {{ $errors->has('originCityID') ? 'border-red-500 bg-red-50' : '' }}">
-                                            <option value="" disabled selected>Pilih Kota Asal</option>
-                                            <option value="1" {{ old('originCityID') == 1 ? 'selected' : '' }}>Jakarta</option>
-                                            <option value="2" {{ old('originCityID') == 2 ? 'selected' : '' }}>Bandung</option>
-                                            <option value="3" {{ old('originCityID') == 3 ? 'selected' : '' }}>Surabaya</option>
+                                            <option value="" disabled {{ !isset($plan) ? 'selected' : '' }}>Pilih Kota Asal</option>
+                                            @foreach(['1'=>'Bandung', '2'=>'Palembang', '3'=>'Merak', '4'=>'Bakauheni', '5'=>'Jakarta'] as $id => $name)
+                                                <option value="{{ $id }}" {{ (old('originCityID', $plan->originCityID ?? '') == $id) ? 'selected' : '' }}>{{ $name }}</option>
+                                            @endforeach
                                         </select>
                                         <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none"><svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                                     </div>
@@ -192,10 +198,10 @@
                                     <label class="block text-sm font-bold text-gray-700 mb-2">Mau ke Mana?</label>
                                     <div class="relative">
                                         <select name="destinationCityID" style="background-image: none !important;" class="no-arrow w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 text-gray-700 outline-none cursor-pointer {{ $errors->has('destinationCityID') ? 'border-red-500 bg-red-50' : '' }}">
-                                            <option value="" disabled selected>Pilih Kota Tujuan</option>
-                                            <option value="4" {{ old('destinationCityID') == 4 ? 'selected' : '' }}>Bali</option>
-                                            <option value="5" {{ old('destinationCityID') == 5 ? 'selected' : '' }}>Lombok</option>
-                                            <option value="6" {{ old('destinationCityID') == 6 ? 'selected' : '' }}>Yogyakarta</option>
+                                            <option value="" disabled {{ !isset($plan) ? 'selected' : '' }}>Pilih Kota Tujuan</option>
+                                            @foreach(['1'=>'Bandung', '2'=>'Palembang', '3'=>'Merak', '4'=>'Bakauheni', '5'=>'Jakarta'] as $id => $name)
+                                                <option value="{{ $id }}" {{ (old('destinationCityID', $plan->destinationCityID ?? '') == $id) ? 'selected' : '' }}>{{ $name }}</option>
+                                            @endforeach
                                         </select>
                                         <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none"><svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                                     </div>
@@ -205,21 +211,22 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-2">Berangkat</label>
-                                    <input type="date" name="startDate" value="{{ old('startDate') }}" class="w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 outline-none {{ $errors->has('startDate') ? 'border-red-500 bg-red-50' : '' }}">
+                                    <input type="date" name="startDate" value="{{ old('startDate', isset($plan) ? $plan->startDate->format('Y-m-d') : '') }}" class="w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 outline-none {{ $errors->has('startDate') ? 'border-red-500 bg-red-50' : '' }}">
                                     <x-input-error :messages="$errors->get('startDate')" class="mt-2" />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-2">Pulang</label>
-                                    <input type="date" name="endDate" value="{{ old('endDate') }}" class="w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 outline-none {{ $errors->has('endDate') ? 'border-red-500 bg-red-50' : '' }}">
+                                    <input type="date" name="endDate" value="{{ old('endDate', isset($plan) ? $plan->endDate->format('Y-m-d') : '') }}" class="w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 outline-none {{ $errors->has('endDate') ? 'border-red-500 bg-red-50' : '' }}">
                                     <x-input-error :messages="$errors->get('endDate')" class="mt-2" />
                                 </div>
                             </div>
                         </div>
+
                         <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 mb-10">
                             <h3 class="text-lg font-bold text-gray-800 mb-6">Preferensi Tambahan</h3>
                             <div class="flex items-center mb-8">
                                 <label class="relative inline-flex items-center cursor-pointer select-none w-full group">
-                                    <input type="checkbox" name="needsAccommodation" class="sr-only peer" {{ old('needsAccommodation') ? 'checked' : '' }}>
+                                    <input type="checkbox" name="needsAccommodation" class="sr-only peer" {{ old('needsAccommodation', $plan->accommodationCityID ?? false) ? 'checked' : '' }}>
                                     <div class="w-14 h-8 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#2CB38B]"></div>
                                     <span class="ml-4 text-sm font-bold text-gray-600 group-hover:text-[#2CB38B] transition">Saya butuh rekomendasi penginapan</span>
                                 </label>
@@ -227,9 +234,12 @@
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-4">Aktivitas yang Disukai</label>
                                 <div class="flex flex-wrap gap-3">
+                                    @php
+                                        $savedActivities = isset($plan) && $plan->requestedActivities ? $plan->requestedActivities : [];
+                                    @endphp
                                     @foreach(['Wisata Kuliner', 'Wisata Alam', 'Sejarah', 'Belanja', 'Staycation'] as $activity)
                                         <label class="cursor-pointer group">
-                                            <input type="checkbox" name="activities[]" value="{{ $activity }}" class="peer sr-only" {{ is_array(old('activities')) && in_array($activity, old('activities')) ? 'checked' : '' }}>
+                                            <input type="checkbox" name="activities[]" value="{{ $activity }}" class="peer sr-only" {{ (is_array(old('activities')) && in_array($activity, old('activities'))) || in_array($activity, $savedActivities) ? 'checked' : '' }}>
                                             <span class="px-6 py-3 rounded-xl text-sm font-bold bg-white text-gray-500 border border-gray-200 peer-checked:bg-[#2CB38B] peer-checked:text-white peer-checked:border-[#2CB38B] peer-checked:shadow-md transition-all select-none inline-block">{{ $activity }}</span>
                                         </label>
                                     @endforeach
@@ -237,8 +247,9 @@
                                 <x-input-error :messages="$errors->get('activities')" class="mt-2" />
                             </div>
                         </div>
+
                         <button type="submit" class="w-full bg-[#2CB38B] hover:bg-[#249d78] text-white font-bold py-5 rounded-2xl text-lg transition shadow-xl hover:shadow-2xl transform active:scale-[0.99] flex items-center justify-center gap-3 group">
-                            <span>Lanjut Pilih Transportasi</span>
+                            <span>{{ isset($plan) ? 'Simpan Perubahan & Lanjut' : 'Lanjut Pilih Transportasi' }}</span>
                             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </button>
                     </form>
