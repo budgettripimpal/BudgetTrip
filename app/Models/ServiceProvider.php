@@ -1,24 +1,25 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class ServiceProvider extends Model
+return new class extends Migration
 {
-    use HasFactory;
-
-    protected $primaryKey = 'providerID';
-    protected $guarded = [];
-
-    public function transportRoutes()
+    public function up(): void
     {
-        return $this->hasMany(TransportRoute::class, 'providerID', 'providerID');
+        Schema::create('service_providers', function (Blueprint $table) {
+            $table->id('providerID'); 
+            
+            $table->string('providerName', 150);
+            $table->string('serviceType', 50);
+            
+            $table->timestamps();
+        });
     }
 
-    public function accommodations()
+    public function down(): void
     {
-        return $this->hasMany(Accommodation::class, 'providerID', 'providerID');
+        Schema::dropIfExists('service_providers');
     }
-}
+};

@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('attractions', function (Blueprint $table) {
-            $table->id();
+            $table->id('attractionID');
+            $table->foreignId('cityID')->constrained('cities', 'cityID');
+            $table->string('attractionName');
+            $table->string('category')->nullable();
+            $table->decimal('estimatedCost', 10, 2)->default(0);
             $table->timestamps();
         });
     }

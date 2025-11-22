@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transport_routes', function (Blueprint $table) {
-            $table->id();
+            $table->id('routeID');
+            $table->foreignId('providerID')->constrained('service_providers', 'providerID');
+            $table->foreignId('originCityID')->constrained('cities', 'cityID');
+            $table->foreignId('destinationCityID')->constrained('cities', 'cityID');
+            $table->decimal('averagePrice', 10, 2);
+            $table->string('bookingLink')->nullable();
             $table->timestamps();
         });
     }

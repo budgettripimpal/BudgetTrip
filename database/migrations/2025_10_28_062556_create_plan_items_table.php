@@ -12,7 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('plan_items', function (Blueprint $table) {
-            $table->id();
+            $table->id('planItemID');
+            $table->foreignId('itineraryID')->constrained('itineraries', 'itineraryID')->onDelete('cascade');
+
+            $table->string('description');
+            $table->string('itemType', 50); // Transportasi/Akomodasi
+            $table->decimal('estimatedCost', 10, 2);
+            $table->string('bookingLink')->nullable();
+            $table->string('providerName')->nullable();
+
             $table->timestamps();
         });
     }

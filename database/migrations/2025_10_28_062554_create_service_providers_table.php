@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('service_providers', function (Blueprint $table) {
-            $table->id();
+            $table->id('providerID');
+            $table->string('providerName', 150);
+            $table->string('serviceType', 50); // Transportasi / Akomodasi
             $table->timestamps();
         });
     }
