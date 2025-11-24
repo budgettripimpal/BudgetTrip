@@ -24,6 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/plan/{travelPlan}', [TravelPlanController::class, 'update'])->name('travel-plan.update');
 
     Route::get('/plan/{travelPlan}/transport', [TravelPlanController::class, 'selectTransport'])->name('travel-plan.transport');
+    Route::get('/plan/{travelPlan}/accommodation', [TravelPlanController::class, 'selectAccommodation'])->name('travel-plan.accommodation');
+    Route::get('/plan/{travelPlan}/attraction', [TravelPlanController::class, 'selectAttraction'])->name('travel-plan.attraction');
 });
 
 require __DIR__ . '/auth.php';

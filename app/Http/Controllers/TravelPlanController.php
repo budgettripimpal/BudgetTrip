@@ -20,15 +20,15 @@ class TravelPlanController extends Controller
         // Validasi input
         $validated = $this->validateInput($request);
 
-        
+
         // Ambil data validasi, tapi buang field yang tidak ada di tabel
         $data = collect($validated)
-            ->except(['needsAccommodation', 'activities']) 
+            ->except(['needsAccommodation', 'activities'])
             ->toArray();
 
         // Isi kolom-kolom manual
         $data['userID'] = Auth::id();
-        
+
         // Map 'activities' (input) ke 'requestedActivities' (database)
         // Eloquent akan otomatis mengubah array ke JSON berkat 'casts' di Model
         $data['requestedActivities'] = $validated['activities'] ?? null;
@@ -90,7 +90,7 @@ class TravelPlanController extends Controller
         if ($travelPlan->userID !== Auth::id()) {
             abort(403);
         }
-        
+
         return view('select-transport', ['plan' => $travelPlan]);
     }
 
@@ -99,11 +99,11 @@ class TravelPlanController extends Controller
         return $request->validate([
             'planName' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z0-9\s\-\(\)]+$/'],
             'amount' => ['required', 'numeric', 'min:0', 'max:1000000000'],
-            'originCityID' => ['required', 'integer', 'exists:cities,cityID'], 
+            'originCityID' => ['required', 'integer', 'exists:cities,cityID'],
             'destinationCityID' => ['required', 'integer', 'exists:cities,cityID', 'different:originCityID'],
             'startDate' => ['required', 'date', 'after_or_equal:today'],
             'endDate' => ['required', 'date', 'after_or_equal:startDate'],
-            'needsAccommodation' => ['nullable', 'string'], 
+            'needsAccommodation' => ['nullable', 'string'],
             'activities' => ['nullable', 'array'],
             'activities.*' => ['string']
         ], [
@@ -119,5 +119,21 @@ class TravelPlanController extends Controller
             'startDate' => 'Start Date',
             'endDate' => 'End Date',
         ]);
+    }
+    public function selectAccommodation(TravelPlan $travelPlan)
+    {
+        if ($travelPlan->userID !== Auth::id()) {
+            abort(403);
+        }
+
+        return view('select-accommodation', ['plan' => $travelPlan]);
+    }
+    public function selectAttraction(TravelPlan $travelPlan)
+    {
+        if ($travelPlan->userID !== Auth::id()) {
+            abort(403);
+        }
+        
+        return view('select-attraction', ['plan' => $travelPlan]);
     }
 }
