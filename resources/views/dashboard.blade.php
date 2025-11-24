@@ -335,7 +335,7 @@
                             <span>+62-123-789-xxxx</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="bg-green-50 p-2 rounded-full text-[#2CB38B]">✉️</span>
+                            <span class="bg-green-50 p-2 rounded-full text-[#2CB38B]">✉</span>
                             <span>support@budgettrip.com</span>
                         </div>
                         <div class="flex items-center gap-3">
