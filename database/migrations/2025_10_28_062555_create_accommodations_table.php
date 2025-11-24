@@ -15,8 +15,14 @@ return new class extends Migration
             $table->id('accommodationID');
             $table->foreignId('providerID')->constrained('service_providers', 'providerID');
             $table->foreignId('cityID')->constrained('cities', 'cityID');
+            
             $table->string('hotelName');
             $table->decimal('averagePricePerNight', 10, 2);
+
+            $table->decimal('rating', 2, 1)->default(0); 
+            $table->string('type', 50)->default('Hotel'); // Hotel, Villa, Apartemen
+            $table->json('facilities')->nullable(); // Array ['WiFi', 'Kolam Renang']
+            
             $table->string('bookingLink')->nullable();
             $table->timestamps();
         });

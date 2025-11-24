@@ -141,196 +141,136 @@
         </div>
 
         <div class="container mx-auto px-6 py-4">
-            <div class="flex flex-col lg:flex-row gap-8">
+            <form action="{{ route('travel-plan.accommodation', $plan->planID) }}" method="GET">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    
+                    <div class="w-full lg:w-80 flex-shrink-0">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                                    Filter Akomodasi
+                                </h2>
+                                <button type="submit" class="text-xs font-bold text-[#2CB38B] hover:underline">Terapkan</button>
+                            </div>
 
-                <div class="w-full lg:w-80 flex-shrink-0">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            Filter Akomodasi
-                        </h2>
+                            <div class="mb-6 pb-6 border-b border-gray-100">
+                                <h3 class="font-semibold text-gray-700 mb-3">Bintang Hotel</h3>
+                                <div class="space-y-2">
+                                    @foreach([5, 4, 3] as $star)
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="ratings[]" value="{{ $star }}" 
+                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
+                                            {{ in_array($star, request('ratings', [])) ? 'checked' : '' }}
+                                            onchange="this.form.submit()">
+                                        <span class="text-gray-600 flex items-center gap-1">
+                                            <span class="text-yellow-400">
+                                                {{ str_repeat('★', $star) }}{{ str_repeat('☆', 5-$star) }}
+                                            </span>
+                                        </span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
 
-                        <div class="mb-6 pb-6 border-b border-gray-100">
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Bintang Hotel</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B] flex items-center gap-1">
-                                        <span>★★★★★</span> <span class="text-xs text-gray-400">(5)</span>
-                                    </span>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B] flex items-center gap-1">
-                                        <span>★★★★</span> <span class="text-xs text-gray-400">(4)</span>
-                                    </span>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B] flex items-center gap-1">
-                                        <span>★★★</span> <span class="text-xs text-gray-400">(3)</span>
-                                    </span>
-                                </label>
+                            <div class="mb-6 pb-6 border-b border-gray-100">
+                                <h3 class="font-semibold text-gray-700 mb-3">Fasilitas</h3>
+                                <div class="space-y-2">
+                                    @foreach(['WiFi Gratis', 'Sarapan', 'Kolam Renang', 'Gym', 'Spa', 'Parkir'] as $facility)
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="facilities[]" value="{{ $facility }}" 
+                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
+                                            {{ in_array($facility, request('facilities', [])) ? 'checked' : '' }}
+                                            onchange="this.form.submit()">
+                                        <span class="text-gray-600">{{ $facility }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold text-gray-700 mb-3">Tipe Akomodasi</h3>
+                                <div class="space-y-2">
+                                    @foreach(['Hotel', 'Villa', 'Apartemen', 'Hostel'] as $type)
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="types[]" value="{{ $type }}" 
+                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
+                                            {{ in_array($type, request('types', [])) ? 'checked' : '' }}
+                                            onchange="this.form.submit()">
+                                        <span class="text-gray-600">{{ $type }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mb-6 pb-6 border-b border-gray-100">
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Fasilitas</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B]">WiFi Gratis</span>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B]">Sarapan</span>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B]">Kolam Renang</span>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B]">Parkir</span>
-                                </label>
-                            </div>
-                        </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Akomodasi</h2>
 
-                        <div>
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Tipe Akomodasi</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B]">Hotel</span>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B]">Apartemen</span>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]">
-                                    <span class="text-gray-600 group-hover:text-[#2CB38B]">Villa</span>
-                                </label>
+                        @if($accommodations->isEmpty())
+                            <div class="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
+                                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">🏨</div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-2">Tidak ada akomodasi ditemukan</h3>
+                                <p class="text-gray-500">Coba ubah filter atau cari di kota lain.</p>
                             </div>
-                        </div>
+                        @else
+                            @foreach($accommodations as $hotel)
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group">
+                                <div class="flex flex-col md:flex-row gap-6">
+                                    <div class="w-full md:w-1/3 h-48 bg-gray-200 rounded-xl overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ $hotel->hotelName }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                                        <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-[#2CB38B] shadow-sm flex items-center gap-1">
+                                            <span>★</span> {{ $hotel->rating }}
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full md:w-2/3 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">{{ $hotel->hotelName }}</h3>
+                                                    <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                        {{ $hotel->city->cityName ?? 'Unknown City' }}
+                                                    </p>
+                                                </div>
+                                                <div class="hidden sm:flex text-yellow-400 text-sm">
+                                                    {{ str_repeat('★', floor($hotel->rating)) }}
+                                                </div>
+                                            </div>
+                                            
+                                            @if($hotel->facilities)
+                                                <div class="mt-4 flex flex-wrap gap-2">
+                                                    @foreach(array_slice($hotel->facilities, 0, 4) as $facility)
+                                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">{{ $facility }}</span>
+                                                    @endforeach
+                                                    @if(count($hotel->facilities) > 4)
+                                                        <span class="bg-gray-50 text-gray-500 text-xs px-2 py-1 rounded-full font-medium">+{{ count($hotel->facilities) - 4 }}</span>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="flex items-end justify-between mt-6">
+                                            <div>
+                                                <p class="text-xs text-gray-400">Mulai dari</p>
+                                                <p class="text-2xl font-bold text-[#2CB38B]">Rp {{ number_format($hotel->averagePricePerNight, 0, ',', '.') }}</p>
+                                                <p class="text-xs text-gray-500">/ malam (termasuk pajak)</p>
+                                            </div>
+                                            <a href="#" class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 text-center">
+                                                Pilih Kamar
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        @endif
+
                     </div>
                 </div>
-
-                <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Akomodasi</h2>
-
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group">
-                        <div class="flex flex-col md:flex-row gap-6">
-                            <div class="w-full md:w-1/3 h-48 bg-gray-200 rounded-xl overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hotel" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
-                                <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-[#2CB38B] shadow-sm">
-                                    4.8/5 (200 Ulasan)
-                                </div>
-                            </div>
-
-                            <div class="w-full md:w-2/3 flex flex-col justify-between">
-                                <div>
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">Hotel Batiqa Palembang</h3>
-                                            <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                                Palembang, Sumatera Selatan
-                                            </p>
-                                        </div>
-                                        <div class="flex text-yellow-400 text-sm">
-                                            ★★★★☆
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-4 flex flex-wrap gap-2">
-                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">WiFi Gratis</span>
-                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">Sarapan</span>
-                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">Gym</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-end justify-between mt-6">
-                                    <div>
-                                        <p class="text-sm text-gray-400 line-through">Rp 950.000</p>
-                                        <p class="text-3xl font-bold text-[#2CB38B]">Rp 550.000</p>
-                                        <p class="text-xs text-gray-500">/ malam (termasuk pajak)</p>
-                                    </div>
-                                    <button class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200">
-                                        Pilih Kamar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group">
-                        <div class="flex flex-col md:flex-row gap-6">
-                            <div class="w-full md:w-1/3 h-48 bg-gray-200 rounded-xl overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hotel" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
-                                <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-[#2CB38B] shadow-sm">
-                                    4.9/5 (540 Ulasan)
-                                </div>
-                            </div>
-                            <div class="w-full md:w-2/3 flex flex-col justify-between">
-                                <div>
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">The Arista Hotel</h3>
-                                            <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                                Palembang, Sumatera Selatan
-                                            </p>
-                                        </div>
-                                        <div class="flex text-yellow-400 text-sm">
-                                            ★★★★★
-                                        </div>
-                                    </div>
-                                    <div class="mt-4 flex flex-wrap gap-2">
-                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">Spa</span>
-                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">Kolam Renang</span>
-                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">Bar</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-end justify-between mt-6">
-                                    <div>
-                                        <p class="text-sm text-gray-400 line-through">Rp 1.500.000</p>
-                                        <p class="text-3xl font-bold text-[#2CB38B]">Rp 1.200.000</p>
-                                        <p class="text-xs text-gray-500">/ malam (termasuk pajak)</p>
-                                    </div>
-                                    <button class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200">
-                                        Pilih Kamar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 

@@ -11,7 +11,11 @@ class TransportRoute extends Model
 
     protected $primaryKey = 'routeID';
     protected $guarded = [];
-
+    protected $casts = [
+        'facilities' => 'array', // Otomatis convert JSON ke Array PHP
+        'departureTime' => 'datetime:H:i', // Format jam
+        'arrivalTime' => 'datetime:H:i',
+    ];
     public function serviceProvider()
     {
         return $this->belongsTo(ServiceProvider::class, 'providerID', 'providerID');
