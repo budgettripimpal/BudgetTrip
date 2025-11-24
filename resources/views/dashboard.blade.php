@@ -53,73 +53,76 @@
         </div>
     </nav>
 
-    <section class="bg-gradient-to-br from-yellow-100 via-yellow-50 to-white pt-32 pb-16 mt-[-4rem]">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h1 class="text-5xl md:text-6xl font-bold text-blue-900 leading-tight mb-6">
-                        Travel smart.<br>
-                        Save more.<br>
-                        Experience better.
-                    </h1>
-                    <p class="text-gray-600 mb-8 leading-relaxed text-lg text-justify">
-                        Setiap perjalanan punya cerita, dan Budget Trip memastikan ceritamu dimulai dengan perencanaan yang cerdas. Dari destinasi impian hingga rincian biaya, semuanya bisa kamu atur dalam satu aplikasi hemat perjalanan ini.✨
-                    </p>
-                    <div class="space-y-4 flex flex-col items-start">
-                        <a href="{{ route('travel-plan.create') }}" class="bg-[#2CB38B] text-white px-8 py-4 rounded-full font-semibold transition duration-300 shadow-lg hover:shadow-xl hover:bg-[#249372] hover:-translate-y-1 inline-flex items-center gap-2">
-                            <span>Buat Rencana Sekarang!</span>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        </a>
-                        
-                        <div class="flex flex-col gap-2">
-                            <button class="text-[#2CB38B] font-medium underline hover:text-green-700 text-left transition">
-                                Sudah Memiliki Rencana?
-                            </button>
-                            <button class="border-2 border-[#2CB38B] text-[#2CB38B] px-8 py-3 rounded-full font-semibold hover:bg-green-50 transition duration-300">
-                                Lihat Rencana Sekarang!
-                            </button>
-                        </div>
-                    </div>
-                </div>
+  <section class="bg-[#FFFBF0] pt-32 pb-0 min-h-[85vh] flex items-center overflow-hidden relative">
+    
+    <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#FFDF67] rounded-full mix-blend-multiply filter blur-[100px] opacity-100 pointer-events-none"></div>
+
+    <div class="absolute bottom-[-20%] left-[-5%] w-[600px] h-[600px] bg-[#FFDF67] rounded-full mix-blend-multiply filter blur-[100px] opacity-100 pointer-events-none"></div>
+
+    <div class="container mx-auto px-6 max-w-7xl relative z-10 mb-16">
+        
+        <div class="flex flex-col-reverse lg:flex-row items-center justify-between gap-12">
+            
+            <div class="w-full lg:w-5/12 space-y-6 text-center lg:text-left z-20">
                 
-                <div class="relative">
-                    <div class="absolute top-8 right-8 bg-white px-5 py-3 rounded-full shadow-lg flex items-center space-x-3 z-10 animate-bounce" style="animation-duration: 3s;">
-                        <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                        </svg>
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold uppercase">Destinasi</p>
-                            <span class="font-bold text-gray-800">Kuta, Bali</span>
-                        </div>
-                    </div>
-                    <div class="rounded-3xl shadow-2xl overflow-hidden border-[6px] border-white transform rotate-2 hover:rotate-0 transition duration-500">
-                        <img src="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Travelers" class="w-full h-[500px] object-cover">
-                    </div>
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-[#181E4B] leading-[1.1] tracking-tighter">
+                    Travel smart. <br>
+                    Save more. <br>
+                    Experience <br> better.
+                </h1>
+
+                <p class="text-[#5E6282] font-medium text-base lg:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0">
+                    Setiap perjalanan punya cerita, dan Budget Trip memastikan ceritamu dimulai dengan perencanaan yang cerdas. Dari destinasi impian hingga rincian biaya, semuanya bisa kamu atur dalam satu aplikasi hemat perjalanan ini.✨
+                </p>
+
+                <div class="flex flex-col items-center lg:items-start space-y-5 pt-4">
+                    <a href="{{ route('travel-plan.create') }}" class="px-10 py-4 bg-[#2CB38B] text-white font-bold text-lg rounded-full shadow-lg shadow-green-200 hover:bg-[#249372] transition transform hover:-translate-y-1 w-full md:w-auto min-w-[240px] text-center">
+                        Buat Rencana Sekarang!
+                    </a>
                     
-                    <div class="absolute bottom-8 right-8 bg-white p-4 rounded-2xl shadow-lg z-10">
-                        <svg class="w-8 h-8 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
+                    <div class="space-y-2 w-full md:w-auto">
+                        <p class="text-gray-400 font-semibold text-sm pl-2 hidden lg:block">
+                            Sudah Memiliki Rencana?
+                        </p>
+                        <p class="text-gray-400 font-semibold text-sm lg:hidden">
+                            Sudah Memiliki Rencana?
+                        </p>
+
+                        <a href="#" class="block px-10 py-4 bg-[#2CB38B] text-white font-bold text-lg rounded-full shadow-lg shadow-green-200 hover:bg-[#249372] transition transform hover:-translate-y-1 w-full md:w-auto min-w-[240px] text-center">
+                            Lihat Rencana Sekarang!
+                        </a>
                     </div>
                 </div>
             </div>
+
+            <div class="w-full lg:w-7/12 relative flex justify-center lg:justify-end">
+                <img src="{{ asset('images/dashboard-hero.png') }}" 
+                     alt="Travel Couple" 
+                     class="w-full max-w-4xl lg:max-w-[140%] object-contain drop-shadow-2xl relative z-10 transform lg:translate-x-10 lg:scale-110 origin-bottom">
+            </div>
+
         </div>
-    </section>
+    </div>
+
+    <div class="absolute bottom-0 left-0 w-full h-22 md:h-28 bg-gradient-to-b from-transparent to-white z-10 pointer-events-none"></div>
+    
+</section>
 
     <section id="about" class="py-20 bg-white">
         <div class="container mx-auto px-6">
             <div class="grid md:grid-cols-2 gap-16 items-center">
+                
                 <div class="flex justify-center">
-                    <div class="bg-white rounded-[40px] shadow-xl p-12 text-center border border-gray-50 transform hover:scale-105 transition duration-300 w-full max-w-md">
-                        <div class="mb-8">
-                            <div class="w-32 h-32 bg-white border-4 border-green-50 rounded-full mx-auto flex items-center justify-center shadow-inner p-4">
-                                <img src="{{ asset('images/budgettrip-logo.png') }}" alt="BudgetTrip Logo" class="w-full h-full object-contain">
-                            </div>
+                    <div class="bg-white rounded-[50px] shadow-2xl p-8 border border-gray-50 transform hover:scale-105 transition duration-300 flex items-center justify-center aspect-square w-full max-w-md relative overflow-hidden">
+                        
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full blur-3xl opacity-50"></div>
+                        <div class="absolute bottom-0 left-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
+
+                        <div class="relative z-10 w-80 h-80 bg-white border-[8px] border-green-50/50 rounded-full flex items-center justify-center shadow-[inset_0_2px_10px_rgba(0,0,0,0.05)] p-6">
+                            <img src="{{ asset('images/budgettrip-logo.png') }}" 
+                                 alt="BudgetTrip Logo" 
+                                 class="w-full h-full object-contain drop-shadow-sm">
                         </div>
-                        <h3 class="text-4xl font-extrabold text-gray-900 mb-2">BUDGET<br><span class="text-[#2CB38B]">TRIP</span></h3>
-                        <div class="h-1 w-20 bg-[#2CB38B] mx-auto rounded-full my-4"></div>
-                        <p class="text-gray-500 font-medium">Start your journey with us</p>
                     </div>
                 </div>
 
@@ -150,91 +153,176 @@
         </div>
     </section>
 
-    <section id="tutorial" class="py-20 bg-gradient-to-br from-green-50 via-emerald-50 to-white relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
+<section id="tutorial" class="py-20 bg-white relative overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-white via-white/80 to-transparent z-10 pointer-events-none"></div>
+        
+        <div class="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-white via-white/80 to-transparent z-10 pointer-events-none"></div>
 
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold text-blue-900 mb-2">Make Your Own Trip</h2>
-                <p class="text-3xl font-bold text-[#2CB38B]">In 5 Easy Ways!</p>
+        <div class="absolute bottom-[-30%] left-[-5%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 pointer-events-none"></div>
+
+        <div class="absolute top-[-10%] bottom-[-30%] right-[-5%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-[100px] opacity-40 pointer-events-none animate-pulse"></div>
+
+        <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-[100px] opacity-40 pointer-events-none animate-pulse -z-10"></div>
+        
+        <div class="absolute top-0 left-[-10%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10 animate-blob"></div>
+        
+        <div class="absolute bottom-0 right-[-10%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10 animate-blob animation-delay-2000"></div>
+
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 -z-10"></div>
+
+
+        <section id="tutorial" class="py-20 bg-white relative overflow-hidden">
+
+        <div class="absolute bottom-0 left-0 w-full h-22 md:h-28 bg-gradient-to-b from-transparent to-white z-10 pointer-events-none"></div>
+
+        <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-[100px] opacity-40 pointer-events-none animate-pulse"></div>
+        <div class="absolute top-0 left-[-10%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10 animate-blob"></div>
+        <div class="absolute bottom-0 right-[-10%] w-[600px] h-[600px] bg-[#2CB38B] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10 animate-blob animation-delay-2000"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 -z-10"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            
+            <div class="text-center mb-16 fade-in-up delay-100">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[#181E4B] mb-3 tracking-tight">
+                    Make Your Own Trip
+                </h2>
+                <p class="text-3xl font-bold text-[#2CB38B]">
+                    In 5 Easy Ways!
+                </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
                 
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition duration-300 border-l-4 border-yellow-400 flex flex-col items-center text-center h-full">
-                    <div class="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mb-4 text-3xl">
-                        💰
+                <div class="bg-white rounded-[40px] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100 hover:shadow-[0_20px_50px_-10px_rgba(44,179,139,0.2)] hover:border-[#2CB38B]/30 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group fade-in-up delay-100 h-full relative overflow-hidden">
+                    <div class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-md border-2 border-[#2CB38B] group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-blue-900 mb-2">1. Menentukan Budget</h3>
-                    <p class="text-gray-500 text-sm">Input jumlah uang yang ingin Anda habiskan.</p>
+                    <h3 class="text-lg font-bold text-[#181E4B] mb-3">Menentukan Budget</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Input jumlah uang yang ingin Anda habiskan.
+                    </p>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition duration-300 border-l-4 border-[#2CB38B] flex flex-col items-center text-center h-full">
-                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-4 text-3xl text-[#2CB38B]">
-                        🚌
+                <div class="bg-white rounded-[40px] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100 hover:shadow-[0_20px_50px_-10px_rgba(44,179,139,0.2)] hover:border-[#2CB38B]/30 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group fade-in-up delay-200 h-full relative overflow-hidden">
+                    <div class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-md border-2 border-[#2CB38B] group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18 20H6c-1.1 0-2-.9-2-2V6c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v12c0 1.1-.9 2-2 2zm-2-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0-9h8V4H8v4z"/>
+                        </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-blue-900 mb-2">2. Memilih Transportasi</h3>
-                    <p class="text-gray-500 text-sm">Pilih travel, bus, atau kereta terbaik.</p>
+                    <h3 class="text-lg font-bold text-[#181E4B] mb-3">Pilih Transportasi</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Pilih travel, bus, atau kereta terbaik.
+                    </p>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition duration-300 border-l-4 border-blue-500 flex flex-col items-center text-center h-full">
-                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-4 text-3xl text-blue-600">
-                        🏨
+                <div class="bg-white rounded-[40px] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100 hover:shadow-[0_20px_50px_-10px_rgba(44,179,139,0.2)] hover:border-[#2CB38B]/30 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group fade-in-up delay-300 h-full relative overflow-hidden">
+                    <div class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-md border-2 border-[#2CB38B] group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-blue-900 mb-2">3. Memilih Akomodasi</h3>
-                    <p class="text-gray-500 text-sm">Cari penginapan nyaman sesuai budget.</p>
+                    <h3 class="text-lg font-bold text-[#181E4B] mb-3">Pilih Akomodasi</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Cari penginapan nyaman sesuai budget.
+                    </p>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition duration-300 border-l-4 border-purple-500 flex flex-col items-center text-center h-full md:ml-auto lg:ml-0">
-                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-4 text-3xl text-purple-600">
-                        🏖️
+                <div class="bg-white rounded-[40px] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100 hover:shadow-[0_20px_50px_-10px_rgba(44,179,139,0.2)] hover:border-[#2CB38B]/30 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group fade-in-up delay-100 h-full relative overflow-hidden">
+                    <div class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-md border-2 border-[#2CB38B] group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-blue-900 mb-2">4. Memilih Wisata</h3>
-                    <p class="text-gray-500 text-sm">Tambahkan destinasi seru ke itinerary.</p>
+                    <h3 class="text-lg font-bold text-[#181E4B] mb-3">Pilih Wisata</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Tambahkan destinasi seru ke itinerary.
+                    </p>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition duration-300 border-l-4 border-red-500 flex flex-col items-center text-center h-full md:mr-auto lg:mr-0 lg:col-start-2">
-                    <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-4 text-3xl text-red-600">
-                        💾
+                <div class="bg-white rounded-[40px] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100 hover:shadow-[0_20px_50px_-10px_rgba(44,179,139,0.2)] hover:border-[#2CB38B]/30 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group fade-in-up delay-200 h-full relative overflow-hidden">
+                    <div class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-md border-2 border-[#2CB38B] group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-blue-900 mb-2">5. Simpan Rencana</h3>
-                    <p class="text-gray-500 text-sm">Simpan dan mulai perjalananmu!</p>
+                    <h3 class="text-lg font-bold text-[#181E4B] mb-3">Simpan Rencana</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Simpan dan mulai perjalananmu!
+                    </p>
                 </div>
 
             </div>
         </div>
     </section>
 
-    <section id="testimonials" class="py-20 bg-white">
+   <section id="testimonials" class="py-20 bg-white relative">
         <div class="container mx-auto px-6">
-            <div class="text-center mb-12">
+            
+            <div class="text-center mb-16">
                 <p class="text-gray-500 font-bold uppercase tracking-widest mb-2">Testimonials</p>
-                <h2 class="text-4xl font-bold text-blue-900">What People Says About Us.</h2>
+                <h2 class="text-4xl font-bold text-[#181E4B]">What People Says About Us.</h2>
             </div>
 
-            <div class="max-w-3xl mx-auto relative">
-                <div class="absolute -top-8 -left-4 text-8xl text-gray-100 font-serif z-0">“</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 
-                <div class="bg-gray-50 rounded-[40px] shadow-xl p-10 border border-gray-100 relative z-10">
-                    <p class="text-gray-700 text-lg leading-loose italic mb-8">
-                        "Budget Trip benar-benar ngebantu aku yang sering bingung soal biaya liburan. Fiturnya simple, estimasi biayanya akurat, dan rekomendasinya pas banget sama budget-ku. Sekarang merencanakan trip jauh lebih mudah dan hemat!"
+                <div class="bg-gray-50 rounded-[40px] p-10 border border-gray-100 shadow-lg relative hover:-translate-y-2 transition-transform duration-300">
+                    <div class="absolute top-6 left-8 text-6xl text-[#2CB38B] opacity-20 font-serif">“</div>
+                    
+                    <p class="text-gray-600 leading-relaxed italic mb-8 relative z-10 pt-4">
+                        "Budget Trip benar-benar ngebantu aku yang sering bingung soal biaya liburan. Fiturnya simple, estimasinya akurat, dan rekomendasinya pas banget sama budget-ku!"
                     </p>
+                    
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-gray-300 rounded-full overflow-hidden">
-                            <img src="https://i.pravatar.cc/150?img=68" class="w-full h-full object-cover">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                            <img src="https://i.pravatar.cc/150?img=32" class="w-full h-full object-cover">
                         </div>
                         <div>
-                            <p class="text-gray-900 font-bold text-lg">User 1</p>
+                            <p class="text-[#181E4B] font-bold text-lg">Sarah J.</p>
                             <p class="text-[#2CB38B] text-sm font-medium">Travel Enthusiast</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-center mt-8 space-x-2">
-                    <button class="w-3 h-3 rounded-full bg-[#2CB38B]"></button>
-                    <button class="w-3 h-3 rounded-full bg-gray-300 hover:bg-green-200 transition"></button>
-                    <button class="w-3 h-3 rounded-full bg-gray-300 hover:bg-green-200 transition"></button>
+                <div class="bg-white rounded-[40px] p-10 border border-gray-100 shadow-xl relative transform md:-translate-y-4 hover:-translate-y-6 transition-transform duration-300 z-10">
+                    <div class="absolute top-6 left-8 text-6xl text-[#2CB38B] opacity-20 font-serif">“</div>
+                    
+                    <p class="text-gray-600 leading-relaxed italic mb-8 relative z-10 pt-4">
+                        "Aplikasi terbaik untuk backpacker! Saya bisa keliling Jogja dan Bali dengan budget minim tapi tetap dapat penginapan yang nyaman. Sangat direkomendasikan!"
+                    </p>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                            <img src="https://i.pravatar.cc/150?img=11" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <p class="text-[#181E4B] font-bold text-lg">Raka Aditya</p>
+                            <p class="text-[#2CB38B] text-sm font-medium">Backpacker</p>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="bg-gray-50 rounded-[40px] p-10 border border-gray-100 shadow-lg relative hover:-translate-y-2 transition-transform duration-300">
+                    <div class="absolute top-6 left-8 text-6xl text-[#2CB38B] opacity-20 font-serif">“</div>
+                    
+                    <p class="text-gray-600 leading-relaxed italic mb-8 relative z-10 pt-4">
+                        "Fitur penyusunan itinerary-nya juara. Saya tidak perlu repot riset satu-satu, Budget Trip sudah menyusunkan rute wisata yang efisien dan hemat waktu."
+                    </p>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                            <img src="https://i.pravatar.cc/150?img=5" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <p class="text-[#181E4B] font-bold text-lg">Amanda P.</p>
+                            <p class="text-[#2CB38B] text-sm font-medium">Lifestyle Blogger</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
