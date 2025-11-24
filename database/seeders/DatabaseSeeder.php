@@ -10,16 +10,66 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. SEED USERS
+        // 1. SEED USERS (DIPERBAIKI: Tambah 'role')
         DB::table('users')->insert([
-            ['id' => 1, 'name' => 'Fajril Ikhsan', 'email' => 'fajril@example.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567890', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 2, 'name' => 'Damar Wahyu', 'email' => 'damar@example.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567891', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 3, 'name' => 'M Dani Riadi', 'email' => 'dani@example.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567892', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 4, 'name' => 'Muhammad Haris', 'email' => 'haris@example.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567893', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 5, 'name' => 'Budi Santoso', 'email' => 'budi@example.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567894', 'created_at' => now(), 'updated_at' => now()],
+            [
+                'id' => 1, 
+                'name' => 'Fajril Ikhsan', 
+                'email' => 'fajril@example.com', 
+                'password' => Hash::make('password'), 
+                'phoneNumber' => '081234567890', 
+                'role' => 'user', // <-- Tambah ini
+                'created_at' => now(), 'updated_at' => now()
+            ],
+            [
+                'id' => 2, 
+                'name' => 'Damar Wahyu', 
+                'email' => 'damar@example.com', 
+                'password' => Hash::make('password'), 
+                'phoneNumber' => '081234567891', 
+                'role' => 'user', // <-- Tambah ini
+                'created_at' => now(), 'updated_at' => now()
+            ],
+            [
+                'id' => 3, 
+                'name' => 'M Dani Riadi', 
+                'email' => 'dani@example.com', 
+                'password' => Hash::make('password'), 
+                'phoneNumber' => '081234567892', 
+                'role' => 'user', // <-- Tambah ini
+                'created_at' => now(), 'updated_at' => now()
+            ],
+            [
+                'id' => 4, 
+                'name' => 'Muhammad Haris', 
+                'email' => 'haris@example.com', 
+                'password' => Hash::make('password'), 
+                'phoneNumber' => '081234567893', 
+                'role' => 'user', // <-- Tambah ini
+                'created_at' => now(), 'updated_at' => now()
+            ],
+            [
+                'id' => 5, 
+                'name' => 'Budi Santoso', 
+                'email' => 'budi@example.com', 
+                'password' => Hash::make('password'), 
+                'phoneNumber' => '081234567894', 
+                'role' => 'user', // <-- Tambah ini
+                'created_at' => now(), 'updated_at' => now()
+            ],
+            // ADMIN (Yang Anda tambahkan)
+            [
+                'id' => 99, 
+                'name' => 'Admin Ganteng', 
+                'email' => 'admin@budgettrip.com', 
+                'password' => Hash::make('password'), 
+                'phoneNumber' => '081234567899', 
+                'role' => 'admin', // <-- Ini penyebab error sebelumnya (karena cuma dia yang punya)
+                'created_at' => now(), 'updated_at' => now()
+            ],
         ]);
 
-        // 2. SEED CITIES
+        // 2. CITIES
         DB::table('cities')->insert([
             ['cityID' => 1, 'cityName' => 'Bandung', 'province' => 'Jawa Barat', 'locationType' => 'Kota'],
             ['cityID' => 2, 'cityName' => 'Palembang', 'province' => 'Sumatera Selatan', 'locationType' => 'Kota'],
@@ -32,24 +82,23 @@ class DatabaseSeeder extends Seeder
             ['cityID' => 9, 'cityName' => 'Surabaya', 'province' => 'Jawa Timur', 'locationType' => 'Kota'],
         ]);
 
-        // 3. SEED SERVICE PROVIDERS (DIPERBAIKI: Tambah ID 6)
+        // 3. SERVICE PROVIDERS
         DB::table('service_providers')->insert([
             ['providerID' => 1, 'providerName' => 'Cititrans', 'serviceType' => 'Transportasi'],
             ['providerID' => 2, 'providerName' => 'Bus ALS', 'serviceType' => 'Transportasi'],
             ['providerID' => 3, 'providerName' => 'ASDP Indonesia Ferry', 'serviceType' => 'Transportasi'],
             ['providerID' => 4, 'providerName' => 'Booking.com', 'serviceType' => 'Akomodasi'],
             ['providerID' => 5, 'providerName' => 'Damri', 'serviceType' => 'Transportasi'],
-            // TAMBAHAN PENTING DI SINI:
             ['providerID' => 6, 'providerName' => 'PT Kereta Api Indonesia', 'serviceType' => 'Transportasi'],
         ]);
 
-        // 4. SEED TRANSPORT ROUTES
+        // 4. TRANSPORT ROUTES
         DB::table('transport_routes')->insert([
             [
                 'routeID' => 1, 
-                'providerID' => 1, // Cititrans
-                'originCityID' => 1, // Bandung
-                'destinationCityID' => 5, // Jakarta
+                'providerID' => 1, 
+                'originCityID' => 1, 
+                'destinationCityID' => 5, 
                 'averagePrice' => 185000.00, 
                 'departureTime' => '08:00:00',
                 'arrivalTime' => '11:30:00',
@@ -60,12 +109,12 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'routeID' => 2, 
-                'providerID' => 2, // Bus ALS
-                'originCityID' => 1, // Bandung
-                'destinationCityID' => 2, // Palembang
+                'providerID' => 2, 
+                'originCityID' => 1, 
+                'destinationCityID' => 2, 
                 'averagePrice' => 700000.00, 
                 'departureTime' => '10:00:00',
-                'arrivalTime' => '06:00:00', // Besoknya
+                'arrivalTime' => '06:00:00', 
                 'class' => 'VIP',
                 'facilities' => json_encode(['AC', 'Bagasi', 'Makanan']),
                 'bookingLink' => 'https://als.co.id/bdg-plm',
@@ -73,9 +122,9 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'routeID' => 3, 
-                'providerID' => 3, // ASDP
-                'originCityID' => 3, // Merak
-                'destinationCityID' => 4, // Bakauheni
+                'providerID' => 3, 
+                'originCityID' => 3, 
+                'destinationCityID' => 4, 
                 'averagePrice' => 80000.00, 
                 'departureTime' => '14:00:00',
                 'arrivalTime' => '16:00:00',
@@ -86,9 +135,9 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'routeID' => 4, 
-                'providerID' => 6, // PT KAI (ID 6 Sudah Ada Sekarang)
-                'originCityID' => 1, // Bandung
-                'destinationCityID' => 5, // Jakarta
+                'providerID' => 6, 
+                'originCityID' => 1, 
+                'destinationCityID' => 5, 
                 'averagePrice' => 590000.00, 
                 'departureTime' => '21:00:00',
                 'arrivalTime' => '22:45:00',
@@ -99,13 +148,12 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // 5. SEED ACCOMMODATIONS 
-        // 5. SEED ACCOMMODATIONS (DATA LENGKAP)
+        // 5. ACCOMMODATIONS
         DB::table('accommodations')->insert([
             [
                 'accommodationID' => 1, 
                 'providerID' => 4, 
-                'cityID' => 2, // Palembang
+                'cityID' => 2, 
                 'hotelName' => 'Hotel Batiqa Palembang', 
                 'averagePricePerNight' => 550000.00, 
                 'rating' => 4.0,
@@ -117,7 +165,7 @@ class DatabaseSeeder extends Seeder
             [
                 'accommodationID' => 2, 
                 'providerID' => 4, 
-                'cityID' => 1, // Bandung
+                'cityID' => 1, 
                 'hotelName' => 'Ibis Hotel Bandung', 
                 'averagePricePerNight' => 600000.00, 
                 'rating' => 3.5,
@@ -129,7 +177,7 @@ class DatabaseSeeder extends Seeder
             [
                 'accommodationID' => 3, 
                 'providerID' => 4, 
-                'cityID' => 2, // Palembang
+                'cityID' => 2, 
                 'hotelName' => 'The Arista Hotel Palembang', 
                 'averagePricePerNight' => 1200000.00, 
                 'rating' => 5.0,
@@ -141,7 +189,7 @@ class DatabaseSeeder extends Seeder
             [
                 'accommodationID' => 4, 
                 'providerID' => 4, 
-                'cityID' => 1, // Bandung
+                'cityID' => 1, 
                 'hotelName' => 'GH Universal Bandung', 
                 'averagePricePerNight' => 1100000.00, 
                 'rating' => 5.0,
@@ -153,7 +201,7 @@ class DatabaseSeeder extends Seeder
             [
                 'accommodationID' => 5, 
                 'providerID' => 4, 
-                'cityID' => 5, // Jakarta
+                'cityID' => 5, 
                 'hotelName' => 'Hotel Indonesia Kempinski', 
                 'averagePricePerNight' => 2500000.00, 
                 'rating' => 5.0,
@@ -162,11 +210,10 @@ class DatabaseSeeder extends Seeder
                 'bookingLink' => 'https://booking.com/kempinski-jkt', 
                 'created_at' => now(), 'updated_at' => now()
             ],
-            // Tambahan untuk Bali (agar filter Villa & Kolam Renang bisa dites)
             [
                 'accommodationID' => 6, 
                 'providerID' => 4, 
-                'cityID' => 7, // Bali
+                'cityID' => 7, 
                 'hotelName' => 'Bali Villa Ubud', 
                 'averagePricePerNight' => 3500000.00, 
                 'rating' => 5.0,
@@ -177,9 +224,8 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // 6. SEED ATTRACTIONS
+        // 6. ATTRACTIONS
         DB::table('attractions')->insert([
-            // BANDUNG
             [
                 'attractionID' => 1, 'cityID' => 1, 
                 'attractionName' => 'Kawah Putih', 'category' => 'Alam', 
@@ -201,8 +247,6 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Taman hiburan indoor terbesar dengan berbagai wahana seru dan pertunjukan kelas dunia.',
                 'created_at' => now(), 'updated_at' => now()
             ],
-            
-            // PALEMBANG
             [
                 'attractionID' => 4, 'cityID' => 2, 
                 'attractionName' => 'Jembatan Ampera', 'category' => 'Landmark', 
@@ -210,8 +254,6 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Ikon kota Palembang yang megah, sangat indah dinikmati saat malam hari dengan lampu-lampu.',
                 'created_at' => now(), 'updated_at' => now()
             ],
-            
-            // BALI
             [
                 'attractionID' => 5, 'cityID' => 7, 
                 'attractionName' => 'Tanah Lot', 'category' => 'Alam', 
@@ -235,14 +277,14 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // 7. SEED PROMOTIONS
+        // 7. PROMOTIONS
         DB::table('promotions')->insert([
             ['promotionID' => 1, 'description' => 'Diskon 10% Bus Antar Pulau', 'discountValue' => 0.10, 'validUntil' => '2025-12-31'],
             ['promotionID' => 2, 'description' => 'Promo Hotel Palembang', 'discountValue' => 0.15, 'validUntil' => '2025-11-30'],
             ['promotionID' => 3, 'description' => 'Cashback 5% Travel', 'discountValue' => 0.05, 'validUntil' => '2025-12-01'],
         ]);
 
-        // 8. SEED TRAVEL PLANS
+        // 8. TRAVEL PLANS
         DB::table('travel_plans')->insert([
             [
                 'planID' => 1,
@@ -280,7 +322,7 @@ class DatabaseSeeder extends Seeder
 
         // 10. PLAN ITEMS
         DB::table('plan_items')->insert([
-            ['planItemID' => 1, 'itineraryID' => 1, 'description' => 'Bus ALS (Bandung ke Palembang)', 'itemType' => 'Transportasi', 'estimatedCost' => 700000.00, 'bookingLink' => 'https://als.co.id/bdg-plm', 'providerName' => 'Bus ALS', 'created_at' => now(), 'updated_at' => now()],
+            ['planItemID' => 1, 'itineraryID' => 1, 'description' => 'Bus ALS', 'itemType' => 'Transportasi', 'estimatedCost' => 700000.00, 'bookingLink' => 'https://als.co.id/bdg-plm', 'providerName' => 'Bus ALS', 'created_at' => now(), 'updated_at' => now()],
             ['planItemID' => 2, 'itineraryID' => 1, 'description' => 'Hotel Batiqa Palembang', 'itemType' => 'Akomodasi', 'estimatedCost' => 1650000.00, 'bookingLink' => 'https://booking.com/batiqa-plm', 'providerName' => 'Booking.com', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
