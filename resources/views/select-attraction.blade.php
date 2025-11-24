@@ -108,124 +108,121 @@
         </div>
 
         <div class="container mx-auto px-6 py-4">
-            <div class="flex flex-col lg:flex-row gap-8">
-                
-                <div class="w-full lg:w-80 flex-shrink-0">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-                            Filter Wisata
-                        </h2>
+            <form action="{{ route('travel-plan.attraction', $plan->planID) }}" method="GET">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    
+                    <div class="w-full lg:w-80 flex-shrink-0">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                                    Filter Wisata
+                                </h2>
+                                <button type="submit" class="text-xs font-bold text-[#2CB38B] hover:underline">Terapkan</button>
+                            </div>
 
-                        <div class="mb-6 pb-6 border-b border-gray-100">
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Kategori Wisata</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">Alam</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">Sejarah & Budaya</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">Kuliner</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">Belanja</span></label>
+                            <div class="mb-6 pb-6 border-b border-gray-100">
+                                <h3 class="font-semibold text-gray-700 mb-3">Kategori Wisata</h3>
+                                <div class="space-y-2">
+                                    @foreach(['Alam', 'Sejarah & Budaya', 'Kuliner', 'Belanja', 'Hiburan', 'Landmark'] as $cat)
+                                    <label class="flex items-center space-x-3 cursor-pointer group">
+                                        <input type="checkbox" name="categories[]" value="{{ $cat }}" 
+                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
+                                            {{ in_array($cat, request('categories', [])) ? 'checked' : '' }}
+                                            onchange="this.form.submit()">
+                                        <span class="text-gray-600 group-hover:text-[#2CB38B]">{{ $cat }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold text-gray-700 mb-3">Harga Tiket</h3>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 cursor-pointer group">
+                                        <input type="checkbox" name="prices[]" value="free" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array('free', request('prices', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600 group-hover:text-[#2CB38B]">Gratis</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer group">
+                                        <input type="checkbox" name="prices[]" value="under_50" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array('under_50', request('prices', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600 group-hover:text-[#2CB38B]">&lt; Rp 50.000</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer group">
+                                        <input type="checkbox" name="prices[]" value="50_100" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array('50_100', request('prices', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600 group-hover:text-[#2CB38B]">Rp 50rb - 100rb</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer group">
+                                        <input type="checkbox" name="prices[]" value="over_100" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array('over_100', request('prices', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600 group-hover:text-[#2CB38B]">&gt; Rp 100rb</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div>
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Harga Tiket</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">Gratis</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">&lt; Rp 50.000</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">Rp 50rb - 100rb</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B]">&gt; Rp 100rb</span></label>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Wisata di {{ $plan->destinationCity->cityName }}</h2>
+
+                        @if($attractions->isEmpty())
+                            <div class="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
+                                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">🏖️</div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-2">Tidak ada wisata ditemukan</h3>
+                                <p class="text-gray-500">Coba ubah filter kategori atau harga.</p>
                             </div>
-                        </div>
+                        @else
+                            @foreach($attractions as $spot)
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group">
+                                <div class="flex flex-col md:flex-row gap-6">
+                                    <div class="w-full md:w-1/3 h-48 bg-gray-200 rounded-xl overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ $spot->attractionName }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                                        <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-[#2CB38B] shadow-sm flex items-center gap-1">
+                                            <span>★</span> {{ $spot->rating }}
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full md:w-2/3 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">{{ $spot->attractionName }}</h3>
+                                                    <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                        {{ $spot->city->cityName }}
+                                                    </p>
+                                                </div>
+                                                <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-bold">{{ $spot->category }}</span>
+                                            </div>
+                                            
+                                            <p class="text-gray-600 mt-3 text-sm line-clamp-2 leading-relaxed">
+                                                {{ $spot->description ?? 'Nikmati pengalaman wisata yang tak terlupakan di tempat ini bersama keluarga dan teman.' }}
+                                            </p>
+
+                                            <p class="text-xs text-gray-400 mt-2">{{ number_format($spot->reviewCount) }} ulasan dari pengunjung</p>
+                                        </div>
+
+                                        <div class="flex items-end justify-between mt-6">
+                                            <div>
+                                                <p class="text-xs text-gray-400">Tiket Masuk</p>
+                                                @if($spot->estimatedCost == 0)
+                                                    <p class="text-2xl font-bold text-[#2CB38B]">Gratis</p>
+                                                @else
+                                                    <p class="text-2xl font-bold text-[#2CB38B]">Rp {{ number_format($spot->estimatedCost, 0, ',', '.') }}</p>
+                                                    <p class="text-xs text-gray-500">/ orang</p>
+                                                @endif
+                                            </div>
+                                            <button type="button" class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200">
+                                                Pilih Tiket
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        @endif
+
                     </div>
                 </div>
-
-                <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Wisata</h2>
-
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group">
-                        <div class="flex flex-col md:flex-row gap-6">
-                            <div class="w-full md:w-1/3 h-48 bg-gray-200 rounded-xl overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1627566477332-52f3c490ee46?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Wisata" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
-                                <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-[#2CB38B] shadow-sm">
-                                    4.7/5 (1.2k Ulasan)
-                                </div>
-                            </div>
-
-                            <div class="w-full md:w-2/3 flex flex-col justify-between">
-                                <div>
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">Kawah Putih</h3>
-                                            <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                                Ciwidey, Bandung
-                                            </p>
-                                        </div>
-                                        <span class="bg-green-100 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-bold">Alam</span>
-                                    </div>
-                                    <p class="text-gray-600 mt-3 text-sm line-clamp-2">
-                                        Danau kawah vulkanik dengan air berwarna putih kehijauan yang memukau. Spot foto favorit wisatawan.
-                                    </p>
-                                </div>
-
-                                <div class="flex items-end justify-between mt-6">
-                                    <div>
-                                        <p class="text-3xl font-bold text-[#2CB38B]">Rp 28.000</p>
-                                        <p class="text-xs text-gray-500">/ orang</p>
-                                    </div>
-                                    <button class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200">
-                                        Pilih Tiket
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group">
-                        <div class="flex flex-col md:flex-row gap-6">
-                            <div class="w-full md:w-1/3 h-48 bg-gray-200 rounded-xl overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1518182170546-0766bb656050?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Wisata" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
-                                <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-[#2CB38B] shadow-sm">
-                                    4.6/5 (890 Ulasan)
-                                </div>
-                            </div>
-                            <div class="w-full md:w-2/3 flex flex-col justify-between">
-                                <div>
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">Museum Geologi</h3>
-                                            <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                                Kota Bandung
-                                            </p>
-                                        </div>
-                                        <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-full font-bold">Sejarah</span>
-                                    </div>
-                                    <p class="text-gray-600 mt-3 text-sm line-clamp-2">
-                                        Museum bersejarah yang menyimpan koleksi fosil, batuan, dan mineral. Edukatif dan menarik untuk keluarga.
-                                    </p>
-                                </div>
-                                <div class="flex items-end justify-between mt-6">
-                                    <div>
-                                        <p class="text-3xl font-bold text-[#2CB38B]">Rp 3.000</p>
-                                        <p class="text-xs text-gray-500">/ orang</p>
-                                    </div>
-                                    <button class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200">
-                                        Pilih Tiket
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 

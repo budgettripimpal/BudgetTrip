@@ -12,6 +12,13 @@ class Accommodation extends Model
     protected $primaryKey = 'accommodationID';
     protected $guarded = [];
 
+    // --- TAMBAHKAN INI ---
+    protected $casts = [
+        'facilities' => 'array',
+        'rating' => 'float',
+        'averagePricePerNight' => 'float',
+    ];
+
     public function serviceProvider()
     {
         return $this->belongsTo(ServiceProvider::class, 'providerID', 'providerID');

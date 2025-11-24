@@ -118,127 +118,147 @@
         </div>
 
         <div class="container mx-auto px-6 py-4">
-            <div class="flex flex-col lg:flex-row gap-8">
-                <div class="w-full lg:w-80 flex-shrink-0">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                            Filter Transportasi
-                        </h2>
-                        
-                        <div class="mb-6 pb-6 border-b border-gray-100">
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Jenis Transportasi</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Bus/Travel</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Pesawat</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Kereta Api</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Kapal</span></label>
+            <form action="{{ route('travel-plan.transport', $plan->planID) }}" method="GET" id="filterForm">
+                
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="w-full lg:w-80 flex-shrink-0">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                                    Filter
+                                </h2>
+                                <button type="submit" class="text-xs font-bold text-[#2CB38B] hover:underline">Terapkan</button>
                             </div>
-                        </div>
-                        
-                        <div class="mb-6 pb-6 border-b border-gray-100">
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Fasilitas</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Bagasi</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">AC</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Makanan</span></label>
-                            </div>
-                        </div>
 
-                        <div>
-                            <button class="accordion-btn flex items-center justify-between w-full text-left font-semibold text-gray-700 mb-2 hover:text-[#2CB38B] transition">
-                                <span>Waktu Keberangkatan</span>
-                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <div class="accordion-content space-y-3 pl-1">
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Pagi (06-12)</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Siang (12-18)</span></label>
-                                <label class="flex items-center space-x-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"><span class="text-gray-600 group-hover:text-[#2CB38B] transition">Malam (18-06)</span></label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Transportasi</h2>
-                    
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-[#2CB38B]"></div>
-                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-2xl">🚂</div>
-                                <div>
-                                    <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">KA Parahyangan</h3>
-                                    <span class="inline-block bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full font-medium mt-1">Eksekutif</span>
+                            <div class="mb-6 pb-6 border-b border-gray-100">
+                                <h3 class="font-semibold text-gray-700 mb-3">Jenis Transportasi</h3>
+                                <div class="space-y-2">
+                                    @foreach(['Bus', 'Kereta', 'Pesawat', 'Kapal'] as $type)
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="types[]" value="{{ $type }}" 
+                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
+                                            {{ in_array($type, request('types', [])) ? 'checked' : '' }}
+                                            onchange="this.form.submit()">
+                                        <span class="text-gray-600">{{ $type }}</span>
+                                    </label>
+                                    @endforeach
                                 </div>
                             </div>
-                            <div class="text-left md:text-right mt-4 md:mt-0">
-                                <p class="text-2xl font-bold text-[#2CB38B]">Rp 590.000</p>
-                                <p class="text-xs text-gray-400">/ penumpang</p>
+
+                            <div class="mb-6 pb-6 border-b border-gray-100">
+                                <h3 class="font-semibold text-gray-700 mb-3">Fasilitas</h3>
+                                <div class="space-y-2">
+                                    @foreach(['Bagasi', 'AC', 'Makanan', 'Wifi'] as $facility)
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="facilities[]" value="{{ $facility }}" 
+                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
+                                            {{ in_array($facility, request('facilities', [])) ? 'checked' : '' }}
+                                            onchange="this.form.submit()">
+                                        <span class="text-gray-600">{{ $facility }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
                             </div>
+
+                            <div>
+                                <h3 class="font-semibold text-gray-700 mb-3">Waktu Berangkat</h3>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="times[]" value="pagi" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array('pagi', request('times', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600">Pagi (06-12)</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="times[]" value="siang" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array('siang', request('times', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600">Siang (12-18)</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" name="times[]" value="malam" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array('malam', request('times', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600">Malam (18-06)</span>
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
-                        <div class="flex flex-col md:flex-row items-center justify-between bg-gray-50 rounded-xl p-4">
-                            <div class="flex items-center justify-between w-full md:w-auto gap-8">
-                                <div class="text-center"><p class="text-xl font-bold text-gray-800">21.00</p><p class="text-xs text-gray-500">BDG</p></div>
-                                <div class="flex flex-col items-center">
-                                    <p class="text-xs text-gray-400 font-medium mb-1">1h 45m</p>
-                                    <div class="w-24 h-0.5 bg-gray-300 relative flex items-center justify-between">
-                                        <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7l7 7-7 7"/></svg>
-                                        <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                    </div>
+
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Transportasi</h2>
+                        
+                        @if($transportRoutes->isEmpty())
+                            <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
+                                <p class="text-gray-500 text-lg">Tidak ada transportasi yang ditemukan untuk rute ini.</p>
+                                <a href="{{ route('travel-plan.edit', $plan->planID) }}" class="text-[#2CB38B] font-bold hover:underline mt-2 inline-block">Ubah Kota Asal/Tujuan</a>
+                            </div>
+                        @else
+                            @foreach($transportRoutes as $route)
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-[#2CB38B]"></div>
+                                
+                                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-2xl">
+                                            @if(str_contains($route->serviceProvider->providerName, 'KA') || str_contains($route->serviceProvider->providerName, 'Kereta')) 🚂 
+                                            @elseif(str_contains($route->serviceProvider->providerName, 'Ferry') || str_contains($route->serviceProvider->providerName, 'Kapal')) 🚢
+                                            @elseif(str_contains($route->serviceProvider->providerName, 'Air') || str_contains($route->serviceProvider->providerName, 'Plane')) ✈️
+                                            @else 🚌 @endif
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">{{ $route->serviceProvider->providerName }}</h3>
+                                            <span class="inline-block bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full font-medium mt-1">{{ $route->class }}</span>
+                                            @if($route->facilities)
+                                                <div class="flex gap-1 mt-1">
+                                                    @foreach($route->facilities as $facility)
+                                                        <span class="text-[10px] bg-green-50 text-[#2CB38B] px-1.5 py-0.5 rounded">{{ $facility }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="text-left md:text-right mt-4 md:mt-0">
+                                        <p class="text-2xl font-bold text-[#2CB38B]">Rp {{ number_format($route->averagePrice, 0, ',', '.') }}</p>
+                                        <p class="text-xs text-gray-400">/ penumpang</p>
                                     </div>
                                 </div>
-                                <div class="text-center"><p class="text-xl font-bold text-gray-800">22.45</p><p class="text-xs text-gray-500">JKT</p></div>
-                            </div>
-                            <button class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2">
-                                <span>Pilih Tiket</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-[#2CB38B]"></div>
-                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">🚌</div>
-                                <div>
-                                    <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">Cititrans</h3>
-                                    <span class="inline-block bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full font-medium mt-1">Executive Shuttle</span>
-                                </div>
-                            </div>
-                            <div class="text-left md:text-right mt-4 md:mt-0">
-                                <p class="text-2xl font-bold text-[#2CB38B]">Rp 185.000</p>
-                                <p class="text-xs text-gray-400">/ penumpang</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-col md:flex-row items-center justify-between bg-gray-50 rounded-xl p-4">
-                            <div class="flex items-center justify-between w-full md:w-auto gap-8">
-                                <div class="text-center"><p class="text-xl font-bold text-gray-800">08.00</p><p class="text-xs text-gray-500">BDG</p></div>
-                                <div class="flex flex-col items-center">
-                                    <p class="text-xs text-gray-400 font-medium mb-1">3h 30m</p>
-                                    <div class="w-24 h-0.5 bg-gray-300 relative flex items-center justify-between">
-                                        <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7l7 7-7 7"/></svg>
-                                        <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+
+                                <div class="flex flex-col md:flex-row items-center justify-between bg-gray-50 rounded-xl p-4">
+                                    <div class="flex items-center justify-between w-full md:w-auto gap-8">
+                                        <div class="text-center">
+                                            <p class="text-xl font-bold text-gray-800">{{ \Carbon\Carbon::parse($route->departureTime)->format('H:i') }}</p>
+                                            <p class="text-xs text-gray-500">{{ $plan->originCity->cityName }}</p>
+                                        </div>
+                                        <div class="flex flex-col items-center">
+                                            @php
+                                                $start = \Carbon\Carbon::parse($route->departureTime);
+                                                $end = \Carbon\Carbon::parse($route->arrivalTime);
+                                                if($end->lt($start)) $end->addDay(); // Jika sampai besok
+                                                $diff = $start->diff($end);
+                                            @endphp
+                                            <p class="text-xs text-gray-400 font-medium mb-1">{{ $diff->h }}j {{ $diff->i }}m</p>
+                                            <div class="w-24 h-0.5 bg-gray-300 relative flex items-center justify-between">
+                                                <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7l7 7-7 7"/></svg>
+                                                <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="text-xl font-bold text-gray-800">{{ \Carbon\Carbon::parse($route->arrivalTime)->format('H:i') }}</p>
+                                            <p class="text-xs text-gray-500">{{ $plan->destinationCity->cityName }}</p>
+                                        </div>
                                     </div>
+
+                                    <button type="button" class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2">
+                                        <span>Pilih Tiket</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                    </button>
                                 </div>
-                                <div class="text-center"><p class="text-xl font-bold text-gray-800">11.30</p><p class="text-xs text-gray-500">JKT</p></div>
                             </div>
-                            <button class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2">
-                                <span>Pilih Tiket</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                            </button>
-                        </div>
+                            @endforeach
+                        @endif
+                        
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 

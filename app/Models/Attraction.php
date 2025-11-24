@@ -12,6 +12,11 @@ class Attraction extends Model
     protected $primaryKey = 'attractionID';
     protected $guarded = [];
 
+    protected $casts = [
+        'estimatedCost' => 'float',
+        'rating' => 'float',
+    ];
+
     public function city()
     {
         return $this->belongsTo(City::class, 'cityID', 'cityID');
