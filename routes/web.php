@@ -38,7 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/plan/{travelPlan}/transport', [TravelPlanController::class, 'selectTransport'])->name('travel-plan.transport');
     Route::get('/plan/{travelPlan}/accommodation', [TravelPlanController::class, 'selectAccommodation'])->name('travel-plan.accommodation');
     Route::get('/plan/{travelPlan}/attraction', [TravelPlanController::class, 'selectAttraction'])->name('travel-plan.attraction');
-
+    Route::get('/plan/{travelPlan}/manage', [TravelPlanController::class, 'managePlan'])->name('travel-plan.manage');
     Route::get('/my-plans', [TravelPlanController::class, 'index'])->name('travel-plan.index');
 });
 

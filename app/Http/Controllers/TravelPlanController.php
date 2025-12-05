@@ -256,4 +256,15 @@ class TravelPlanController extends Controller
 
         return view('my-plans', ['plans' => $plans]);
     }
+    
+    public function managePlan(TravelPlan $travelPlan)
+    {
+        if ($travelPlan->userID !== Auth::id()) {
+            abort(403);
+        }
+
+        $travelPlan->load('itineraries.planItems');
+
+        return view('manage-plan', ['plan' => $travelPlan]);
+    }
 }
