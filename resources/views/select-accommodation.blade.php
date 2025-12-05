@@ -99,7 +99,7 @@
                                     <path d="M18 20H6c-1.1 0-2-.9-2-2V6c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v12c0 1.1-.9 2-2 2zm-2-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0-9h8V4H8v4z" />
                                 </svg>
                             </div>
-                            <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">Pilih<br>Transportasi</p>
+                            <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">Lihat<br>Detail</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
@@ -111,7 +111,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <p class="text-xs font-bold text-[#2CB38B] text-center">Pilih<br>Akomodasi</p>
+                            <p class="text-xs font-bold text-[#2CB38B] text-center">Lihat<br>Detail</p>
                         </div>
                         <div class="w-full h-1 bg-gray-200 mx-2 rounded-full"></div>
                     </div>
@@ -123,7 +123,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                             </div>
-                            <p class="text-xs font-semibold text-gray-400 text-center group-hover:text-[#2CB38B] group-hover:underline">Pilih<br>Wisata</p>
+                            <p class="text-xs font-semibold text-gray-400 text-center group-hover:text-[#2CB38B] group-hover:underline">Lihat<br>Detail</p>
                         </div>
                         <div class="w-full h-1 bg-gray-200 mx-2 rounded-full"></div>
                     </a>
