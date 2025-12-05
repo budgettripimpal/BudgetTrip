@@ -8,7 +8,6 @@ use App\Http\Controllers\AdminController;
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     
-    // Route untuk submit form tambah data
     Route::post('/city', [AdminController::class, 'storeCity'])->name('admin.store.city');
     Route::post('/provider', [AdminController::class, 'storeProvider'])->name('admin.store.provider');
     Route::post('/route', [AdminController::class, 'storeRoute'])->name('admin.store.route');
@@ -25,7 +24,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/plan/{travelPlan}/transport', [TravelPlanController::class, 'selectTransport'])->name('travel-plan.transport');
     Route::get('/plan/{travelPlan}/accommodation', [TravelPlanController::class, 'selectAccommodation'])->name('travel-plan.accommodation');
     Route::get('/plan/{travelPlan}/attraction', [TravelPlanController::class, 'selectAttraction'])->name('travel-plan.attraction');
+
+    Route::get('/my-plans', [TravelPlanController::class, 'index'])->name('travel-plan.index');
 });
 
 require __DIR__ . '/auth.php';
