@@ -20,6 +20,8 @@ class User extends Authenticatable // (baris ini mungkin juga punya `implements 
         'name',
         'email',
         'password',
+        'phoneNumber',
+        'role',
     ];
 
     /**

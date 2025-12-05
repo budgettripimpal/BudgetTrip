@@ -247,4 +247,13 @@ class TravelPlanController extends Controller
             'attractions' => $attractions
         ]);
     }
+
+    public function index()
+    {
+        $plans = TravelPlan::where('userID', Auth::id())
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+        return view('my-plans', ['plans' => $plans]);
+    }
 }
