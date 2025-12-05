@@ -76,7 +76,7 @@
                                     <path d="M18 20H6c-1.1 0-2-.9-2-2V6c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v12c0 1.1-.9 2-2 2zm-2-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0-9h8V4H8v4z"/>
                                 </svg>
                             </div>
-                            <p class="text-xs font-bold text-[#2CB38B] text-center">Pilih<br>Transportasi</p>
+                            <p class="text-xs font-bold text-[#2CB38B] text-center">Lihat<br>Detail</p>
                         </div>
                         <div class="w-full h-1 bg-gray-200 mx-2 rounded-full"></div>
                     </div>
