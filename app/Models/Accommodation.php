@@ -12,9 +12,9 @@ class Accommodation extends Model
     protected $primaryKey = 'accommodationID';
     protected $guarded = [];
 
-    // --- TAMBAHKAN INI ---
     protected $casts = [
         'facilities' => 'array',
+        'images' => 'array',
         'rating' => 'float',
         'averagePricePerNight' => 'float',
     ];

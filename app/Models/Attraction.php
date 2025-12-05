@@ -13,6 +13,7 @@ class Attraction extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'images' => 'array',
         'estimatedCost' => 'float',
         'rating' => 'float',
     ];
