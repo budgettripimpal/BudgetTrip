@@ -76,7 +76,7 @@
                                     <path d="M18 20H6c-1.1 0-2-.9-2-2V6c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v12c0 1.1-.9 2-2 2zm-2-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0-9h8V4H8v4z"/>
                                 </svg>
                             </div>
-                            <p class="text-xs font-bold text-[#2CB38B] text-center">Lihat<br>Detail</p>
+                            <p class="text-xs font-bold text-[#2CB38B] text-center">Pilih<br>Transportasi</p>
                         </div>
                         <div class="w-full h-1 bg-gray-200 mx-2 rounded-full"></div>
                     </div>
@@ -248,7 +248,7 @@
                                     </div>
 
                                     <button type="button" class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2">
-                                        <span>Pilih Tiket</span>
+                                        <span>Lihat Detail</span>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                                     </button>
                                 </div>
