@@ -13,6 +13,7 @@ class TransportRoute extends Model
     protected $guarded = [];
     protected $casts = [
         'facilities' => 'array', // Otomatis convert JSON ke Array PHP
+        'images' => 'array',
         'departureTime' => 'datetime:H:i', // Format jam
         'arrivalTime' => 'datetime:H:i',
     ];

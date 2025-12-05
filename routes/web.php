@@ -7,7 +7,7 @@ use App\Http\Controllers\AdminController;
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    
+
     Route::post('/city', [AdminController::class, 'storeCity'])->name('admin.store.city');
     Route::post('/provider', [AdminController::class, 'storeProvider'])->name('admin.store.provider');
     Route::post('/route', [AdminController::class, 'storeRoute'])->name('admin.store.route');
@@ -40,6 +40,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/plan/{travelPlan}/attraction', [TravelPlanController::class, 'selectAttraction'])->name('travel-plan.attraction');
     Route::get('/plan/{travelPlan}/manage', [TravelPlanController::class, 'managePlan'])->name('travel-plan.manage');
     Route::get('/my-plans', [TravelPlanController::class, 'index'])->name('travel-plan.index');
+
+    Route::get('/plan/{travelPlan}/transport/{id}', [TravelPlanController::class, 'showTransport'])->name('transport.show');
+    Route::get('/plan/{travelPlan}/accommodation/{id}', [TravelPlanController::class, 'showAccommodation'])->name('accommodation.show');
+    Route::get('/plan/{travelPlan}/attraction/{id}', [TravelPlanController::class, 'showAttraction'])->name('attraction.show');
+
+    Route::post('/plan/{travelPlan}/add-item', [TravelPlanController::class, 'addToPlan'])->name('plan.add-item');
+    Route::post('/plan/{travelPlan}/itinerary', [TravelPlanController::class, 'storeItinerary'])->name('travel-plan.store-itinerary');
+    Route::delete('/plan-item/{planItemID}', [TravelPlanController::class, 'deleteItem'])->name('plan-item.destroy');
+    Route::delete('/itinerary/{itinerary}', [TravelPlanController::class, 'destroyItinerary'])->name('itinerary.destroy');
 });
 
 require __DIR__ . '/auth.php';

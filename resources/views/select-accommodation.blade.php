@@ -2,45 +2,19 @@
     @push('styles')
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .text-primary {
-            color: #2CB38B;
-        }
-
-        .bg-primary {
-            background-color: #2CB38B;
-        }
-
-        .border-primary {
-            border-color: #2CB38B;
-        }
-
-        .ring-primary {
-            --tw-ring-color: #2CB38B;
-        }
-
-        .focus\:ring-primary:focus {
-            --tw-ring-color: #2CB38B;
-        }
-
-        /* Checkbox Custom */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .text-primary { color: #2CB38B; }
+        .bg-primary { background-color: #2CB38B; }
+        .border-primary { border-color: #2CB38B; }
+        .ring-primary { --tw-ring-color: #2CB38B; }
+        .focus\:ring-primary:focus { --tw-ring-color: #2CB38B; }
+        
         input[type="checkbox"]:checked {
             background-color: #2CB38B;
             border-color: #2CB38B;
         }
-
-        input[type="checkbox"]:focus {
-            --tw-ring-color: #2CB38B;
-        }
-
-        /* Smooth Transition */
-        .accordion-content {
-            transition: max-height 0.3s ease-out;
-            overflow: hidden;
-        }
+        input[type="checkbox"]:focus { --tw-ring-color: #2CB38B; }
+        .accordion-content { transition: max-height 0.3s ease-out; overflow: hidden; }
     </style>
     @endpush
 
@@ -49,7 +23,7 @@
             <div class="flex items-center justify-between h-full">
                 <div class="flex items-center space-x-2">
                     <svg class="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                     </svg>
                     <span class="text-2xl font-bold tracking-tight">
                         <span class="text-gray-900">BUDGET</span><span class="text-[#2CB38B]">TRIP</span>
@@ -57,43 +31,18 @@
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('dashboard') }}" class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-[#2CB38B] transition">About</a>
+                    <a href="#" class="text-gray-600 hover:text-[#2CB38B] transition">Tutorial</a>
                 </div>
                 <div class="flex items-center space-x-4 relative group">
                     <span class="text-gray-600 hidden md:inline font-medium">Welcome, {{ Auth::user()->name }}</span>
                     <div class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg">
                         {{ substr(Auth::user()->name, 0, 1) }}
                     </div>
-                    <div
-                        class="absolute top-10 right-0 w-56 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
-                        <div class="px-4 py-2 border-b border-gray-100 mb-1">
-                            <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
-                        </div>
-
-                        <a href="{{ route('profile.show') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
-                            View Profile
-                        </a>
-
-                        <a href="{{ route('travel-plan.index') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition font-semibold">
-                            Rencana Saya
-                        </a>
-
-                        <a href="{{ route('profile.edit') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
-                            Edit Profile
-                        </a>
-
-                        <div class="border-t border-gray-100 mt-1"></div>
-
+                    <div class="absolute top-10 right-0 w-48 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <a href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition rounded-b-xl">
-                                Log Out
-                            </a>
+                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition rounded-md mx-2">Log Out</a>
                         </form>
                     </div>
                 </div>
@@ -102,7 +51,7 @@
     </nav>
 
     <div class="min-h-screen bg-gray-50 pb-12 pt-20">
-
+        
         <div class="bg-white shadow-sm py-8 mb-8 sticky top-20 z-40">
             <div class="container mx-auto px-6">
                 <div class="flex items-center justify-between max-w-6xl mx-auto">
@@ -153,7 +102,6 @@
                         </div>
                         <p class="text-xs font-semibold text-gray-400 text-center group-hover:text-[#2CB38B] group-hover:underline">Atur<br>Rencana</p>
                     </a>
-
                 </div>
             </div>
         </div>
@@ -177,15 +125,8 @@
                                 <div class="space-y-2">
                                     @foreach([5, 4, 3] as $star)
                                     <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="ratings[]" value="{{ $star }}" 
-                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
-                                            {{ in_array($star, request('ratings', [])) ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
-                                        <span class="text-gray-600 flex items-center gap-1">
-                                            <span class="text-yellow-400">
-                                                {{ str_repeat('★', $star) }}{{ str_repeat('☆', 5-$star) }}
-                                            </span>
-                                        </span>
+                                        <input type="checkbox" name="ratings[]" value="{{ $star }}" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array($star, request('ratings', [])) ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="text-gray-600 flex items-center gap-1"><span class="text-yellow-400">{{ str_repeat('★', $star) }}{{ str_repeat('☆', 5-$star) }}</span></span>
                                     </label>
                                     @endforeach
                                 </div>
@@ -196,10 +137,7 @@
                                 <div class="space-y-2">
                                     @foreach(['WiFi Gratis', 'Sarapan', 'Kolam Renang', 'Gym', 'Spa', 'Parkir'] as $facility)
                                     <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="facilities[]" value="{{ $facility }}" 
-                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
-                                            {{ in_array($facility, request('facilities', [])) ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
+                                        <input type="checkbox" name="facilities[]" value="{{ $facility }}" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array($facility, request('facilities', [])) ? 'checked' : '' }} onchange="this.form.submit()">
                                         <span class="text-gray-600">{{ $facility }}</span>
                                     </label>
                                     @endforeach
@@ -211,10 +149,7 @@
                                 <div class="space-y-2">
                                     @foreach(['Hotel', 'Villa', 'Apartemen', 'Hostel'] as $type)
                                     <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="types[]" value="{{ $type }}" 
-                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
-                                            {{ in_array($type, request('types', [])) ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
+                                        <input type="checkbox" name="types[]" value="{{ $type }}" class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]" {{ in_array($type, request('types', [])) ? 'checked' : '' }} onchange="this.form.submit()">
                                         <span class="text-gray-600">{{ $type }}</span>
                                     </label>
                                     @endforeach
@@ -225,7 +160,6 @@
 
                     <div class="flex-1">
                         <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Akomodasi</h2>
-
                         @if($accommodations->isEmpty())
                             <div class="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
                                 <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">🏨</div>
@@ -233,13 +167,13 @@
                                 <p class="text-gray-500">Coba ubah filter atau cari di kota lain.</p>
                             </div>
                         @else
-                            @foreach($accommodations as $hotel)
+                            @foreach($accommodations as $acc)
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group">
                                 <div class="flex flex-col md:flex-row gap-6">
                                     <div class="w-full md:w-1/3 h-48 bg-gray-200 rounded-xl overflow-hidden relative">
-                                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ $hotel->hotelName }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ $acc->hotelName }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
                                         <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-[#2CB38B] shadow-sm flex items-center gap-1">
-                                            <span>★</span> {{ $hotel->rating }}
+                                            <span>★</span> {{ $acc->rating }}
                                         </div>
                                     </div>
 
@@ -247,25 +181,22 @@
                                         <div>
                                             <div class="flex justify-between items-start">
                                                 <div>
-                                                    <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">{{ $hotel->hotelName }}</h3>
+                                                    <h3 class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">{{ $acc->hotelName }}</h3>
                                                     <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
                                                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                                        {{ $hotel->city->cityName ?? 'Unknown City' }}
+                                                        {{ $acc->city->cityName }}
                                                     </p>
                                                 </div>
                                                 <div class="hidden sm:flex text-yellow-400 text-sm">
-                                                    {{ str_repeat('★', floor($hotel->rating)) }}
+                                                    {{ str_repeat('★', floor($acc->rating)) }}
                                                 </div>
                                             </div>
                                             
-                                            @if($hotel->facilities)
+                                            @if($acc->facilities)
                                                 <div class="mt-4 flex flex-wrap gap-2">
-                                                    @foreach(array_slice($hotel->facilities, 0, 4) as $facility)
-                                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">{{ $facility }}</span>
+                                                    @foreach(array_slice($acc->facilities, 0, 4) as $f)
+                                                        <span class="bg-green-50 text-[#2CB38B] text-xs px-3 py-1 rounded-full font-medium">{{ $f }}</span>
                                                     @endforeach
-                                                    @if(count($hotel->facilities) > 4)
-                                                        <span class="bg-gray-50 text-gray-500 text-xs px-2 py-1 rounded-full font-medium">+{{ count($hotel->facilities) - 4 }}</span>
-                                                    @endif
                                                 </div>
                                             @endif
                                         </div>
@@ -273,11 +204,11 @@
                                         <div class="flex items-end justify-between mt-6">
                                             <div>
                                                 <p class="text-xs text-gray-400">Mulai dari</p>
-                                                <p class="text-2xl font-bold text-[#2CB38B]">Rp {{ number_format($hotel->averagePricePerNight, 0, ',', '.') }}</p>
-                                                <p class="text-xs text-gray-500">/ malam (termasuk pajak)</p>
+                                                <p class="text-2xl font-bold text-[#2CB38B]">Rp {{ number_format($acc->averagePricePerNight, 0, ',', '.') }}</p>
+                                                <p class="text-xs text-gray-500">/ malam</p>
                                             </div>
-                                            <a href="#" class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 text-center">
-                                                Lihat Detail
+                                            <a href="{{ route('accommodation.show', ['travelPlan' => $plan->planID, 'id' => $acc->accommodationID]) }}" class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 text-center">
+                                                Pilih Kamar
                                             </a>
                                         </div>
                                     </div>
@@ -285,7 +216,6 @@
                             </div>
                             @endforeach
                         @endif
-
                     </div>
                 </div>
             </form>
@@ -298,7 +228,7 @@
             accordions.forEach(acc => {
                 const content = acc.nextElementSibling;
                 const icon = acc.querySelector('svg');
-                content.style.maxHeight = content.scrollHeight + "px";
+                content.style.maxHeight = content.scrollHeight + "px"; 
                 icon.style.transform = "rotate(180deg)";
                 acc.addEventListener('click', function() {
                     if (content.style.maxHeight) {
