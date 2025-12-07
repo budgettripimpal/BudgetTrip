@@ -17,4 +17,9 @@ class PlanItem extends Model
     {
         return $this->belongsTo(Itinerary::class, 'itineraryID', 'itineraryID');
     }
+    // Relasi ke Order (Satu item rencana bisa memiliki satu order pembayaran)
+    public function order()
+    {
+        return $this->hasOne(Order::class, 'plan_item_id', 'planItemID');
+    }
 }
