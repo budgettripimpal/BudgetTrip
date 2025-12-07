@@ -108,13 +108,6 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-8 py-8">
-            
-            @if (session('error'))
-                <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md shadow-sm flex items-start">
-                    <div class="text-red-700 text-sm font-bold">{{ session('error') }}</div>
-                </div>
-            @endif
-
             <div class="mb-8">
                 <h1 class="text-4xl font-bold flex items-center text-gray-900">
                     <svg class="w-10 h-10 mr-3 text-[#2CB38B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
@@ -132,9 +125,7 @@
                         <span class="w-4 h-4 rounded-full" :class="activeTab === {{ $itinerary->itineraryID }} ? 'bg-[#2CB38B]' : 'bg-gray-300'"></span>
                     </div>
                 @empty
-                    <div class="p-5 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500 col-span-3">
-                        Belum ada folder rencana. Silakan buat satu.
-                    </div>
+                    <div class="p-5 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500 col-span-3">Belum ada folder rencana. Silakan buat satu.</div>
                 @endforelse
 
                 <button onclick="openModal()" class="p-5 border-2 border-dashed border-gray-300 rounded-xl flex justify-center items-center hover:border-[#2CB38B] hover:bg-green-50 cursor-pointer transition group text-gray-400 hover:text-[#2CB38B] w-full">
@@ -149,8 +140,7 @@
                 
                 <div class="flex justify-end mb-4">
                      <form action="{{ route('itinerary.destroy', $itinerary->itineraryID) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus folder rencana {{ $itinerary->itineraryName }}? Semua item di dalamnya akan hilang permanen.');">
-                        @csrf
-                        @method('DELETE')
+                        @csrf @method('DELETE')
                         <button type="submit" class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             Hapus Folder Rencana Ini
@@ -193,13 +183,24 @@
                     @else
                         @foreach($transports as $item)
                         <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-[#2CB38B] transition mb-4 relative group bg-white">
-                            <form action="{{ route('plan-item.destroy', $item->planItemID) }}" method="POST" class="absolute top-4 right-4" onsubmit="return confirm('Hapus item ini?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                            </form>
+                            <form action="{{ route('plan-item.destroy', $item->planItemID) }}" method="POST" class="absolute top-4 right-4" onsubmit="return confirm('Hapus item ini?');">@csrf @method('DELETE')<button type="submit" class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></form>
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center flex-1"><div class="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mr-5 text-2xl">🚌</div><div><p class="font-semibold text-gray-900 text-lg">{{ $item->providerName }}</p><p class="text-base text-gray-500">{{ $item->description }}</p></div></div>
-                                <div class="text-right mr-10"><p class="font-bold text-gray-900 text-xl">Rp {{ number_format($item->estimatedCost, 0, ',', '.') }}</p><p class="text-sm text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block">{{ $item->quantity ?? 1 }}x Tiket</p></div>
+                                <div class="flex items-center flex-1">
+                                    <div class="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mr-5 text-2xl">🚌</div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 text-lg">{{ $item->providerName }}</p>
+                                        <p class="text-base text-gray-500">{{ $item->description }}</p>
+                                        @if($item->bookingLink) <a href="{{ $item->bookingLink }}" target="_blank" class="text-sm text-[#2CB38B] hover:underline flex items-center gap-1 mt-1">🔗 Link Pemesanan</a> @endif
+                                    </div>
+                                </div>
+                                <div class="text-right mr-10 flex flex-col items-end gap-2">
+                                    <p class="font-bold text-gray-900 text-xl">Rp {{ number_format($item->estimatedCost, 0, ',', '.') }}</p>
+                                    <div class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                                        <form action="{{ route('plan-item.decrease', $item->planItemID) }}" method="POST">@csrf @method('PATCH')<button type="submit" class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button></form>
+                                        <span class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
+                                        <form action="{{ route('plan-item.increase', $item->planItemID) }}" method="POST">@csrf @method('PATCH')<button type="submit" class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button></form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         @endforeach
@@ -216,8 +217,22 @@
                         <div class="border-2 border-gray-200 rounded-xl p-6 mb-5 hover:border-[#2CB38B] transition bg-white relative group">
                             <form action="{{ route('plan-item.destroy', $item->planItemID) }}" method="POST" class="absolute top-4 right-4" onsubmit="return confirm('Hapus item ini?');">@csrf @method('DELETE')<button type="submit" class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></form>
                             <div class="flex justify-between items-center gap-6">
-                                <div class="flex items-center flex-1 gap-5"><div class="w-14 h-14 bg-yellow-50 rounded-lg flex items-center justify-center text-2xl">🏨</div><div><h3 class="font-semibold text-gray-900 text-lg mb-1">{{ $item->providerName }}</h3><p class="text-base text-gray-500">{{ $item->description }}</p></div></div>
-                                <div class="text-right mr-10"><p class="font-bold text-gray-900 text-xl">Rp {{ number_format($item->estimatedCost, 0, ',', '.') }}</p><p class="text-sm text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block">{{ $item->quantity ?? 1 }} Malam</p></div>
+                                <div class="flex items-center flex-1 gap-5">
+                                    <div class="w-14 h-14 bg-yellow-50 rounded-lg flex items-center justify-center text-2xl">🏨</div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900 text-lg mb-1">{{ $item->providerName }}</h3>
+                                        <p class="text-base text-gray-500">{{ $item->description }}</p>
+                                        @if($item->bookingLink) <a href="{{ $item->bookingLink }}" target="_blank" class="text-sm text-[#2CB38B] hover:underline flex items-center gap-1 mt-1">🔗 Link Pemesanan</a> @endif
+                                    </div>
+                                </div>
+                                <div class="text-right mr-10 flex flex-col items-end gap-2">
+                                    <p class="font-bold text-gray-900 text-xl">Rp {{ number_format($item->estimatedCost, 0, ',', '.') }}</p>
+                                    <div class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                                        <form action="{{ route('plan-item.decrease', $item->planItemID) }}" method="POST">@csrf @method('PATCH')<button type="submit" class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button></form>
+                                        <span class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
+                                        <form action="{{ route('plan-item.increase', $item->planItemID) }}" method="POST">@csrf @method('PATCH')<button type="submit" class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button></form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         @endforeach
@@ -234,8 +249,22 @@
                         <div class="border-2 border-gray-200 rounded-xl p-6 mb-5 hover:border-[#2CB38B] transition bg-white relative group">
                             <form action="{{ route('plan-item.destroy', $item->planItemID) }}" method="POST" class="absolute top-4 right-4" onsubmit="return confirm('Hapus item ini?');">@csrf @method('DELETE')<button type="submit" class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></form>
                             <div class="flex justify-between items-center gap-6">
-                                <div class="flex items-center flex-1 gap-5"><div class="w-14 h-14 bg-purple-50 rounded-lg flex items-center justify-center text-2xl">🏖️</div><div><h3 class="font-semibold text-gray-900 text-lg">{{ $item->providerName }}</h3><p class="text-base text-gray-500">{{ $item->description }}</p></div></div>
-                                <div class="text-right mr-10"><p class="font-bold text-gray-900 text-xl">{{ $item->estimatedCost == 0 ? 'Gratis' : 'Rp '.number_format($item->estimatedCost, 0, ',', '.') }}</p><p class="text-sm text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block">{{ $item->quantity ?? 1 }} Orang</p></div>
+                                <div class="flex items-center flex-1 gap-5">
+                                    <div class="w-14 h-14 bg-purple-50 rounded-lg flex items-center justify-center text-2xl">🏖️</div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900 text-lg">{{ $item->providerName }}</h3>
+                                        <p class="text-base text-gray-500">{{ $item->description }}</p>
+                                        @if($item->bookingLink) <a href="{{ $item->bookingLink }}" target="_blank" class="text-sm text-[#2CB38B] hover:underline flex items-center gap-1 mt-1">🔗 Link Pemesanan</a> @endif
+                                    </div>
+                                </div>
+                                <div class="text-right mr-10 flex flex-col items-end gap-2">
+                                    <p class="font-bold text-gray-900 text-xl">{{ $item->estimatedCost == 0 ? 'Gratis' : 'Rp '.number_format($item->estimatedCost, 0, ',', '.') }}</p>
+                                    <div class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                                        <form action="{{ route('plan-item.decrease', $item->planItemID) }}" method="POST">@csrf @method('PATCH')<button type="submit" class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button></form>
+                                        <span class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
+                                        <form action="{{ route('plan-item.increase', $item->planItemID) }}" method="POST">@csrf @method('PATCH')<button type="submit" class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button></form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         @endforeach
@@ -267,11 +296,7 @@
     </div>
 
     <script>
-        function openModal() {
-            document.getElementById('newPlanModal').classList.remove('hidden');
-        }
-        function closeModal() {
-            document.getElementById('newPlanModal').classList.add('hidden');
-        }
+        function openModal() { document.getElementById('newPlanModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('newPlanModal').classList.add('hidden'); }
     </script>
 </x-app-layout>

@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/plan/{travelPlan}/itinerary', [TravelPlanController::class, 'storeItinerary'])->name('travel-plan.store-itinerary');
     Route::delete('/plan-item/{planItemID}', [TravelPlanController::class, 'deleteItem'])->name('plan-item.destroy');
     Route::delete('/itinerary/{itinerary}', [TravelPlanController::class, 'destroyItinerary'])->name('itinerary.destroy');
+    Route::patch('/plan-item/{planItem}/increase', [TravelPlanController::class, 'increaseItemQuantity'])->name('plan-item.increase');
+    Route::patch('/plan-item/{planItem}/decrease', [TravelPlanController::class, 'decreaseItemQuantity'])->name('plan-item.decrease');
 });
 
 require __DIR__ . '/auth.php';

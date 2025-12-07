@@ -20,6 +20,7 @@
                 <div>
                     <div class="bg-white rounded-3xl shadow-lg overflow-hidden mb-4 aspect-video"><img src="{{ $attraction->images[0] ?? 'https://placehold.co/600x400?text=Wisata' }}" class="w-full h-full object-cover"></div>
                 </div>
+
                 <div>
                     <div class="bg-white rounded-3xl shadow-lg p-8">
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ $attraction->attractionName }}</h1>
@@ -31,6 +32,19 @@
 
                         <div class="bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 mb-8 text-center">
                             <p class="text-3xl font-bold text-gray-900">{{ $attraction->estimatedCost == 0 ? 'Gratis' : 'Rp '.number_format($attraction->estimatedCost, 0, ',', '.') }} <span class="text-sm text-gray-500 font-normal">/ Orang</span></p>
+                        </div>
+                        
+                        <div class="space-y-4 mb-8 text-sm">
+                            <div class="flex justify-between py-3 border-t border-gray-100">
+                                <span class="text-gray-600 font-medium">Link Website/Tiket</span>
+                                @if($attraction->bookingLink)
+                                    <a href="{{ $attraction->bookingLink }}" target="_blank" class="text-[#2CB38B] hover:underline font-semibold truncate max-w-[200px] flex items-center gap-1">
+                                        🔗 {{ $attraction->bookingLink }}
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 italic">Tidak tersedia (Bayar di tempat atau gratis)</span>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="flex items-center justify-between gap-4">

@@ -20,6 +20,7 @@
                 <div>
                     <div class="bg-white rounded-3xl shadow-lg overflow-hidden mb-4 aspect-video"><img src="{{ $accommodation->images[0] ?? 'https://placehold.co/600x400?text=Hotel' }}" class="w-full h-full object-cover"></div>
                 </div>
+
                 <div>
                     <div class="bg-white rounded-3xl shadow-lg p-8">
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ $accommodation->hotelName }}</h1>
@@ -37,6 +38,17 @@
                                 <div class="text-right">
                                     @if($accommodation->facilities) @foreach($accommodation->facilities as $f) <span class="inline-block bg-green-50 text-[#2CB38B] text-xs px-2 py-1 rounded font-bold mb-1">{{ $f }}</span> @endforeach @else - @endif
                                 </div>
+                            </div>
+                            
+                            <div class="flex justify-between py-3">
+                                <span class="text-gray-600 font-medium">Link Pemesanan</span>
+                                @if($accommodation->bookingLink)
+                                    <a href="{{ $accommodation->bookingLink }}" target="_blank" class="text-[#2CB38B] hover:underline font-semibold truncate max-w-[200px] flex items-center gap-1">
+                                        🔗 {{ $accommodation->bookingLink }}
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 italic">Tidak tersedia</span>
+                                @endif
                             </div>
                         </div>
 
