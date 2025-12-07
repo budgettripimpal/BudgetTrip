@@ -11,38 +11,47 @@ use Midtrans\Snap;
 
 class PaymentController extends Controller
 {
+    protected function configureMidtrans()
+    {
+        // Set konfigurasi Midtrans secara eksplisit
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
+    }
+
     public function checkout(PlanItem $planItem)
     {
-        // 1. Validasi: Hanya item dengan brand "Budgettrip" yang bisa dibayar
+        // 1. Validasi Brand
         if (!str_contains(strtolower($planItem->providerName), 'budgettrip')) {
-            return back()->with('error', 'Item ini tidak mendukung pembayaran langsung.');
+            return back()->with('error', 'Hanya item Budgettrip yang bisa dibayar langsung.');
         }
 
-        // 2. Cek apakah sudah ada order untuk item ini
-        $order = Order::where('plan_item_id', $planItem->planItemID)
-            ->where('status', 'unpaid')
-            ->first();
-
-        // Jika belum ada, buat order baru
-        if (!$order) {
-            $order = Order::create([
-                'user_id' => Auth::id(),
-                'plan_item_id' => $planItem->planItemID,
-                'order_number' => 'TRIP-' . uniqid() . '-' . $planItem->planItemID,
-                'total_price' => $planItem->estimatedCost, // Harga * Quantity (sudah dihitung di TravelPlanController)
-                'status' => 'unpaid',
-            ]);
-        }
+        // 2. Hitung Harga (Wajib Integer)
+        $pricePerItem = (int) round($planItem->estimatedCost / $planItem->quantity);
+        $grossAmount = $pricePerItem * $planItem->quantity;
 
         // 3. Konfigurasi Midtrans
-        Config::$serverKey = config('services.midtrans.server_key', env('MIDTRANS_SERVER_KEY'));
-        Config::$isProduction = config('services.midtrans.is_production', env('MIDTRANS_IS_PRODUCTION', false));
-        Config::$isSanitized = config('services.midtrans.is_sanitized', env('MIDTRANS_IS_SANITIZED', true));
-        Config::$is3ds = config('services.midtrans.is_3ds', env('MIDTRANS_IS_3DS', true));
+        $this->configureMidtrans();
 
-        // 4. Buat Parameter Transaksi Midtrans
-        $unitName = $planItem->itemType == 'Akomodasi' ? 'Kamar/Malam' : 'Tiket';
-        
+        // Cek Server Key
+        if (empty(Config::$serverKey)) {
+            return back()->with('error', 'Server Key Midtrans kosong. Cek .env Anda.');
+        }
+
+        // 4. Buat/Cari Order
+        // Gunakan updateOrCreate agar tidak duplikat order untuk item yang sama
+        $order = Order::updateOrCreate(
+            ['plan_item_id' => $planItem->planItemID],
+            [
+                'user_id' => Auth::id(),
+                'order_number' => 'TRIP-' . uniqid() . '-' . $planItem->planItemID, // Order ID baru setiap klik
+                'total_price' => $grossAmount,
+                'status' => 'unpaid',
+            ]
+        );
+
+        // 5. Siapkan Parameter Snap
         $params = [
             'transaction_details' => [
                 'order_id' => $order->order_number,
@@ -56,40 +65,38 @@ class PaymentController extends Controller
             'item_details' => [
                 [
                     'id' => $planItem->planItemID,
-                    'price' => (int) ($planItem->estimatedCost / $planItem->quantity),
+                    'price' => $pricePerItem,
                     'quantity' => $planItem->quantity,
-                    'name' => substr($planItem->description, 0, 50), // Midtrans limit nama item 50 char
+                    'name' => substr($planItem->description, 0, 50),
                 ]
             ]
         ];
 
-        // 5. Dapatkan Snap Token
+        // 6. Request Snap Token
         try {
             $snapToken = Snap::getSnapToken($params);
             
-            // Simpan token ke database agar tidak generate ulang terus
-            $order->update(['snap_token' => $snapToken]);
+            // Simpan token ke DB
+            $order->snap_token = $snapToken;
+            $order->save();
 
-            // Kembali ke halaman manage plan dengan membawa token
+            // Redirect dengan token
             return back()->with('snapToken', $snapToken);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 
     public function success(Request $request)
     {
-        // Simulasi sukses: Update status order jadi 'paid'
-        $orderId = $request->query('order_id');
-        $order = Order::where('order_number', $orderId)->first();
+        $order = Order::where('order_number', $request->order_id)->first();
 
         if ($order) {
             $order->update(['status' => 'paid']);
             
-            // Redirect kembali ke halaman manage plan itinerary terkait
             return redirect()->route('travel-plan.manage', $order->planItem->itinerary->planID)
-                ->with('success', 'Pembayaran Berhasil! E-Tiket telah diterbitkan.');
+                ->with('success', 'Pembayaran Berhasil! Tiket/Voucher telah terbit.');
         }
 
         return redirect()->route('dashboard')->with('error', 'Transaksi tidak ditemukan.');

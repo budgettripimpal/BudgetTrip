@@ -3,8 +3,10 @@
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
             rel="stylesheet">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
         <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+            data-client-key="{{ config('midtrans.client_key') }}"></script>
+
         <style>
             body {
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -80,13 +82,15 @@
     </nav>
 
     <div class="min-h-screen bg-gray-50 pb-12 pt-20" x-data="{
-        activeTab: {{ $plan->itineraries->first()->itineraryID ?? 0 }}
+        activeTab: {{ $plan->itineraries->first()->itineraryID ?? 0 }},
+        showNewPlanModal: false
     }">
 
         {{-- SCRIPT AUTO POPUP MIDTRANS --}}
         @if (session('snapToken'))
-            <script>
+            <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", function(event) {
+                    console.log("Snap Token: {{ session('snapToken') }}"); // Debug Console
                     window.snap.pay('{{ session('snapToken') }}', {
                         onSuccess: function(result) {
                             window.location.href = "{{ route('payment.success') }}?order_id=" + result.order_id;
@@ -107,8 +111,10 @@
 
         <div class="bg-white shadow-sm py-8 mb-8 sticky top-20 z-40">
             <div class="container mx-auto px-6">
-                <div class="flex items-center justify-between max-w-6xl mx-auto">
-
+                <div class="flex items-center justify-between max-w-6xl mx-auto relative">
+                    <div
+                        class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-[#2CB38B] -z-10 rounded-full">
+                    </div>
                     <a href="{{ route('travel-plan.edit', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -118,14 +124,12 @@
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
+                                </svg></div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">Input Budget
                                 &<br>Rencana</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
-
                     <a href="{{ route('travel-plan.transport', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -134,14 +138,12 @@
                                 <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M18 20H6c-1.1 0-2-.9-2-2V6c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v12c0 1.1-.9 2-2 2zm-2-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0-9h8V4H8v4z" />
-                                </svg>
-                            </div>
+                                </svg></div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">
                                 Pilih<br>Transportasi</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
-
                     <a href="{{ route('travel-plan.accommodation', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -151,14 +153,12 @@
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                            </div>
+                                </svg></div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">
                                 Pilih<br>Akomodasi</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
-
                     <a href="{{ route('travel-plan.attraction', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -170,30 +170,45 @@
                                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </div>
+                                </svg></div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">
                                 Pilih<br>Wisata</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
-
                     <div class="flex flex-col items-center relative z-10">
                         <div
                             class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-lg ring-4 ring-green-100 transform scale-110">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
+                            </svg></div>
                         <p class="text-xs font-bold text-[#2CB38B] text-center">Atur<br>Rencana</p>
                     </div>
-
                 </div>
             </div>
         </div>
 
         <div class="max-w-7xl mx-auto px-8 py-8">
+
+            @if (session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
+                    role="alert">
+                    <strong class="font-bold">Gagal!</strong>
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                    <span class="block text-xs mt-1">Saran: Periksa kredensial Midtrans di .env dan pastikan mode
+                        Sandbox aktif.</span>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6"
+                    role="alert">
+                    <strong class="font-bold">Sukses!</strong>
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+
             <div class="mb-8">
                 <h1 class="text-4xl font-bold flex items-center text-gray-900">
                     <svg class="w-10 h-10 mr-3 text-[#2CB38B]" fill="none" stroke="currentColor"
@@ -237,7 +252,7 @@
 
                     <div class="flex justify-end mb-4">
                         <form action="{{ route('itinerary.destroy', $itinerary->itineraryID) }}" method="POST"
-                            onsubmit="return confirm('Yakin ingin menghapus folder rencana {{ $itinerary->itineraryName }}? Semua item di dalamnya akan hilang permanen.');">
+                            onsubmit="return confirm('Yakin ingin menghapus folder rencana ini?');">
                             @csrf @method('DELETE')
                             <button type="submit"
                                 class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition">
@@ -282,271 +297,105 @@
                         </div>
                     </div>
 
-                    <div class="mb-10">
-                        <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2"><span
-                                class="bg-blue-100 text-blue-600 p-2 rounded-lg"><svg class="w-6 h-6"
-                                    fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M18 20H6c-1.1 0-2-.9-2-2V6c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v12c0 1.1-.9 2-2 2zm-2-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0-9h8V4H8v4z" />
-                                </svg></span> Transportasi Pilihan</h2>
-                        @php $transports = $itinerary->planItems->where('itemType', 'Transportasi'); @endphp
-                        @if ($transports->isEmpty())
-                            <div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl">
-                                <p class="text-gray-400 mb-2">Belum ada transportasi.</p><a
-                                    href="{{ route('travel-plan.transport', $plan->planID) }}"
-                                    class="text-[#2CB38B] font-bold hover:underline">+ Tambah Transportasi</a>
-                            </div>
-                        @else
-                            @foreach ($transports as $item)
-                                <div
-                                    class="border-2 border-gray-200 rounded-xl p-6 hover:border-[#2CB38B] transition mb-4 relative group bg-white">
-                                    <form action="{{ route('plan-item.destroy', $item->planItemID) }}" method="POST"
-                                        class="absolute top-4 right-4" onsubmit="return confirm('Hapus item ini?');">
-                                        @csrf @method('DELETE')
-                                        <button type="submit"
-                                            class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg
-                                                class="w-5 h-5" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg></button>
-                                    </form>
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center flex-1">
-                                            <div
-                                                class="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mr-5 text-2xl">
-                                                🚌</div>
-                                            <div>
-                                                <p class="font-semibold text-gray-900 text-lg">
-                                                    {{ $item->providerName }}</p>
-                                                <p class="text-base text-gray-500">{{ $item->description }}</p>
+                    @foreach (['Transportasi' => '🚌', 'Akomodasi' => '🏨', 'Aktivitas' => '🏖️'] as $type => $icon)
+                        <div class="mb-10">
+                            <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2"><span
+                                    class="bg-blue-100 text-blue-600 p-2 rounded-lg text-xl">{{ $icon }}</span>
+                                {{ $type == 'Aktivitas' ? 'Wisata' : $type }} Pilihan</h2>
+                            @php
+                                $checkTypes = $type == 'Aktivitas' ? ['Aktivitas', 'Wisata'] : [$type];
+                                $items = $itinerary->planItems->whereIn('itemType', $checkTypes);
+                            @endphp
 
-                                                {{-- LOGIKA PEMBAYARAN & LINK --}}
-                                                @php
-                                                    $isBudgettrip = \Illuminate\Support\Str::contains(
-                                                        strtolower($item->providerName),
-                                                        'budgettrip',
-                                                    );
-                                                    $isPaid = $item->order && $item->order->status == 'paid';
-                                                @endphp
-                                                @if ($isBudgettrip)
-                                                    @if ($isPaid)
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">✅
-                                                            Lunas - Tiket Terbit</span>
-                                                    @else
-                                                        <form
-                                                            action="{{ route('payment.checkout', $item->planItemID) }}"
-                                                            method="POST" class="mt-2">
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center shadow-sm">💳
-                                                                Bayar Sekarang</button>
-                                                        </form>
+                            @if ($items->isEmpty())
+                                <div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl">
+                                    <p class="text-gray-400 mb-2">Belum ada
+                                        {{ strtolower($type == 'Aktivitas' ? 'wisata' : $type) }}.</p>
+                                </div>
+                            @else
+                                @foreach ($items as $item)
+                                    <div
+                                        class="border-2 border-gray-200 rounded-xl p-6 hover:border-[#2CB38B] transition mb-4 relative group bg-white">
+                                        <form action="{{ route('plan-item.destroy', $item->planItemID) }}"
+                                            method="POST" class="absolute top-4 right-4"
+                                            onsubmit="return confirm('Hapus item ini?');">@csrf
+                                            @method('DELETE')<button type="submit"
+                                                class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg
+                                                    class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg></button></form>
+
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center flex-1">
+                                                <div
+                                                    class="w-14 h-14 bg-gray-50 rounded-lg flex items-center justify-center mr-5 text-2xl">
+                                                    {{ $icon }}</div>
+                                                <div>
+                                                    <p class="font-semibold text-gray-900 text-lg">
+                                                        {{ $item->providerName }}</p>
+                                                    <p class="text-base text-gray-500">{{ $item->description }}</p>
+
+                                                    @php
+                                                        $isBudgettrip = \Illuminate\Support\Str::contains(
+                                                            strtolower($item->providerName),
+                                                            'budgettrip',
+                                                        );
+                                                        $isPaid = $item->order && $item->order->status == 'paid';
+                                                    @endphp
+
+                                                    @if ($isBudgettrip)
+                                                        @if ($isPaid)
+                                                            <span
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">✅
+                                                                Lunas - Tiket Terbit</span>
+                                                        @else
+                                                            <form
+                                                                action="{{ route('payment.checkout', $item->planItemID) }}"
+                                                                method="POST" class="mt-2">
+                                                                @csrf
+                                                                <button type="submit"
+                                                                    class="text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center shadow-sm">💳
+                                                                    Bayar Sekarang</button>
+                                                            </form>
+                                                        @endif
+                                                    @elseif($item->bookingLink)
+                                                        <a href="{{ $item->bookingLink }}" target="_blank"
+                                                            class="text-sm text-[#2CB38B] hover:underline flex items-center gap-1 mt-1">🔗
+                                                            Link Pemesanan</a>
                                                     @endif
-                                                @elseif($item->bookingLink)
-                                                    <a href="{{ $item->bookingLink }}" target="_blank"
-                                                        class="text-sm text-[#2CB38B] hover:underline flex items-center gap-1 mt-1">🔗
-                                                        Link Pemesanan</a>
-                                                @endif
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="text-right mr-10 flex flex-col items-end gap-2">
-                                            <p class="font-bold text-gray-900 text-xl">Rp
-                                                {{ number_format($item->estimatedCost, 0, ',', '.') }}</p>
-                                            <div
-                                                class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                                                <form action="{{ route('plan-item.decrease', $item->planItemID) }}"
-                                                    method="POST">@csrf @method('PATCH')<button type="submit"
-                                                        class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                                        {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button></form>
-                                                <span
-                                                    class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
-                                                <form action="{{ route('plan-item.increase', $item->planItemID) }}"
-                                                    method="POST">@csrf @method('PATCH')<button type="submit"
-                                                        class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button>
-                                                </form>
+                                            <div class="text-right mr-10 flex flex-col items-end gap-2">
+                                                <p class="font-bold text-gray-900 text-xl">
+                                                    {{ $item->estimatedCost == 0 ? 'Gratis' : 'Rp ' . number_format($item->estimatedCost, 0, ',', '.') }}
+                                                </p>
+
+                                                <div
+                                                    class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                                                    <form
+                                                        action="{{ route('plan-item.decrease', $item->planItemID) }}"
+                                                        method="POST">@csrf @method('PATCH')<button type="submit"
+                                                            class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                            {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
+                                                    </form>
+                                                    <span
+                                                        class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
+                                                    <form
+                                                        action="{{ route('plan-item.increase', $item->planItemID) }}"
+                                                        method="POST">@csrf @method('PATCH')<button type="submit"
+                                                            class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
-
-                    <div class="mb-10">
-                        <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2"><span
-                                class="bg-yellow-100 text-yellow-600 p-2 rounded-lg"><svg class="w-6 h-6"
-                                    fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg></span> Akomodasi Pilihan</h2>
-                        @php $hotels = $itinerary->planItems->where('itemType', 'Akomodasi'); @endphp
-                        @if ($hotels->isEmpty())
-                            <div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl">
-                                <p class="text-gray-400 mb-2">Belum ada akomodasi.</p><a
-                                    href="{{ route('travel-plan.accommodation', $plan->planID) }}"
-                                    class="text-[#2CB38B] font-bold hover:underline">+ Tambah Akomodasi</a>
-                            </div>
-                        @else
-                            @foreach ($hotels as $item)
-                                <div
-                                    class="border-2 border-gray-200 rounded-xl p-6 mb-5 hover:border-[#2CB38B] transition bg-white relative group">
-                                    <form action="{{ route('plan-item.destroy', $item->planItemID) }}" method="POST"
-                                        class="absolute top-4 right-4" onsubmit="return confirm('Hapus item ini?');">
-                                        @csrf @method('DELETE')<button type="submit"
-                                            class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg
-                                                class="w-5 h-5" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg></button></form>
-                                    <div class="flex justify-between items-center gap-6">
-                                        <div class="flex items-center flex-1 gap-5">
-                                            <div
-                                                class="w-14 h-14 bg-yellow-50 rounded-lg flex items-center justify-center text-2xl">
-                                                🏨</div>
-                                            <div>
-                                                <h3 class="font-semibold text-gray-900 text-lg mb-1">
-                                                    {{ $item->providerName }}</h3>
-                                                <p class="text-base text-gray-500">{{ $item->description }}</p>
-                                                {{-- LOGIKA PEMBAYARAN & LINK --}}
-                                                @php
-                                                    $isBudgettrip = \Illuminate\Support\Str::contains(
-                                                        strtolower($item->providerName),
-                                                        'budgettrip',
-                                                    );
-                                                    $isPaid = $item->order && $item->order->status == 'paid';
-                                                @endphp
-                                                @if ($isBudgettrip)
-                                                    @if ($isPaid)
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">✅
-                                                            Lunas - Tiket Terbit</span>
-                                                    @else
-                                                        <form
-                                                            action="{{ route('payment.checkout', $item->planItemID) }}"
-                                                            method="POST" class="mt-2">@csrf<button type="submit"
-                                                                class="text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center shadow-sm">💳
-                                                                Bayar Sekarang</button></form>
-                                                    @endif
-                                                @elseif($item->bookingLink)
-                                                    <a href="{{ $item->bookingLink }}" target="_blank"
-                                                        class="text-sm text-[#2CB38B] hover:underline flex items-center gap-1 mt-1">🔗
-                                                        Link Pemesanan</a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="text-right mr-10 flex flex-col items-end gap-2">
-                                            <p class="font-bold text-gray-900 text-xl">Rp
-                                                {{ number_format($item->estimatedCost, 0, ',', '.') }}</p>
-                                            <div
-                                                class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                                                <form action="{{ route('plan-item.decrease', $item->planItemID) }}"
-                                                    method="POST">@csrf @method('PATCH')<button type="submit"
-                                                        class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                                        {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button></form>
-                                                <span
-                                                    class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
-                                                <form action="{{ route('plan-item.increase', $item->planItemID) }}"
-                                                    method="POST">@csrf @method('PATCH')<button type="submit"
-                                                        class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
-
-                    <div class="mb-10">
-                        <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2"><span
-                                class="bg-purple-100 text-purple-600 p-2 rounded-lg"><svg class="w-6 h-6"
-                                    fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg></span> Wisata Pilihan</h2>
-                        @php $attractions = $itinerary->planItems->whereIn('itemType', ['Aktivitas', 'Wisata']); @endphp
-                        @if ($attractions->isEmpty())
-                            <div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl">
-                                <p class="text-gray-400 mb-2">Belum ada wisata.</p><a
-                                    href="{{ route('travel-plan.attraction', $plan->planID) }}"
-                                    class="text-[#2CB38B] font-bold hover:underline">+ Tambah Wisata</a>
-                            </div>
-                        @else
-                            @foreach ($attractions as $item)
-                                <div
-                                    class="border-2 border-gray-200 rounded-xl p-6 mb-5 hover:border-[#2CB38B] transition bg-white relative group">
-                                    <form action="{{ route('plan-item.destroy', $item->planItemID) }}" method="POST"
-                                        class="absolute top-4 right-4" onsubmit="return confirm('Hapus item ini?');">
-                                        @csrf @method('DELETE')<button type="submit"
-                                            class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg
-                                                class="w-5 h-5" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg></button></form>
-                                    <div class="flex justify-between items-center gap-6">
-                                        <div class="flex items-center flex-1 gap-5">
-                                            <div
-                                                class="w-14 h-14 bg-purple-50 rounded-lg flex items-center justify-center text-2xl">
-                                                🏖️</div>
-                                            <div>
-                                                <h3 class="font-semibold text-gray-900 text-lg">
-                                                    {{ $item->providerName }}</h3>
-                                                <p class="text-base text-gray-500">{{ $item->description }}</p>
-                                                {{-- LOGIKA PEMBAYARAN & LINK --}}
-                                                @php
-                                                    $isBudgettrip = \Illuminate\Support\Str::contains(
-                                                        strtolower($item->providerName),
-                                                        'budgettrip',
-                                                    );
-                                                    $isPaid = $item->order && $item->order->status == 'paid';
-                                                @endphp
-                                                @if ($isBudgettrip)
-                                                    @if ($isPaid)
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">✅
-                                                            Lunas - Tiket Terbit</span>
-                                                    @else
-                                                        <form
-                                                            action="{{ route('payment.checkout', $item->planItemID) }}"
-                                                            method="POST" class="mt-2">@csrf<button type="submit"
-                                                                class="text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center shadow-sm">💳
-                                                                Bayar Sekarang</button></form>
-                                                    @endif
-                                                @elseif($item->bookingLink)
-                                                    <a href="{{ $item->bookingLink }}" target="_blank"
-                                                        class="text-sm text-[#2CB38B] hover:underline flex items-center gap-1 mt-1">🔗
-                                                        Link Pemesanan</a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="text-right mr-10 flex flex-col items-end gap-2">
-                                            <p class="font-bold text-gray-900 text-xl">
-                                                {{ $item->estimatedCost == 0 ? 'Gratis' : 'Rp ' . number_format($item->estimatedCost, 0, ',', '.') }}
-                                            </p>
-                                            <div
-                                                class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                                                <form action="{{ route('plan-item.decrease', $item->planItemID) }}"
-                                                    method="POST">@csrf @method('PATCH')<button type="submit"
-                                                        class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                                        {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button></form>
-                                                <span
-                                                    class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
-                                                <form action="{{ route('plan-item.increase', $item->planItemID) }}"
-                                                    method="POST">@csrf @method('PATCH')<button type="submit"
-                                                        class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    @endforeach
 
                 </div>
             @endforeach
@@ -567,18 +416,15 @@
             <h3 class="text-2xl font-bold text-gray-900 mb-4">Buat Opsi Rencana Baru</h3>
             <form action="{{ route('travel-plan.store-itinerary', $plan->planID) }}" method="POST">
                 @csrf
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Nama Rencana</label>
-                    <input type="text" name="itineraryName"
+                <div class="mb-6"><label class="block text-sm font-bold text-gray-700 mb-2">Nama
+                        Rencana</label><input type="text" name="itineraryName"
                         class="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 outline-none"
-                        placeholder="Misal: Opsi Hemat, Opsi Mewah" required>
-                </div>
+                        placeholder="Misal: Opsi Hemat, Opsi Mewah" required></div>
                 <button type="submit"
                     class="w-full bg-[#2CB38B] hover:bg-[#249d78] text-white font-bold py-3 rounded-xl shadow-lg transition">Simpan</button>
             </form>
         </div>
     </div>
-
     <script>
         function openModal() {
             document.getElementById('newPlanModal').classList.remove('hidden');
