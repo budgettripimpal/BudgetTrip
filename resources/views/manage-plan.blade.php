@@ -3,10 +3,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
             rel="stylesheet">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-        <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="{{ config('midtrans.client_key') }}"></script>
-
         <style>
             body {
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -47,6 +43,10 @@
         </style>
     @endpush
 
+    {{-- SCRIPT MIDTRANS (LETKKAN DISINI AGAR PASTI TERLOAD) --}}
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
+
     <nav class="bg-white shadow-sm fixed w-full top-0 z-50 h-20">
         <div class="container mx-auto px-6 h-full">
             <div class="flex items-center justify-between h-full">
@@ -86,35 +86,62 @@
         showNewPlanModal: false
     }">
 
-        {{-- SCRIPT AUTO POPUP MIDTRANS --}}
+        {{-- LOGIKA POPUP --}}
         @if (session('snapToken'))
             <script type="text/javascript">
-                document.addEventListener("DOMContentLoaded", function(event) {
-                    console.log("Snap Token: {{ session('snapToken') }}"); // Debug Console
-                    window.snap.pay('{{ session('snapToken') }}', {
-                        onSuccess: function(result) {
-                            window.location.href = "{{ route('payment.success') }}?order_id=" + result.order_id;
-                        },
-                        onPending: function(result) {
-                            alert("Menunggu pembayaran!");
-                        },
-                        onError: function(result) {
-                            alert("Pembayaran gagal!");
-                        },
-                        onClose: function() {
-                            alert('Anda menutup popup pembayaran');
-                        }
-                    });
-                });
+                // Kita jalankan saat window load agar snap.js pasti sudah siap
+                window.onload = function() {
+                    console.log("Mencoba membuka Snap untuk Token: {{ session('snapToken') }}");
+
+                    // Cek lagi apakah snap sudah ada
+                    if (typeof window.snap !== 'undefined') {
+                        window.snap.pay('{{ session('snapToken') }}', {
+                            onSuccess: function(result) {
+                                window.location.href = "{{ route('payment.success') }}?order_id=" + result.order_id;
+                            },
+                            onPending: function(result) {
+                                alert("Menunggu pembayaran!");
+                            },
+                            onError: function(result) {
+                                alert("Pembayaran gagal!");
+                            },
+                            onClose: function() {
+                                alert('Anda menutup popup pembayaran');
+                            }
+                        });
+                    } else {
+                        console.error("Snap JS tidak terload dengan benar.");
+                        alert("Gagal memuat sistem pembayaran. Coba refresh halaman.");
+                    }
+                };
             </script>
+        @endif
+
+        {{-- ALERT ERROR --}}
+        @if (session('error'))
+            <div class="max-w-7xl mx-auto px-6 mt-4">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Gagal!</strong>
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                </div>
+            </div>
+        @endif
+
+        {{-- ALERT SUCCESS --}}
+        @if (session('success'))
+            <div class="max-w-7xl mx-auto px-6 mt-4">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+                    role="alert">
+                    <strong class="font-bold">Berhasil!</strong>
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            </div>
         @endif
 
         <div class="bg-white shadow-sm py-8 mb-8 sticky top-20 z-40">
             <div class="container mx-auto px-6">
-                <div class="flex items-center justify-between max-w-6xl mx-auto relative">
-                    <div
-                        class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-[#2CB38B] -z-10 rounded-full">
-                    </div>
+                <div class="flex items-center justify-between max-w-6xl mx-auto">
+
                     <a href="{{ route('travel-plan.edit', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -124,12 +151,14 @@
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">Input Budget
                                 &<br>Rencana</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
+
                     <a href="{{ route('travel-plan.transport', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -138,12 +167,14 @@
                                 <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M18 20H6c-1.1 0-2-.9-2-2V6c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v12c0 1.1-.9 2-2 2zm-2-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0-9h8V4H8v4z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">
                                 Pilih<br>Transportasi</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
+
                     <a href="{{ route('travel-plan.accommodation', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -153,12 +184,14 @@
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">
                                 Pilih<br>Akomodasi</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
+
                     <a href="{{ route('travel-plan.attraction', $plan->planID) }}"
                         class="flex items-center flex-1 group cursor-pointer">
                         <div class="flex flex-col items-center relative z-10">
@@ -170,45 +203,30 @@
                                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <p class="text-xs font-bold text-[#2CB38B] text-center group-hover:underline">
                                 Pilih<br>Wisata</p>
                         </div>
                         <div class="w-full h-1 bg-[#2CB38B] mx-2 rounded-full"></div>
                     </a>
+
                     <div class="flex flex-col items-center relative z-10">
                         <div
                             class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-lg ring-4 ring-green-100 transform scale-110">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg></div>
+                            </svg>
+                        </div>
                         <p class="text-xs font-bold text-[#2CB38B] text-center">Atur<br>Rencana</p>
                     </div>
+
                 </div>
             </div>
         </div>
 
         <div class="max-w-7xl mx-auto px-8 py-8">
-
-            @if (session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
-                    role="alert">
-                    <strong class="font-bold">Gagal!</strong>
-                    <span class="block sm:inline">{{ session('error') }}</span>
-                    <span class="block text-xs mt-1">Saran: Periksa kredensial Midtrans di .env dan pastikan mode
-                        Sandbox aktif.</span>
-                </div>
-            @endif
-
-            @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6"
-                    role="alert">
-                    <strong class="font-bold">Sukses!</strong>
-                    <span class="block sm:inline">{{ session('success') }}</span>
-                </div>
-            @endif
-
             <div class="mb-8">
                 <h1 class="text-4xl font-bold flex items-center text-gray-900">
                     <svg class="w-10 h-10 mr-3 text-[#2CB38B]" fill="none" stroke="currentColor"
@@ -252,7 +270,7 @@
 
                     <div class="flex justify-end mb-4">
                         <form action="{{ route('itinerary.destroy', $itinerary->itineraryID) }}" method="POST"
-                            onsubmit="return confirm('Yakin ingin menghapus folder rencana ini?');">
+                            onsubmit="return confirm('Yakin ingin menghapus folder rencana {{ $itinerary->itineraryName }}? Semua item di dalamnya akan hilang permanen.');">
                             @csrf @method('DELETE')
                             <button type="submit"
                                 class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition">
@@ -275,26 +293,19 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-bold text-gray-800">Ringkasan Anggaran</h3>
                             <span
-                                class="px-3 py-1 rounded-full text-xs font-bold {{ $isOverBudget ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600' }}">
-                                {{ $isOverBudget ? 'Over Budget' : 'Aman' }}
-                            </span>
+                                class="px-3 py-1 rounded-full text-xs font-bold {{ $isOverBudget ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600' }}">{{ $isOverBudget ? 'Over Budget' : 'Aman' }}</span>
                         </div>
-                        <div class="flex justify-between text-sm mb-2">
-                            <span class="text-gray-500">Terpakai: <strong>Rp
-                                    {{ number_format($totalCost, 0, ',', '.') }}</strong></span>
-                            <span class="text-gray-500">Total: <strong>Rp
-                                    {{ number_format($plan->amount, 0, ',', '.') }}</strong></span>
-                        </div>
+                        <div class="flex justify-between text-sm mb-2"><span class="text-gray-500">Terpakai:
+                                <strong>Rp {{ number_format($totalCost, 0, ',', '.') }}</strong></span><span
+                                class="text-gray-500">Total: <strong>Rp
+                                    {{ number_format($plan->amount, 0, ',', '.') }}</strong></span></div>
                         <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
                             <div class="h-4 rounded-full {{ $isOverBudget ? 'bg-red-500' : 'bg-[#2CB38B]' }} transition-all duration-500"
                                 style="width: {{ min($percentage, 100) }}%"></div>
                         </div>
-                        <div class="mt-3 text-right">
-                            <span class="text-sm font-bold {{ $isOverBudget ? 'text-red-500' : 'text-[#2CB38B]' }}">
-                                {{ $isOverBudget ? 'Kurang: ' : 'Sisa: ' }} Rp
-                                {{ number_format(abs($remaining), 0, ',', '.') }}
-                            </span>
-                        </div>
+                        <div class="mt-3 text-right"><span
+                                class="text-sm font-bold {{ $isOverBudget ? 'text-red-500' : 'text-[#2CB38B]' }}">{{ $isOverBudget ? 'Kurang: ' : 'Sisa: ' }}
+                                Rp {{ number_format(abs($remaining), 0, ',', '.') }}</span></div>
                     </div>
 
                     @foreach (['Transportasi' => '🚌', 'Akomodasi' => '🏨', 'Aktivitas' => '🏖️'] as $type => $icon)
@@ -302,10 +313,7 @@
                             <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2"><span
                                     class="bg-blue-100 text-blue-600 p-2 rounded-lg text-xl">{{ $icon }}</span>
                                 {{ $type == 'Aktivitas' ? 'Wisata' : $type }} Pilihan</h2>
-                            @php
-                                $checkTypes = $type == 'Aktivitas' ? ['Aktivitas', 'Wisata'] : [$type];
-                                $items = $itinerary->planItems->whereIn('itemType', $checkTypes);
-                            @endphp
+                            @php $items = $itinerary->planItems->whereIn('itemType', ($type == 'Aktivitas') ? ['Aktivitas', 'Wisata'] : [$type]); @endphp
 
                             @if ($items->isEmpty())
                                 <div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl">
@@ -345,7 +353,6 @@
                                                         );
                                                         $isPaid = $item->order && $item->order->status == 'paid';
                                                     @endphp
-
                                                     @if ($isBudgettrip)
                                                         @if ($isPaid)
                                                             <span
@@ -354,12 +361,10 @@
                                                         @else
                                                             <form
                                                                 action="{{ route('payment.checkout', $item->planItemID) }}"
-                                                                method="POST" class="mt-2">
-                                                                @csrf
-                                                                <button type="submit"
+                                                                method="POST" class="mt-2">@csrf<button
+                                                                    type="submit"
                                                                     class="text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center shadow-sm">💳
-                                                                    Bayar Sekarang</button>
-                                                            </form>
+                                                                    Bayar Sekarang</button></form>
                                                         @endif
                                                     @elseif($item->bookingLink)
                                                         <a href="{{ $item->bookingLink }}" target="_blank"
@@ -372,7 +377,6 @@
                                                 <p class="font-bold text-gray-900 text-xl">
                                                     {{ $item->estimatedCost == 0 ? 'Gratis' : 'Rp ' . number_format($item->estimatedCost, 0, ',', '.') }}
                                                 </p>
-
                                                 <div
                                                     class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
                                                     <form

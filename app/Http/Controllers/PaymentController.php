@@ -13,7 +13,6 @@ class PaymentController extends Controller
 {
     protected function configureMidtrans()
     {
-        // Set konfigurasi Midtrans secara eksplisit
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
@@ -27,7 +26,7 @@ class PaymentController extends Controller
             return back()->with('error', 'Hanya item Budgettrip yang bisa dibayar langsung.');
         }
 
-        // 2. Hitung Harga (Wajib Integer)
+        // 2. Hitung Harga 
         $pricePerItem = (int) round($planItem->estimatedCost / $planItem->quantity);
         $grossAmount = $pricePerItem * $planItem->quantity;
 

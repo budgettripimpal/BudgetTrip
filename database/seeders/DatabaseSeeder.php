@@ -266,7 +266,7 @@ class DatabaseSeeder extends Seeder
             [
                 'accommodationID' => 99, 
                 'providerID' => 100, // Budgettrip Hotel
-                'cityID' => 1, 
+                'cityID' => 5, 
                 'hotelName' => 'Budgettrip Capsule Hotel', 
                 'averagePricePerNight' => 95000.00, 
                 'rating' => 4.5,
