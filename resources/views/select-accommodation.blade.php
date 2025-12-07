@@ -208,7 +208,7 @@
                                                 <p class="text-xs text-gray-500">/ malam</p>
                                             </div>
                                             <a href="{{ route('accommodation.show', ['travelPlan' => $plan->planID, 'id' => $acc->accommodationID]) }}" class="bg-[#2CB38B] hover:bg-[#249d78] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 text-center">
-                                                Pilih Kamar
+                                                Lihat Detail
                                             </a>
                                         </div>
                                     </div>

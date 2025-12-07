@@ -11,7 +11,6 @@ class Attraction extends Model
 
     protected $primaryKey = 'attractionID';
     protected $guarded = [];
-
     protected $casts = [
         'images' => 'array',
         'estimatedCost' => 'float',
