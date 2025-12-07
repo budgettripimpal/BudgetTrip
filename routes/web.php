@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TravelPlanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PaymentController;
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -51,6 +52,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/itinerary/{itinerary}', [TravelPlanController::class, 'destroyItinerary'])->name('itinerary.destroy');
     Route::patch('/plan-item/{planItem}/increase', [TravelPlanController::class, 'increaseItemQuantity'])->name('plan-item.increase');
     Route::patch('/plan-item/{planItem}/decrease', [TravelPlanController::class, 'decreaseItemQuantity'])->name('plan-item.decrease');
+
+    Route::post('/payment/checkout/{planItem}', [PaymentController::class, 'checkout'])->name('payment.checkout');
+    Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 });
 
 require __DIR__ . '/auth.php';
