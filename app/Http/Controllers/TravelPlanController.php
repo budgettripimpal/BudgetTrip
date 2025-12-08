@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TravelPlan;
+use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Itinerary;
@@ -12,7 +13,13 @@ class TravelPlanController extends Controller
     // Tampilkan Form Kosong (Buat Baru)
     public function create()
     {
-        return view('createplan', ['plan' => null]);
+        // Ambil semua kota diurutkan berdasarkan nama
+        $cities = City::orderBy('cityName', 'asc')->get();
+
+        return view('createplan', [
+            'plan' => null,
+            'cities' => $cities // Kirim ke view
+        ]);
     }
 
     // Simpan Data Baru ke Database
@@ -53,7 +60,14 @@ class TravelPlanController extends Controller
         if ($travelPlan->userID !== Auth::id()) {
             abort(403);
         }
-        return view('createplan', ['plan' => $travelPlan]);
+
+        // Ambil semua kota
+        $cities = City::orderBy('cityName', 'asc')->get();
+
+        return view('createplan', [
+            'plan' => $travelPlan,
+            'cities' => $cities // Kirim ke view
+        ]);
     }
 
     // Simpan Perubahan (Update)
@@ -95,9 +109,9 @@ class TravelPlanController extends Controller
             ->where('originCityID', $travelPlan->originCityID)
             ->where('destinationCityID', $travelPlan->destinationCityID);
 
-        // 2. Filter: Jenis Transportasi (Provider Type)
+        // 2. Filter: Jenis Transportasi
         if ($request->has('types')) {
-            $types = $request->input('types'); // Array ['Bus', 'Kereta']
+            $types = $request->input('types');
             $query->whereHas('serviceProvider', function ($q) use ($types) {
                 $q->where(function ($subQ) use ($types) {
                     foreach ($types as $type) {
@@ -110,7 +124,7 @@ class TravelPlanController extends Controller
             });
         }
 
-        // 3. Filter: Fasilitas (JSON)
+        // 3. Filter: Fasilitas
         if ($request->has('facilities')) {
             foreach ($request->input('facilities') as $facility) {
                 $query->whereJsonContains('facilities', $facility);
@@ -128,7 +142,22 @@ class TravelPlanController extends Controller
             });
         }
 
-        $transportRoutes = $query->get();
+        // 5. Eksekusi Query & Hitung Sisa Kursi
+        $transportRoutes = $query->get()->map(function ($transport) {
+            // Hitung kursi yang SUDAH DIBAYAR (Paid) berdasarkan ID Rute
+            $bookedSeats = \App\Models\PlanItem::where('transport_route_id', $transport->routeID)
+                ->whereHas('order', function ($q) {
+                    $q->where('status', 'paid');
+                })
+                ->sum('quantity');
+
+            // Default 40 jika kolom total_seats belum diisi/null
+            $totalCapacity = $transport->total_seats ?? 40;
+
+            $transport->remaining_seats = $totalCapacity - $bookedSeats;
+
+            return $transport;
+        });
 
         return view('select-transport', [
             'plan' => $travelPlan,
@@ -162,7 +191,7 @@ class TravelPlanController extends Controller
             'endDate' => 'End Date',
         ]);
     }
-    // 6. Halaman Pilih Akomodasi (DENGAN FILTER)
+    // 6. Halaman Pilih Akomodasi
     public function selectAccommodation(Request $request, TravelPlan $travelPlan)
     {
         if ($travelPlan->userID !== Auth::id()) {
@@ -170,7 +199,6 @@ class TravelPlanController extends Controller
         }
 
         // 1. Tentukan Kota Pencarian
-        // Prioritas: Kota Akomodasi (jika dipilih khusus) > Kota Tujuan
         $targetCityID = $travelPlan->accommodationCityID ?? $travelPlan->destinationCityID;
 
         // 2. Query Dasar
@@ -181,25 +209,38 @@ class TravelPlanController extends Controller
             $query->whereIn('type', $request->input('types'));
         }
 
-        // 4. Filter: Fasilitas (JSON)
+        // 4. Filter: Fasilitas
         if ($request->has('facilities')) {
             foreach ($request->input('facilities') as $facility) {
                 $query->whereJsonContains('facilities', $facility);
             }
         }
 
-        // 5. Filter: Rating (Bintang)
+        // 5. Filter: Rating
         if ($request->has('ratings')) {
             $ratings = $request->input('ratings');
             $query->where(function ($q) use ($ratings) {
                 foreach ($ratings as $rating) {
-                    // Mencari hotel dengan rating di range tersebut (misal pilih 4, cari 4.0 - 4.9)
                     $q->orWhereBetween('rating', [$rating, $rating + 0.9]);
                 }
             });
         }
 
-        $accommodations = $query->get();
+        // 6. Eksekusi & Hitung Sisa Kamar
+        $accommodations = $query->get()->map(function ($hotel) {
+            // Anggap kapasitas hotel statis 20 kamar per hotel (bisa diganti field DB)
+            $totalRooms = 20;
+
+            $bookedRooms = \App\Models\PlanItem::where('accommodation_id', $hotel->accommodationID)
+                ->whereHas('order', function ($q) {
+                    $q->where('status', 'paid');
+                })
+                ->sum('quantity');
+
+            $hotel->remaining_rooms = $totalRooms - $bookedRooms;
+
+            return $hotel;
+        });
 
         return view('select-accommodation', [
             'plan' => $travelPlan,
@@ -304,9 +345,11 @@ class TravelPlanController extends Controller
             'itinerary_id' => 'required|exists:itineraries,itineraryID',
             'item_type' => 'required|in:Transportasi,Akomodasi,Wisata',
             'item_id' => 'required|integer',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'duration' => 'nullable|integer|min:1',
         ]);
 
+        // Variabel penampung data
         $description = '';
         $unitPrice = 0;
         $bookingLink = '';
@@ -315,7 +358,12 @@ class TravelPlanController extends Controller
         $lat = null;
         $long = null;
 
-        // 1. Ambil Data Master
+        // Variabel ID Referensi untuk Validasi Stok
+        $transportRouteID = null;
+        $accommodationID = null;
+
+        $duration = $request->duration ?? 1;
+
         if ($request->item_type == 'Transportasi') {
             $item = \App\Models\TransportRoute::with('serviceProvider')->find($request->item_id);
             $providerName = $item->serviceProvider->providerName;
@@ -325,6 +373,7 @@ class TravelPlanController extends Controller
             $itemTypeDB = 'Transportasi';
             $lat = $item->start_latitude;
             $long = $item->start_longitude;
+            $transportRouteID = $item->routeID; // Simpan ID Rute
         } elseif ($request->item_type == 'Akomodasi') {
             $item = \App\Models\Accommodation::find($request->item_id);
             $providerName = $item->hotelName;
@@ -334,6 +383,7 @@ class TravelPlanController extends Controller
             $itemTypeDB = 'Akomodasi';
             $lat = $item->latitude;
             $long = $item->longitude;
+            $accommodationID = $item->accommodationID; // Simpan ID Hotel
         } elseif ($request->item_type == 'Wisata') {
             $item = \App\Models\Attraction::find($request->item_id);
             $providerName = $item->attractionName;
@@ -345,51 +395,60 @@ class TravelPlanController extends Controller
             $long = $item->longitude;
         }
 
-        // 2. Logic Cek Eksistensi 
-        // Cari item yang sama di itinerary ini
-        // TAPI pastikan item tersebut BELUM DIBAYAR 
-        $existingItem = \App\Models\PlanItem::where('itineraryID', $request->itinerary_id)
+        // Logic Hitung Biaya
+        if ($itemTypeDB == 'Akomodasi') {
+            $totalEstimatedCost = $unitPrice * $request->quantity * $duration;
+            $description .= " - {$duration} Malam";
+        } else {
+            $totalEstimatedCost = $unitPrice * $request->quantity;
+        }
+
+        // Logic Merge: Hanya merge jika item sama & status BELUM PAID & Durasi sama (khusus hotel)
+        $query = \App\Models\PlanItem::where('itineraryID', $request->itinerary_id)
             ->where('itemType', $itemTypeDB)
             ->where('providerName', $providerName)
             ->whereDoesntHave('order', function ($q) {
                 $q->where('status', 'paid');
-            })
-            ->first();
+            });
 
-        // Jika item sudah ada dan BELUM DIBAYAR -> Update Quantity
+        if ($itemTypeDB == 'Akomodasi') {
+            $query->where('duration', $duration);
+        }
+
+        $existingItem = $query->first();
+
         if ($existingItem) {
+            // Update Quantity
             $newQuantity = $existingItem->quantity + $request->quantity;
 
-            // Update deskripsi khusus Akomodasi
+            // Recalculate cost
             if ($itemTypeDB == 'Akomodasi') {
-                // Reset deskripsi lama agar formatnya konsisten
-                $description = "$providerName ({$item->type}) - {$newQuantity} Malam";
+                $newTotalCost = $unitPrice * $newQuantity * $duration;
+            } else {
+                $newTotalCost = $unitPrice * $newQuantity;
             }
 
             $existingItem->update([
                 'quantity' => $newQuantity,
-                'estimatedCost' => $unitPrice * $newQuantity,
-                'description' => $description, // Update deskripsi juga
+                'estimatedCost' => $newTotalCost,
                 'latitude' => $lat,
                 'longitude' => $long
             ]);
-        }
-        // Jika item belum ada ATAU item yang ada sudah LUNAS -> Buat Baru
-        else {
-            if ($itemTypeDB == 'Akomodasi') {
-                $description .= " - {$request->quantity} Malam";
-            }
-
+        } else {
+            // Create New Item dengan ID Referensi
             \App\Models\PlanItem::create([
                 'itineraryID' => $request->itinerary_id,
                 'description' => $description,
                 'itemType' => $itemTypeDB,
-                'estimatedCost' => $unitPrice * $request->quantity,
+                'estimatedCost' => $totalEstimatedCost,
                 'quantity' => $request->quantity,
+                'duration' => ($itemTypeDB == 'Akomodasi') ? $duration : 1,
                 'bookingLink' => $bookingLink,
                 'providerName' => $providerName,
                 'latitude' => $lat,
-                'longitude' => $long
+                'longitude' => $long,
+                'transport_route_id' => $transportRouteID,
+                'accommodation_id' => $accommodationID
             ]);
         }
 
@@ -414,20 +473,11 @@ class TravelPlanController extends Controller
 
     public function increaseItemQuantity(\App\Models\PlanItem $planItem)
     {
-        // Hitung harga satuan saat ini
-        $unitPrice = $planItem->estimatedCost / $planItem->quantity;
+        // Hitung harga satuan dasar (per item per durasi)
+        $basePrice = $planItem->estimatedCost / $planItem->quantity;
 
-        // Tambah quantity
         $planItem->quantity += 1;
-
-        // Update total harga
-        $planItem->estimatedCost = $unitPrice * $planItem->quantity;
-
-        // Update deskripsi jika item adalah akomodasi
-        if ($planItem->itemType == 'Akomodasi') {
-            $planItem->description = preg_replace('/\d+ Malam/', $planItem->quantity . ' Malam', $planItem->description);
-        }
-
+        $planItem->estimatedCost = $basePrice * $planItem->quantity;
         $planItem->save();
 
         return back()->with('success', 'Jumlah berhasil ditambahkan.');
@@ -435,25 +485,14 @@ class TravelPlanController extends Controller
 
     public function decreaseItemQuantity(\App\Models\PlanItem $planItem)
     {
-        // Jika sisa 1, tidak bisa dikurangi lagi (harus pakai tombol hapus jika ingin membatalkan)
         if ($planItem->quantity <= 1) {
-            return back()->with('error', 'Jumlah minimal adalah 1. Gunakan tombol hapus untuk membatalkan.');
+            return back()->with('error', 'Jumlah minimal adalah 1.');
         }
 
-        // Hitung harga satuan
-        $unitPrice = $planItem->estimatedCost / $planItem->quantity;
+        $basePrice = $planItem->estimatedCost / $planItem->quantity;
 
-        // Kurangi quantity
         $planItem->quantity -= 1;
-
-        // Update total harga
-        $planItem->estimatedCost = $unitPrice * $planItem->quantity;
-
-        // Update deskripsi jika item adalah akomodasi
-        if ($planItem->itemType == 'Akomodasi') {
-            $planItem->description = preg_replace('/\d+ Malam/', $planItem->quantity . ' Malam', $planItem->description);
-        }
-
+        $planItem->estimatedCost = $basePrice * $planItem->quantity;
         $planItem->save();
 
         return back()->with('success', 'Jumlah berhasil dikurangi.');
@@ -491,5 +530,39 @@ class TravelPlanController extends Controller
 
         // 3. Tampilkan View
         return view('overview-plan', ['plan' => $travelPlan]);
+    }
+
+    public function showTicket($planItemID)
+    {
+        $item = \App\Models\PlanItem::with(['itinerary.travelPlan.user', 'order'])->findOrFail($planItemID);
+
+        // Validasi Akses
+        if (Auth::id() !== $item->itinerary->travelPlan->userID) {
+            abort(403);
+        }
+
+        // Validasi Status Bayar
+        if (!$item->order || $item->order->status !== 'paid') {
+            return back()->with('error', 'Tiket belum lunas.');
+        }
+
+        return view('ticket-print', ['item' => $item]);
+    }
+
+    public function showBooking($planItemID)
+    {
+        $item = \App\Models\PlanItem::with(['itinerary.travelPlan.user', 'order'])->findOrFail($planItemID);
+
+        // Validasi Akses
+        if (Auth::id() !== $item->itinerary->travelPlan->userID) {
+            abort(403);
+        }
+
+        // Validasi Status Bayar
+        if (!$item->order || $item->order->status !== 'paid') {
+            return back()->with('error', 'Pesanan belum lunas.');
+        }
+
+        return view('booking-print', ['item' => $item]);
     }
 }

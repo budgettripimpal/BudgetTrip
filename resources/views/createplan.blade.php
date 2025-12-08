@@ -250,10 +250,11 @@
                                             class="no-arrow w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 text-gray-700 outline-none cursor-pointer {{ $errors->has('originCityID') ? 'border-red-500 bg-red-50' : '' }}">
                                             <option value="" disabled {{ !isset($plan) ? 'selected' : '' }}>
                                                 Pilih Kota Asal</option>
-                                            @foreach (['1' => 'Bandung', '2' => 'Palembang', '3' => 'Merak', '4' => 'Bakauheni', '5' => 'Jakarta'] as $id => $name)
-                                                <option value="{{ $id }}"
-                                                    {{ old('originCityID', $plan->originCityID ?? '') == $id ? 'selected' : '' }}>
-                                                    {{ $name }}</option>
+                                            @foreach ($cities as $city)
+                                                <option value="{{ $city->cityID }}"
+                                                    {{ old('originCityID', $plan->originCityID ?? '') == $city->cityID ? 'selected' : '' }}>
+                                                    {{ $city->cityName }}
+                                                </option>
                                             @endforeach
                                         </select>
                                         <div
@@ -267,6 +268,7 @@
                                     </div>
                                     <x-input-error :messages="$errors->get('originCityID')" class="mt-2" />
                                 </div>
+
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-2">Mau ke Mana?</label>
                                     <div class="relative">
@@ -274,10 +276,11 @@
                                             class="no-arrow w-full px-5 py-4 rounded-2xl border-gray-200 focus:border-[#2CB38B] focus:ring-2 focus:ring-[#2CB38B]/20 bg-gray-50 text-gray-700 outline-none cursor-pointer {{ $errors->has('destinationCityID') ? 'border-red-500 bg-red-50' : '' }}">
                                             <option value="" disabled {{ !isset($plan) ? 'selected' : '' }}>
                                                 Pilih Kota Tujuan</option>
-                                            @foreach (['1' => 'Bandung', '2' => 'Palembang', '3' => 'Merak', '4' => 'Bakauheni', '5' => 'Jakarta'] as $id => $name)
-                                                <option value="{{ $id }}"
-                                                    {{ old('destinationCityID', $plan->destinationCityID ?? '') == $id ? 'selected' : '' }}>
-                                                    {{ $name }}</option>
+                                            @foreach ($cities as $city)
+                                                <option value="{{ $city->cityID }}"
+                                                    {{ old('destinationCityID', $plan->destinationCityID ?? '') == $city->cityID ? 'selected' : '' }}>
+                                                    {{ $city->cityName }}
+                                                </option>
                                             @endforeach
                                         </select>
                                         <div

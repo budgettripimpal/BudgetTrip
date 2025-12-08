@@ -10,7 +10,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. USERS (DIPERBANYAK AGAR TIDAK ERROR)
+        // ==========================================
+        // 1. USERS (Admin & User Dummy)
+        // ==========================================
         DB::table('users')->insert([
             [
                 'id' => 1,
@@ -33,27 +35,6 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'id' => 3,
-                'name' => 'Siti Aminah',
-                'email' => 'siti@example.com',
-                'password' => Hash::make('password'),
-                'phoneNumber' => '081234567892',
-                'role' => 'user',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'id' => 4,
-                'name' => 'Budi Santoso',
-                'email' => 'budi@example.com',
-                'password' => Hash::make('password'),
-                'phoneNumber' => '081234567893',
-                'role' => 'user',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            // ADMIN
-            [
                 'id' => 99,
                 'name' => 'Admin BudgetTrip',
                 'email' => 'admin@budgettrip.com',
@@ -65,210 +46,277 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // 2. CITIES (LENGKAP DENGAN KOORDINAT)
-        DB::table('cities')->insert([
-            ['cityID' => 1, 'cityName' => 'Bandung', 'province' => 'Jawa Barat', 'locationType' => 'Kota', 'latitude' => -6.917464, 'longitude' => 107.619123],
-            ['cityID' => 2, 'cityName' => 'Palembang', 'province' => 'Sumatera Selatan', 'locationType' => 'Kota', 'latitude' => -2.976074, 'longitude' => 104.775431],
-            ['cityID' => 3, 'cityName' => 'Jakarta', 'province' => 'DKI Jakarta', 'locationType' => 'Kota', 'latitude' => -6.208763, 'longitude' => 106.845599],
-            ['cityID' => 4, 'cityName' => 'Yogyakarta', 'province' => 'DIY', 'locationType' => 'Kota', 'latitude' => -7.795580, 'longitude' => 110.369490],
-            ['cityID' => 5, 'cityName' => 'Bali (Denpasar)', 'province' => 'Bali', 'locationType' => 'Kota', 'latitude' => -8.670458, 'longitude' => 115.212629],
-            ['cityID' => 6, 'cityName' => 'Surabaya', 'province' => 'Jawa Timur', 'locationType' => 'Kota', 'latitude' => -7.257472, 'longitude' => 112.752088],
-            ['cityID' => 7, 'cityName' => 'Malang', 'province' => 'Jawa Timur', 'locationType' => 'Kota', 'latitude' => -7.966620, 'longitude' => 112.632632],
-            ['cityID' => 8, 'cityName' => 'Labuan Bajo', 'province' => 'NTT', 'locationType' => 'Kota', 'latitude' => -8.453483, 'longitude' => 119.873278],
-            ['cityID' => 9, 'cityName' => 'Medan', 'province' => 'Sumatera Utara', 'locationType' => 'Kota', 'latitude' => 3.595196, 'longitude' => 98.672223],
-            ['cityID' => 10, 'cityName' => 'Semarang', 'province' => 'Jawa Tengah', 'locationType' => 'Kota', 'latitude' => -6.966667, 'longitude' => 110.416664],
-        ]);
+        // ==========================================
+        // 2. CITIES (Kota-kota Besar di Indonesia)
+        // ==========================================
+        $cities = [
+            ['id' => 1, 'name' => 'Bandung', 'prov' => 'Jawa Barat', 'lat' => -6.917464, 'lng' => 107.619123],
+            ['id' => 2, 'name' => 'Jakarta', 'prov' => 'DKI Jakarta', 'lat' => -6.208763, 'lng' => 106.845599],
+            ['id' => 3, 'name' => 'Yogyakarta', 'prov' => 'DIY', 'lat' => -7.795580, 'lng' => 110.369490],
+            ['id' => 4, 'name' => 'Surabaya', 'prov' => 'Jawa Timur', 'lat' => -7.257472, 'lng' => 112.752088],
+            ['id' => 5, 'name' => 'Bali (Denpasar)', 'prov' => 'Bali', 'lat' => -8.670458, 'lng' => 115.212629],
+            ['id' => 6, 'name' => 'Malang', 'prov' => 'Jawa Timur', 'lat' => -7.966620, 'lng' => 112.632632],
+            ['id' => 7, 'name' => 'Semarang', 'prov' => 'Jawa Tengah', 'lat' => -6.966667, 'lng' => 110.416664],
+            ['id' => 8, 'name' => 'Medan', 'prov' => 'Sumatera Utara', 'lat' => 3.595196, 'lng' => 98.672223],
+            ['id' => 9, 'name' => 'Palembang', 'prov' => 'Sumatera Selatan', 'lat' => -2.976074, 'lng' => 104.775431],
+            ['id' => 10, 'name' => 'Labuan Bajo', 'prov' => 'NTT', 'lat' => -8.453483, 'lng' => 119.873278],
+        ];
 
+        foreach ($cities as $city) {
+            DB::table('cities')->insert([
+                'cityID' => $city['id'],
+                'cityName' => $city['name'],
+                'province' => $city['prov'],
+                'locationType' => 'Kota',
+                'latitude' => $city['lat'],
+                'longitude' => $city['lng'],
+            ]);
+        }
+
+        // ==========================================
         // 3. SERVICE PROVIDERS
-        DB::table('service_providers')->insert([
-            ['providerID' => 1, 'providerName' => 'Cititrans', 'serviceType' => 'Transportasi'],
-            ['providerID' => 2, 'providerName' => 'Bus ALS', 'serviceType' => 'Transportasi'],
-            ['providerID' => 3, 'providerName' => 'Garuda Indonesia', 'serviceType' => 'Transportasi'],
-            ['providerID' => 4, 'providerName' => 'Booking.com', 'serviceType' => 'Akomodasi'],
-            ['providerID' => 5, 'providerName' => 'KAI (Kereta Api)', 'serviceType' => 'Transportasi'],
-            ['providerID' => 6, 'providerName' => 'Lion Air', 'serviceType' => 'Transportasi'],
-            ['providerID' => 7, 'providerName' => 'Traveloka', 'serviceType' => 'Akomodasi'],
+        // ==========================================
+        $providers = [
+            ['id' => 1, 'name' => 'Cititrans', 'type' => 'Transportasi'], // Travel
+            ['id' => 2, 'name' => 'DayTrans', 'type' => 'Transportasi'], // Travel
+            ['id' => 3, 'name' => 'Sinar Jaya', 'type' => 'Transportasi'], // Bus
+            ['id' => 4, 'name' => 'Rosalia Indah', 'type' => 'Transportasi'], // Bus
+            ['id' => 5, 'name' => 'KAI (Kereta Api)', 'type' => 'Transportasi'], // Kereta
+            ['id' => 6, 'name' => 'Garuda Indonesia', 'type' => 'Transportasi'], // Pesawat
+            ['id' => 7, 'name' => 'Lion Air', 'type' => 'Transportasi'], // Pesawat
+            ['id' => 8, 'name' => 'Pelni', 'type' => 'Transportasi'], // Kapal
+            ['id' => 9, 'name' => 'Traveloka', 'type' => 'Akomodasi'],
+            ['id' => 10, 'name' => 'Booking.com', 'type' => 'Akomodasi'],
+            ['id' => 11, 'name' => 'Tiket.com', 'type' => 'Akomodasi'],
+            ['id' => 99, 'name' => 'Budgettrip Travel', 'type' => 'Transportasi'], // Custom
+            ['id' => 100, 'name' => 'Budgettrip Hotel', 'type' => 'Akomodasi'], // Custom
+        ];
 
-            // PROVIDER KHUSUS BUDGETTRIP (UNTUK FITUR PEMBAYARAN)
-            ['providerID' => 99, 'providerName' => 'Budgettrip Travel', 'serviceType' => 'Transportasi'],
-            ['providerID' => 100, 'providerName' => 'Budgettrip Hotel', 'serviceType' => 'Akomodasi'],
-        ]);
+        foreach ($providers as $p) {
+            DB::table('service_providers')->insert([
+                'providerID' => $p['id'],
+                'providerName' => $p['name'],
+                'serviceType' => $p['type'],
+            ]);
+        }
 
-        // 4. ATTRACTIONS (Objek Wisata Lebih Banyak)
-        DB::table('attractions')->insert([
-            // BANDUNG
-            ['attractionID' => 1, 'cityID' => 1, 'attractionName' => 'Kawah Putih', 'category' => 'Alam', 'estimatedCost' => 28000, 'rating' => 4.7, 'reviewCount' => 1200, 'description' => 'Danau kawah vulkanik dengan air berwarna putih kehijauan.', 'bookingLink' => 'https://ticket.com/kawah-putih', 'images' => json_encode(['https://asset.kompas.com/crops/O5-K0qq_u3e7zB9i1p7l6s2d_0=/0x0:1000x667/750x500/data/photo/2020/03/10/5e670b8a4b6b6.jpg']), 'latitude' => -7.166204, 'longitude' => 107.402126, 'created_at' => now(), 'updated_at' => now()],
-            ['attractionID' => 2, 'cityID' => 1, 'attractionName' => 'Trans Studio Bandung', 'category' => 'Hiburan', 'estimatedCost' => 200000, 'rating' => 4.5, 'reviewCount' => 2500, 'description' => 'Taman hiburan indoor terbesar.', 'bookingLink' => 'https://transstudiobandung.com', 'images' => json_encode(['https://www.transstudiobandung.com/images/slider/1.jpg']), 'latitude' => -6.923700, 'longitude' => 107.636400, 'created_at' => now(), 'updated_at' => now()],
+        // ==========================================
+        // 4. ACCOMMODATIONS (Setiap Kota Ada)
+        // ==========================================
+        $accommodationsData = [];
+        $accID = 1;
 
-            // JOGJA
-            ['attractionID' => 3, 'cityID' => 4, 'attractionName' => 'Candi Borobudur', 'category' => 'Sejarah & Budaya', 'estimatedCost' => 50000, 'rating' => 4.9, 'reviewCount' => 5000, 'description' => 'Candi Buddha terbesar di dunia.', 'bookingLink' => 'https://borobudurpark.com', 'images' => json_encode(['https://upload.wikimedia.org/wikipedia/commons/8/8c/Borobudur-Northeast_view.jpg']), 'latitude' => -7.607874, 'longitude' => 110.203751, 'created_at' => now(), 'updated_at' => now()],
-            ['attractionID' => 4, 'cityID' => 4, 'attractionName' => 'Jalan Malioboro', 'category' => 'Belanja', 'estimatedCost' => 0, 'rating' => 4.7, 'reviewCount' => 10000, 'description' => 'Jantung kota Yogyakarta, pusat belanja dan kuliner.', 'bookingLink' => null, 'images' => json_encode(['https://visitingjogja.jogjaprov.go.id/wp-content/uploads/2020/04/malioboro.jpg']), 'latitude' => -7.792622, 'longitude' => 110.365842, 'created_at' => now(), 'updated_at' => now()],
-
-            // BALI
-            ['attractionID' => 5, 'cityID' => 5, 'attractionName' => 'Pantai Kuta', 'category' => 'Alam', 'estimatedCost' => 0, 'rating' => 4.6, 'reviewCount' => 8000, 'description' => 'Pantai paling populer di Bali dengan sunset yang indah.', 'bookingLink' => null, 'images' => json_encode(['https://upload.wikimedia.org/wikipedia/commons/a/a3/Kuta_Beach_Bali.jpg']), 'latitude' => -8.718484, 'longitude' => 115.168625, 'created_at' => now(), 'updated_at' => now()],
-            ['attractionID' => 6, 'cityID' => 5, 'attractionName' => 'Garuda Wisnu Kencana (GWK)', 'category' => 'Sejarah & Budaya', 'estimatedCost' => 125000, 'rating' => 4.8, 'reviewCount' => 4000, 'description' => 'Taman budaya dengan patung raksasa Dewa Wisnu.', 'bookingLink' => 'https://gwkbali.com', 'images' => json_encode(['https://www.indonesia.travel/content/dam/indtravelrevamp/en/destinations/bali-nusa-tenggara/bali/garuda-wisnu-kencana-cultural-park/gwk.jpg']), 'latitude' => -8.810574, 'longitude' => 115.166343, 'created_at' => now(), 'updated_at' => now()],
-
-            // PALEMBANG
-            ['attractionID' => 7, 'cityID' => 2, 'attractionName' => 'Jembatan Ampera', 'category' => 'Landmark', 'estimatedCost' => 0, 'rating' => 4.8, 'reviewCount' => 3000, 'description' => 'Ikon kota Palembang yang megah.', 'bookingLink' => null, 'images' => json_encode(['https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Ampera_Bridge_at_Night.jpg/1200px-Ampera_Bridge_at_Night.jpg']), 'latitude' => -2.991196, 'longitude' => 104.763434, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        // 5. ACCOMMODATIONS (Lebih Banyak Hotel)
-        DB::table('accommodations')->insert([
-            // BANDUNG
-            ['accommodationID' => 1, 'providerID' => 4, 'cityID' => 1, 'hotelName' => 'The Trans Luxury Hotel', 'averagePricePerNight' => 2500000, 'rating' => 5.0, 'type' => 'Hotel', 'facilities' => json_encode(['Kolam Renang', 'Spa', 'Gym']), 'bookingLink' => 'https://thetranshotel.com', 'description' => 'Hotel mewah bintang 6 di Bandung.', 'images' => json_encode(['https://cf.bstatic.com/xdata/images/hotel/max1024x768/12345678.jpg']), 'latitude' => -6.923890, 'longitude' => 107.636750, 'created_at' => now(), 'updated_at' => now()],
-            ['accommodationID' => 2, 'providerID' => 100, 'cityID' => 1, 'hotelName' => 'Budgettrip Capsule Hotel Bandung', 'averagePricePerNight' => 95000, 'rating' => 4.2, 'type' => 'Hostel', 'facilities' => json_encode(['WiFi', 'AC', 'Loker']), 'bookingLink' => null, 'description' => 'Hotel kapsul hemat di pusat kota.', 'images' => json_encode(['https://placehold.co/600x400?text=Capsule+Hotel']), 'latitude' => -6.914744, 'longitude' => 107.609810, 'created_at' => now(), 'updated_at' => now()],
-
-            // JOGJA
-            ['accommodationID' => 3, 'providerID' => 4, 'cityID' => 4, 'hotelName' => 'Adhistana Hotel Yogyakarta', 'averagePricePerNight' => 450000, 'rating' => 4.5, 'type' => 'Hotel', 'facilities' => json_encode(['WiFi', 'Kolam Renang']), 'bookingLink' => 'https://adhistana.com', 'description' => 'Hotel butik dengan nuansa Jawa modern.', 'images' => json_encode(['https://adhistana.com/wp-content/uploads/2019/01/Pool-Area.jpg']), 'latitude' => -7.818950, 'longitude' => 110.364440, 'created_at' => now(), 'updated_at' => now()],
-
-            // BALI
-            ['accommodationID' => 4, 'providerID' => 4, 'cityID' => 5, 'hotelName' => 'Hard Rock Hotel Bali', 'averagePricePerNight' => 1800000, 'rating' => 4.7, 'type' => 'Hotel', 'facilities' => json_encode(['Kolam Renang', 'Bar', 'Musik']), 'bookingLink' => 'https://hardrockhotels.com/bali', 'description' => 'Hotel bertema musik di tepi pantai Kuta.', 'images' => json_encode(['https://lh3.googleusercontent.com/p/AF1QipM5...']), 'latitude' => -8.722638, 'longitude' => 115.169548, 'created_at' => now(), 'updated_at' => now()],
-
-            // PALEMBANG
-            ['accommodationID' => 5, 'providerID' => 100, 'cityID' => 2, 'hotelName' => 'Budgettrip Homestay Palembang', 'averagePricePerNight' => 150000, 'rating' => 4.3, 'type' => 'Homestay', 'facilities' => json_encode(['AC', 'Sarapan']), 'bookingLink' => null, 'description' => 'Homestay nyaman dekat jembatan Ampera.', 'images' => json_encode(['https://placehold.co/600x400?text=Homestay+Palembang']), 'latitude' => -2.986873, 'longitude' => 104.762953, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        // 6. TRANSPORT ROUTES (Rute Lebih Variatif)
-        DB::table('transport_routes')->insert([
-            // JKT - BDG
-            [
-                'routeID' => 1,
-                'providerID' => 1,
-                'originCityID' => 3,
-                'destinationCityID' => 1,
-                'averagePrice' => 150000,
-                'departureTime' => '08:00:00',
-                'arrivalTime' => '11:00:00',
-                'class' => 'Executive',
-                'facilities' => json_encode(['AC', 'Seat Belt']),
-                'bookingLink' => 'https://cititrans.co.id',
-                'description' => 'Shuttle SCBD ke Dipatiukur.',
-                'images' => json_encode(['https://cititrans.co.id/unit.jpg']),
-                'start_latitude' => -6.223838,
-                'start_longitude' => 106.809835,
-                'end_latitude' => -6.894326,
-                'end_longitude' => 107.615967,
+        foreach ($cities as $city) {
+            // Hotel Mewah
+            $accommodationsData[] = [
+                'accommodationID' => $accID++,
+                'providerID' => 10, // Booking.com
+                'cityID' => $city['id'],
+                'hotelName' => 'Grand Hotel ' . $city['name'],
+                'averagePricePerNight' => rand(800000, 1500000),
+                'rating' => 4.8,
+                'type' => 'Hotel',
+                'facilities' => json_encode(['Kolam Renang', 'Gym', 'Spa', 'Breakfast']),
+                'bookingLink' => 'https://booking.com/grand-' . strtolower(str_replace(' ', '-', $city['name'])),
+                'description' => 'Hotel bintang 5 dengan pemandangan pusat kota ' . $city['name'],
+                'images' => json_encode(['https://placehold.co/600x400?text=Grand+Hotel+' . urlencode($city['name'])]),
+                'latitude' => $city['lat'] + 0.002, // Sedikit geser dari pusat kota
+                'longitude' => $city['lng'] + 0.002,
                 'created_at' => now(),
                 'updated_at' => now()
-            ],
-            // JOGJA - JKT
-            [
-                'routeID' => 2,
-                'providerID' => 5,
-                'originCityID' => 4,
-                'destinationCityID' => 3,
-                'averagePrice' => 450000,
-                'departureTime' => '20:00:00',
-                'arrivalTime' => '04:00:00',
-                'class' => 'Eksekutif',
-                'facilities' => json_encode(['AC', 'Toilet', 'Makan']),
-                'bookingLink' => 'https://kai.id',
-                'description' => 'KA Taksaka Malam.',
-                'images' => json_encode(['https://kai.id/unit.jpg']),
-                'start_latitude' => -7.789178,
-                'start_longitude' => 110.363419, // Stasiun Tugu
-                'end_latitude' => -6.176662,
-                'end_longitude' => 106.830635, // Stasiun Gambir
+            ];
+
+            // Hotel Budget (Budgettrip)
+            $accommodationsData[] = [
+                'accommodationID' => $accID++,
+                'providerID' => 100, // Budgettrip Hotel
+                'cityID' => $city['id'],
+                'hotelName' => 'Budgettrip Capsule ' . $city['name'],
+                'averagePricePerNight' => rand(100000, 250000),
+                'rating' => 4.2,
+                'type' => 'Hostel',
+                'facilities' => json_encode(['WiFi', 'AC', 'Loker', 'Shared Bathroom']),
+                'bookingLink' => null, // Bisa bayar langsung di app
+                'description' => 'Penginapan hemat dan nyaman untuk backpacker di ' . $city['name'],
+                'images' => json_encode(['https://placehold.co/600x400?text=Capsule+' . urlencode($city['name'])]),
+                'latitude' => $city['lat'] - 0.002,
+                'longitude' => $city['lng'] - 0.002,
                 'created_at' => now(),
                 'updated_at' => now()
-            ],
-            // BDG - JOGJA (KHUSUS BUDGETTRIP)
-            [
-                'routeID' => 99,
-                'providerID' => 99,
-                'originCityID' => 1,
-                'destinationCityID' => 4,
-                'averagePrice' => 200000,
-                'departureTime' => '07:00:00',
-                'arrivalTime' => '15:00:00',
-                'class' => 'Budgettrip Bus',
-                'facilities' => json_encode(['AC', 'Snack']),
+            ];
+
+            // Villa / Guesthouse
+            $accommodationsData[] = [
+                'accommodationID' => $accID++,
+                'providerID' => 9, // Traveloka
+                'cityID' => $city['id'],
+                'hotelName' => 'Guesthouse Asri ' . $city['name'],
+                'averagePricePerNight' => rand(300000, 500000),
+                'rating' => 4.5,
+                'type' => 'Guesthouse',
+                'facilities' => json_encode(['WiFi', 'Parkir', 'Dapur']),
+                'bookingLink' => 'https://traveloka.com/guesthouse-' . strtolower(str_replace(' ', '-', $city['name'])),
+                'description' => 'Suasana seperti rumah sendiri di jantung kota ' . $city['name'],
+                'images' => json_encode(['https://placehold.co/600x400?text=Guesthouse']),
+                'latitude' => $city['lat'] + 0.005,
+                'longitude' => $city['lng'] - 0.005,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+        DB::table('accommodations')->insert($accommodationsData);
+
+
+        // ==========================================
+        // 5. ATTRACTIONS (Setiap Kota Ada)
+        // ==========================================
+        $attractionsData = [];
+        $attID = 1;
+        $categories = ['Alam', 'Sejarah', 'Kuliner', 'Hiburan', 'Belanja'];
+
+        foreach ($cities as $city) {
+            // Wisata 1
+            $attractionsData[] = [
+                'attractionID' => $attID++,
+                'cityID' => $city['id'],
+                'attractionName' => 'Alun-alun ' . $city['name'],
+                'category' => 'Hiburan',
+                'estimatedCost' => 0,
+                'rating' => 4.5,
+                'reviewCount' => rand(100, 5000),
+                'description' => 'Pusat keramaian kota ' . $city['name'] . ' dengan berbagai jajanan.',
                 'bookingLink' => null,
-                'description' => 'Bus Pariwisata Budgettrip.',
-                'images' => json_encode(['https://placehold.co/600x400?text=Bus+Budgettrip']),
-                'start_latitude' => -6.912759,
-                'start_longitude' => 107.575974, // Terminal Leuwi Panjang
-                'end_latitude' => -7.801377,
-                'end_longitude' => 110.375253, // Terminal Giwangan
+                'images' => json_encode(['https://placehold.co/600x400?text=Alun-alun+' . urlencode($city['name'])]),
+                'latitude' => $city['lat'],
+                'longitude' => $city['lng'],
                 'created_at' => now(),
                 'updated_at' => now()
-            ],
-            // JKT - BALI (PESAWAT)
+            ];
+
+            // Wisata 2 (Berbayar)
+            $attractionsData[] = [
+                'attractionID' => $attID++,
+                'cityID' => $city['id'],
+                'attractionName' => 'Museum Sejarah ' . $city['name'],
+                'category' => 'Sejarah',
+                'estimatedCost' => rand(15000, 50000),
+                'rating' => 4.6,
+                'reviewCount' => rand(50, 1000),
+                'description' => 'Menyimpan benda bersejarah dari kota ' . $city['name'],
+                'bookingLink' => 'https://museum.go.id',
+                'images' => json_encode(['https://placehold.co/600x400?text=Museum']),
+                'latitude' => $city['lat'] + 0.01,
+                'longitude' => $city['lng'] + 0.01,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+        DB::table('attractions')->insert($attractionsData);
+
+
+        // ==========================================
+        // 6. TRANSPORT ROUTES (Logika Kursi Dinamis)
+        // ==========================================
+        $routesData = [];
+        $routeID = 1;
+
+        // Fungsi Helper untuk generate rute
+        $createRoute = function ($provID, $origin, $dest, $type, $price, $time, $seats) use (&$routeID) {
+            return [
+                'routeID' => $routeID++,
+                'providerID' => $provID,
+                'originCityID' => $origin['id'],
+                'destinationCityID' => $dest['id'],
+                'averagePrice' => $price,
+                'departureTime' => $time,
+                'arrivalTime' => date('H:i:s', strtotime($time) + 3600 * rand(1, 5)), // Estimasi +1-5 jam
+                'class' => ($seats == 8 ? 'Executive Shuttle' : ($seats == 28 ? 'Business Class' : 'Economy')),
+                'total_seats' => $seats,
+                'facilities' => json_encode(['AC', ($seats > 30 ? 'Toilet' : 'Reclining Seat')]),
+                'bookingLink' => ($provID == 99 ? null : 'https://ticket.com'),
+                'description' => "Perjalanan nyaman dari {$origin['name']} ke {$dest['name']}",
+                'images' => json_encode(['https://placehold.co/600x400?text=Transport']),
+                'start_latitude' => $origin['lat'],
+                'start_longitude' => $origin['lng'],
+                'end_latitude' => $dest['lat'],
+                'end_longitude' => $dest['lng'],
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        };
+
+        // Buat Rute Acak Antar Kota
+        // Hub: Jakarta (2), Bandung (1), Surabaya (4), Bali (5)
+        $hubs = [1, 2, 4, 5];
+
+        foreach ($cities as $origin) {
+            foreach ($cities as $dest) {
+                if ($origin['id'] == $dest['id']) continue; // Skip kota sama
+
+                // Rute Travel (Jarak Dekat) - Kursi 8
+                // Misal: Jkt-Bdg, Bdg-Jkt, Jogja-Semarang, Surabaya-Malang
+                if (
+                    ($origin['id'] == 2 && $dest['id'] == 1) || ($origin['id'] == 1 && $dest['id'] == 2) ||
+                    ($origin['id'] == 3 && $dest['id'] == 7) || ($origin['id'] == 4 && $dest['id'] == 6)
+                ) {
+                    $routesData[] = $createRoute(1, $origin, $dest, 'Transportasi', 150000, '08:00:00', 8); // Cititrans
+                    $routesData[] = $createRoute(99, $origin, $dest, 'Transportasi', 135000, '10:00:00', 8); // Budgettrip Travel
+                }
+
+                // Rute Bus (Jarak Menengah) - Kursi 28
+                // Jkt-Jogja, Bdg-Jogja, Sby-Bali
+                if (in_array($origin['id'], $hubs) && in_array($dest['id'], $hubs)) {
+                    $routesData[] = $createRoute(4, $origin, $dest, 'Transportasi', 250000, '19:00:00', 28); // Rosalia
+                    $routesData[] = $createRoute(99, $origin, $dest, 'Transportasi', 200000, '20:00:00', 28); // Budgettrip Bus
+                }
+
+                // Rute Pesawat (Jarak Jauh / Seberang Pulau) - Kursi 150
+                // Jkt-Medan, Jkt-Bali, Jkt-Makassar, Sby-Medan
+                if (
+                    ($origin['id'] == 2 && in_array($dest['id'], [5, 8, 9])) ||
+                    ($origin['id'] == 4 && $dest['id'] == 8)
+                ) {
+                    $routesData[] = $createRoute(6, $origin, $dest, 'Transportasi', 1200000, '07:00:00', 150); // Garuda
+                    $routesData[] = $createRoute(7, $origin, $dest, 'Transportasi', 800000, '13:00:00', 180); // Lion
+                }
+
+                // Rute Kereta (Jawa) - Kursi 80
+                // Jkt-Sby, Bdg-Jogja, Smg-Sby
+                if ($origin['id'] <= 7 && $dest['id'] <= 7) { // Kota-kota di Jawa (ID 1-7 di array cities kita)
+                    $routesData[] = $createRoute(5, $origin, $dest, 'Transportasi', 450000, '08:00:00', 80); // KAI
+                }
+            }
+        }
+
+        DB::table('transport_routes')->insert($routesData);
+
+
+        // ==========================================
+        // 7. TRAVEL PLANS CONTOH
+        // ==========================================
+        DB::table('travel_plans')->insert([
             [
-                'routeID' => 3,
-                'providerID' => 6,
-                'originCityID' => 3,
+                'planID' => 1,
+                'userID' => 1,
+                'planName' => 'Liburan ke Bali',
+                'amount' => 5000000,
+                'originCityID' => 2,
                 'destinationCityID' => 5,
-                'averagePrice' => 1200000,
-                'departureTime' => '10:00:00',
-                'arrivalTime' => '13:00:00',
-                'class' => 'Ekonomi',
-                'facilities' => json_encode(['Bagasi 20KG']),
-                'bookingLink' => 'https://lionair.co.id',
-                'description' => 'Penerbangan langsung Jakarta - Denpasar.',
-                'images' => json_encode(['https://upload.wikimedia.org/wikipedia/commons/5/52/Lion_Air_Boeing_737-900ER.jpg']),
-                'start_latitude' => -6.125556,
-                'start_longitude' => 106.655833, // Bandara Soetta
-                'end_latitude' => -8.748169,
-                'end_longitude' => 115.167173, // Bandara Ngurah Rai
+                'accommodationCityID' => 5,
+                'startDate' => '2025-12-20',
+                'endDate' => '2025-12-25',
+                'requestedActivities' => json_encode(['Pantai']),
                 'created_at' => now(),
                 'updated_at' => now()
             ]
         ]);
 
-        // 7. TRAVEL PLANS (Data Dummy untuk Testing)
-        DB::table('travel_plans')->insert([
-            [
-                'planID' => 1,
-                'userID' => 1,
-                'planName' => 'Liburan ke Palembang',
-                'amount' => 2000000,
-                'originCityID' => 1,
-                'destinationCityID' => 2,
-                'accommodationCityID' => 2,
-                'startDate' => '2025-12-01',
-                'endDate' => '2025-12-05',
-                'requestedActivities' => json_encode(['Wisata Kuliner']),
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'planID' => 2,
-                'userID' => 2,
-                'planName' => 'Trip Jogja Hemat',
-                'amount' => 1500000,
-                'originCityID' => 1,
-                'destinationCityID' => 4,
-                'accommodationCityID' => 4,
-                'startDate' => '2025-11-20',
-                'endDate' => '2025-11-23',
-                'requestedActivities' => json_encode(['Sejarah']),
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-        ]);
-
-        // 8. ITINERARIES
         DB::table('itineraries')->insert([
             ['itineraryID' => 1, 'planID' => 1, 'itineraryName' => 'Rencana Utama', 'created_at' => now(), 'updated_at' => now()],
-            ['itineraryID' => 2, 'planID' => 2, 'itineraryName' => 'Opsi Backpacker', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // 9. PLAN ITEMS (Isi item dummy ke rencana)
-        DB::table('plan_items')->insert([
-            // Rencana 1: Bus Budgettrip (Bisa tes bayar)
-            ['planItemID' => 1, 'itineraryID' => 1, 'description' => 'Budgettrip Bus (Executive)', 'itemType' => 'Transportasi', 'estimatedCost' => 200000, 'quantity' => 2, 'bookingLink' => null, 'providerName' => 'Budgettrip Travel', 'latitude' => -6.912759, 'longitude' => 107.575974, 'created_at' => now(), 'updated_at' => now()],
-
-            // Rencana 1: Hotel
-            ['planItemID' => 2, 'itineraryID' => 1, 'description' => 'Budgettrip Homestay Palembang', 'itemType' => 'Akomodasi', 'estimatedCost' => 450000, 'quantity' => 3, 'bookingLink' => null, 'providerName' => 'Budgettrip Hotel', 'latitude' => -2.986873, 'longitude' => 104.762953, 'created_at' => now(), 'updated_at' => now()],
-
-            // Rencana 2: Hotel Kapsul
-            ['planItemID' => 3, 'itineraryID' => 2, 'description' => 'Budgettrip Capsule Hotel Bandung', 'itemType' => 'Akomodasi', 'estimatedCost' => 190000, 'quantity' => 2, 'bookingLink' => null, 'providerName' => 'Budgettrip Hotel', 'latitude' => -6.914744, 'longitude' => 107.609810, 'created_at' => now(), 'updated_at' => now()]
-        ]);
-
-        // 10. PROMOTIONS
-        DB::table('promotions')->insert([
-            ['promotionID' => 1, 'description' => 'Diskon 10% Member Baru', 'discountValue' => 0.10, 'validUntil' => '2025-12-31'],
-        ]);
+        // Item Contoh (Pesawat)
+        // Cari route ID pesawat Jkt-Bali (kita tau ID-nya dinamis, tapi kita ambil sampel manual atau skip)
+        // Agar aman, kita biarkan kosong atau insert manual jika perlu.
     }
 }

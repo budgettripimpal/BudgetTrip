@@ -319,16 +319,53 @@
 
                                                     @if ($isBudgettrip)
                                                         @if ($isPaid)
-                                                            <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">✅
-                                                                Lunas - Tiket Terbit</span>
+                                                            {{-- SUDAH LUNAS --}}
+                                                            <div class="flex flex-col gap-2 mt-2 w-full">
+                                                                <span
+                                                                    class="inline-flex justify-center items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 w-full border border-green-200">
+                                                                    ✅ Lunas
+                                                                </span>
+
+                                                                {{-- TOMBOL CETAK SESUAI TIPE --}}
+                                                                @if ($item->itemType == 'Transportasi')
+                                                                    <a href="{{ route('ticket.show', $item->planItemID) }}"
+                                                                        target="_blank"
+                                                                        class="inline-flex justify-center items-center px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white text-xs font-bold rounded-lg transition shadow-sm gap-2">
+                                                                        <svg class="w-4 h-4" fill="none"
+                                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                                stroke-width="2"
+                                                                                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                                                                        </svg>
+                                                                        Cetak Tiket
+                                                                    </a>
+                                                                @elseif($item->itemType == 'Akomodasi')
+                                                                    <a href="{{ route('booking.show', $item->planItemID) }}"
+                                                                        target="_blank"
+                                                                        class="inline-flex justify-center items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition shadow-sm gap-2">
+                                                                        <svg class="w-4 h-4" fill="none"
+                                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                                stroke-width="2"
+                                                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                        </svg>
+                                                                        Bukti Reservasi
+                                                                    </a>
+                                                                @endif
+                                                            </div>
                                                         @else
+                                                            {{-- BELUM LUNAS --}}
                                                             <form
                                                                 action="{{ route('payment.checkout', $item->planItemID) }}"
-                                                                method="POST" class="mt-2">@csrf<button
-                                                                    type="submit"
-                                                                    class="text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center shadow-sm">💳
-                                                                    Bayar Sekarang</button></form>
+                                                                method="POST" class="mt-2 w-full">
+                                                                @csrf
+                                                                <button type="submit"
+                                                                    class="w-full text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex justify-center items-center shadow-sm">
+                                                                    💳 Bayar Sekarang
+                                                                </button>
+                                                            </form>
                                                         @endif
                                                     @elseif($item->bookingLink)
                                                         <a href="{{ $item->bookingLink }}" target="_blank"

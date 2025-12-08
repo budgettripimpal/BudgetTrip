@@ -11,7 +11,9 @@ class PlanItem extends Model
 
     protected $primaryKey = 'planItemID';
     protected $guarded = [];
-
+    protected $casts = [
+        'seat_numbers' => 'array',
+    ];
     // Relasi Komposisi (Dimiliki oleh Itinerary)
     public function itinerary()
     {
