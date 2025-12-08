@@ -308,45 +308,6 @@
                             </div>
                         </div>
 
-                        <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 mb-10">
-                            <h3 class="text-lg font-bold text-gray-800 mb-6">Preferensi Tambahan</h3>
-                            <div class="flex items-center mb-8">
-                                <label
-                                    class="relative inline-flex items-center cursor-pointer select-none w-full group">
-                                    <input type="checkbox" name="needsAccommodation" class="sr-only peer"
-                                        {{ old('needsAccommodation', $plan->accommodationCityID ?? false) ? 'checked' : '' }}>
-                                    <div
-                                        class="w-14 h-8 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#2CB38B]">
-                                    </div>
-                                    <span
-                                        class="ml-4 text-sm font-bold text-gray-600 group-hover:text-[#2CB38B] transition">Saya
-                                        butuh rekomendasi penginapan</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-4">Aktivitas yang
-                                    Disukai</label>
-                                <div class="flex flex-wrap gap-3">
-                                    @php
-                                        $savedActivities =
-                                            isset($plan) && $plan->requestedActivities
-                                                ? $plan->requestedActivities
-                                                : [];
-                                    @endphp
-                                    @foreach (['Wisata Kuliner', 'Wisata Alam', 'Sejarah', 'Belanja', 'Staycation'] as $activity)
-                                        <label class="cursor-pointer group">
-                                            <input type="checkbox" name="activities[]" value="{{ $activity }}"
-                                                class="peer sr-only"
-                                                {{ (is_array(old('activities')) && in_array($activity, old('activities'))) || in_array($activity, $savedActivities) ? 'checked' : '' }}>
-                                            <span
-                                                class="px-6 py-3 rounded-xl text-sm font-bold bg-white text-gray-500 border border-gray-200 peer-checked:bg-[#2CB38B] peer-checked:text-white peer-checked:border-[#2CB38B] peer-checked:shadow-md transition-all select-none inline-block">{{ $activity }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                                <x-input-error :messages="$errors->get('activities')" class="mt-2" />
-                            </div>
-                        </div>
-
                         <button type="submit"
                             class="w-full bg-[#2CB38B] hover:bg-[#249d78] text-white font-bold py-5 rounded-2xl text-lg transition shadow-xl hover:shadow-2xl transform active:scale-[0.99] flex items-center justify-center gap-3 group">
                             <span>{{ isset($plan) ? 'Simpan Perubahan & Lanjut' : 'Lanjut Pilih Transportasi' }}</span>
