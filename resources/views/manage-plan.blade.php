@@ -43,7 +43,6 @@
         </style>
     @endpush
 
-    {{-- SCRIPT MIDTRANS (LETKKAN DISINI AGAR PASTI TERLOAD) --}}
     <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
 
@@ -61,8 +60,6 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('dashboard') }}"
                         class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
-                    <a href="#" class="text-gray-600 hover:text-[#2CB38B] transition">About</a>
-                    <a href="#" class="text-gray-600 hover:text-[#2CB38B] transition">Tutorial</a>
                 </div>
                 <div class="flex items-center space-x-4 relative group">
                     <span class="text-gray-600 hidden md:inline font-medium">Welcome, {{ Auth::user()->name }}</span>
@@ -70,11 +67,37 @@
                         class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg">
                         {{ substr(Auth::user()->name, 0, 1) }}</div>
                     <div
-                        class="absolute top-10 right-0 w-48 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
-                        <form method="POST" action="{{ route('logout') }}">@csrf<a href="{{ route('logout') }}"
+                        class="absolute top-10 right-0 w-56 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
+                        <div class="px-4 py-2 border-b border-gray-100 mb-1">
+                            <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                        </div>
+
+                        <a href="{{ route('profile.show') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
+                            View Profile
+                        </a>
+
+                        <a href="{{ route('travel-plan.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition font-semibold">
+                            Rencana Saya
+                        </a>
+
+                        <a href="{{ route('profile.edit') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
+                            Edit Profile
+                        </a>
+
+                        <div class="border-t border-gray-100 mt-1"></div>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a href="{{ route('logout') }}"
                                 onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition rounded-md mx-2">Log
-                                Out</a></form>
+                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition rounded-b-xl">
+                                Log Out
+                            </a>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -97,16 +120,17 @@
                     if (typeof window.snap !== 'undefined') {
                         window.snap.pay('{{ session('snapToken') }}', {
                             onSuccess: function(result) {
-                                window.location.href = "{{ route('payment.success') }}?order_id=" + result.order_id;
+                                window.location.href = "{{ route('payment.success') }}?order_id=" + result
+                                    .order_id;
                             },
                             onPending: function(result) {
-                                alert("Menunggu pembayaran!");
+                                alert("Anda membatalkan pembayaran");
                             },
                             onError: function(result) {
                                 alert("Pembayaran gagal!");
                             },
                             onClose: function() {
-                                alert('Anda menutup popup pembayaran');
+                                alert('Anda membatalkan popup pembayaran');
                             }
                         });
                     } else {
@@ -214,7 +238,8 @@
                     <div class="flex flex-col items-center relative z-10">
                         <div
                             class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-lg ring-4 ring-green-100 transform scale-110">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
