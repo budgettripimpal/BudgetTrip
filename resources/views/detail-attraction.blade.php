@@ -1,66 +1,118 @@
 <x-app-layout>
-    @push('styles')
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-            rel="stylesheet">
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <style>
-            body {
-                font-family: 'Plus Jakarta Sans', sans-serif;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2CB38B'
+                    }
+                }
             }
-        </style>
-    @endpush
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        #detailMap {
+            height: 400px !important;
+            width: 100% !important;
+            border-radius: 12px;
+            background: #f3f4f6;
+            position: relative;
+            z-index: 0;
+        }
+
+        .leaflet-pane,
+        .leaflet-top,
+        .leaflet-bottom {
+            z-index: 1 !important;
+        }
+
+        .leaflet-control {
+            z-index: 2 !important;
+        }
+
+        .leaflet-popup {
+            z-index: 3 !important;
+        }
+
+        .custom-marker {
+            background: none;
+            border: none;
+        }
+
+        .marker-pin {
+            width: 30px;
+            height: 30px;
+            border-radius: 50% 50% 50% 0;
+            position: relative;
+            transform: rotate(-45deg);
+            left: -15px;
+            top: -15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .marker-pin::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            margin: 8px 0 0 8px;
+            background: #fff;
+            position: absolute;
+            border-radius: 50%;
+        }
+    </style>
 
     <nav class="bg-white shadow-sm fixed w-full top-0 z-50 h-20">
         <div class="container mx-auto px-6 h-full">
             <div class="flex items-center justify-between h-full">
                 <div class="flex items-center space-x-2">
-                    <svg class="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                    </svg>
-                    <span class="text-2xl font-bold tracking-tight"><span class="text-gray-900">BUDGET</span><span
-                            class="text-[#2CB38B]">TRIP</span></span>
+                    <img src="{{ asset('images/budgettrip-logo.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                    <span class="text-2xl font-bold tracking-tight">
+                        <span class="text-gray-900">BUDGET</span><span class="text-[#2CB38B]">TRIP</span>
+                    </span>
                 </div>
+
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('dashboard') }}"
                         class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
                 </div>
+
                 <div class="flex items-center space-x-4 relative group">
                     <span class="text-gray-600 hidden md:inline font-medium">Welcome, {{ Auth::user()->name }}</span>
                     <div
                         class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg">
-                        {{ substr(Auth::user()->name, 0, 1) }}</div>
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+
                     <div
-                        class="absolute top-10 right-0 w-56 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
+                        class="absolute top-10 right-0 w-56 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down z-50">
                         <div class="px-4 py-2 border-b border-gray-100 mb-1">
-                            <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                            <p class="text-sm font-bold text-gray-800">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
                         </div>
-
-                        <a href="{{ route('profile.show') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
-                            View Profile
-                        </a>
-
-                        <a href="{{ route('travel-plan.index') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition font-semibold">
-                            Rencana Saya
-                        </a>
-
                         <a href="{{ route('profile.edit') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
-                            Edit Profile
-                        </a>
-
-                        <div class="border-t border-gray-100 mt-1"></div>
-
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">View
+                            Profile</a>
+                        <a href="{{ route('travel-plan.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition font-bold">Rencana
+                            Saya</a>
+                        <a href="{{ route('profile.edit') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">Edit
+                            Profile</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <a href="{{ route('logout') }}"
                                 onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition rounded-b-xl">
-                                Log Out
-                            </a>
+                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition rounded-b-xl">Log
+                                Out</a>
                         </form>
                     </div>
                 </div>
@@ -68,7 +120,7 @@
         </div>
     </nav>
 
-    <div class="min-h-screen bg-gray-50 pt-28 pb-12" x-data="{ showModal: false, quantity: 1 }">
+    <div class="min-h-screen pt-28 pb-12 bg-gray-50" x-data="{ showModal: false, quantity: 1 }">
         <div class="container mx-auto px-6">
             <button onclick="history.back()" class="mb-6 hover:bg-gray-200 p-2 rounded-full transition"><svg
                     class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,55 +128,61 @@
                 </svg></button>
 
             <div class="grid lg:grid-cols-2 gap-8">
-                <div>
-                    <div class="bg-white rounded-3xl shadow-lg overflow-hidden mb-4 aspect-video"><img
-                            src="{{ $attraction->images[0] ?? 'https://placehold.co/600x400?text=Wisata' }}"
-                            class="w-full h-full object-cover"></div>
+                <div class="space-y-6">
+                    <div class="bg-white rounded-3xl shadow-lg overflow-hidden aspect-video">
+                        <img src="{{ $attraction->images[0] ?? 'https://placehold.co/600x400?text=Wisata' }}"
+                            class="w-full h-full object-cover">
+                    </div>
+                    @if (isset($attraction->latitude) && isset($attraction->longitude))
+                        <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">📍 Lokasi Wisata
+                            </h3>
+                            <div id="detailMap"></div>
+                            <p class="text-xs text-gray-500 mt-3 text-center">Koordinat: {{ $attraction->latitude }},
+                                {{ $attraction->longitude }}</p>
+                        </div>
+                    @endif
                 </div>
 
                 <div>
-                    <div class="bg-white rounded-3xl shadow-lg p-8">
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ $attraction->attractionName }}</h1>
+                    <div class="bg-white rounded-3xl shadow-lg p-8 sticky top-24">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ $attraction->attractionName ?? 'Wisata' }}
+                        </h1>
                         <div class="flex items-center gap-2 mb-6">
                             <span
-                                class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">{{ $attraction->category }}</span>
-                            <span class="text-yellow-500 font-bold">★ {{ $attraction->rating }}</span>
+                                class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">{{ $attraction->category ?? 'Umum' }}</span>
+                            <span class="text-yellow-500 font-bold">★ {{ $attraction->rating ?? '0' }}</span>
                         </div>
-                        <p class="text-gray-600 leading-relaxed mb-8">
-                            {{ $attraction->description ?? 'Nikmati keindahan wisata ini.' }}</p>
+                        <p class="text-gray-600 leading-relaxed mb-6">
+                            {{ $attraction->description ?? 'Deskripsi tidak tersedia' }}</p>
 
                         <div class="bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 mb-8 text-center">
                             <p class="text-3xl font-bold text-gray-900">
-                                {{ $attraction->estimatedCost == 0 ? 'Gratis' : 'Rp ' . number_format($attraction->estimatedCost, 0, ',', '.') }}
-                                <span class="text-sm text-gray-500 font-normal">/ Orang</span></p>
+                                {{ ($attraction->estimatedCost ?? 0) == 0 ? 'Gratis' : 'Rp ' . number_format($attraction->estimatedCost, 0, ',', '.') }}
+                                <span class="text-sm text-gray-500 font-normal">/ Orang</span>
+                            </p>
                         </div>
 
-                        <div class="space-y-4 mb-8 text-sm">
-                            <div class="flex justify-between py-3 border-t border-gray-100">
-                                <span class="text-gray-600 font-medium">Link Website/Tiket</span>
-                                @if ($attraction->bookingLink)
-                                    <a href="{{ $attraction->bookingLink }}" target="_blank"
-                                        class="text-[#2CB38B] hover:underline font-semibold truncate max-w-[200px] flex items-center gap-1">
-                                        🔗 {{ $attraction->bookingLink }}
-                                    </a>
-                                @else
-                                    <span class="text-gray-400 italic">Tidak tersedia (Bayar di tempat atau
-                                        gratis)</span>
-                                @endif
-                            </div>
+                        <div class="flex justify-between py-3 border-t border-gray-100 mb-6 text-sm">
+                            <span class="text-gray-600 font-medium">Link Info/Tiket</span>
+                            @if (isset($attraction->bookingLink) && $attraction->bookingLink)
+                                <a href="{{ $attraction->bookingLink }}" target="_blank"
+                                    class="text-primary hover:underline font-bold">🔗 Buka Link</a>
+                            @else
+                                <span class="text-gray-400 italic">Tidak tersedia</span>
+                            @endif
                         </div>
 
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center space-x-4 bg-gray-100 rounded-full px-6 py-3">
                                 <button @click="if(quantity > 1) quantity--"
-                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded-full text-gray-800 font-bold">-</button>
-                                <span class="text-2xl font-bold text-gray-800 min-w-[40px] text-center"
-                                    x-text="quantity">1</span>
+                                    class="w-8 h-8 font-bold hover:bg-gray-200 rounded-full">-</button>
+                                <span class="text-2xl font-bold min-w-[40px] text-center" x-text="quantity">1</span>
                                 <button @click="quantity++"
-                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded-full text-gray-800 font-bold">+</button>
+                                    class="w-8 h-8 font-bold hover:bg-gray-200 rounded-full">+</button>
                             </div>
                             <button @click="showModal = true"
-                                class="flex-1 bg-[#2CB38B] hover:bg-[#249d78] text-white font-bold py-4 px-8 rounded-full text-lg transition shadow-lg">Tambah
+                                class="flex-1 bg-primary hover:bg-green-600 text-white font-bold py-4 rounded-full shadow-lg transition">Tambah
                                 ke Rencana</button>
                         </div>
                     </div>
@@ -132,39 +190,82 @@
             </div>
         </div>
 
-        <div x-show="showModal"
-            class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+        <div x-show="showModal" x-cloak
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
             style="display: none;">
             <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative m-4">
                 <button @click="showModal = false"
                     class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✖</button>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">Simpan ke Rencana</h3>
-                <p class="text-gray-500 mb-6 text-sm">Pilih folder rencana mana item ini akan disimpan.</p>
-                <form action="{{ route('plan.add-item', $travelPlan->planID) }}" method="POST">
+                <h3 class="text-2xl font-bold mb-4">Simpan ke Rencana</h3>
+                <form action="{{ route('plan.add-item', $travelPlan->planID ?? 1) }}" method="POST">
                     @csrf
                     <input type="hidden" name="item_type" value="Wisata">
-                    <input type="hidden" name="item_id" value="{{ $attraction->attractionID }}">
+                    <input type="hidden" name="item_id" value="{{ $attraction->attractionID ?? 0 }}">
                     <input type="hidden" name="quantity" x-model="quantity">
-                    <div class="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2">
-                        @foreach ($itineraries as $itinerary)
-                            <label
-                                class="flex items-center justify-between p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[#2CB38B] transition group">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-lg">
-                                        📁</div><span
-                                        class="font-bold text-gray-700 group-hover:text-[#2CB38B] transition">{{ $itinerary->itineraryName }}</span>
-                                </div>
-                                <input type="radio" name="itinerary_id" value="{{ $itinerary->itineraryID }}"
-                                    class="w-5 h-5 text-[#2CB38B] border-gray-300 focus:ring-[#2CB38B]" required
-                                    checked>
-                            </label>
-                        @endforeach
+                    <div class="space-y-3 mb-6 max-h-60 overflow-y-auto">
+                        @if (isset($itineraries))
+                            @foreach ($itineraries as $itinerary)
+                                <label
+                                    class="flex items-center gap-3 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="itinerary_id" value="{{ $itinerary->itineraryID }}"
+                                        {{ $loop->first ? 'checked' : '' }}>
+                                    <span>{{ $itinerary->itineraryName }}</span>
+                                </label>
+                            @endforeach
+                        @endif
                     </div>
                     <button type="submit"
-                        class="w-full bg-[#2CB38B] hover:bg-[#249d78] text-white font-bold py-4 rounded-xl shadow-lg transition">Simpan</button>
+                        class="w-full bg-primary hover:bg-green-600 text-white font-bold py-3 rounded-xl">Simpan</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    @if (isset($attraction->latitude) && isset($attraction->longitude))
+        <script>
+            (function() {
+                const lat = {{ $attraction->latitude }};
+                const lng = {{ $attraction->longitude }};
+                const name = "{{ $attraction->attractionName ?? 'Wisata' }}";
+
+                function createMarker(color) {
+                    return L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div class="marker-pin" style="background-color: ${color};"></div>`,
+                        iconSize: [30, 42],
+                        iconAnchor: [15, 42],
+                        popupAnchor: [0, -42]
+                    });
+                }
+
+                function initMap() {
+                    if (typeof L === 'undefined') {
+                        setTimeout(initMap, 500);
+                        return;
+                    }
+                    const container = document.getElementById('detailMap');
+                    if (!container) return;
+
+                    try {
+                        const map = L.map('detailMap').setView([lat, lng], 15);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap',
+                            maxZoom: 19
+                        }).addTo(map);
+                        L.marker([lat, lng], {
+                            icon: createMarker('#a855f7')
+                        }).addTo(map).bindPopup(`<b>🟣 ${name}</b><br><small>Wisata</small>`).openPopup();
+                        setTimeout(() => map.invalidateSize(), 500);
+                    } catch (error) {
+                        console.error('Map error:', error);
+                    }
+                }
+                if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMap);
+                else initMap();
+            })();
+        </script>
+    @endif
 </x-app-layout>

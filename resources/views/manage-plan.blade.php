@@ -3,6 +3,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
             rel="stylesheet">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="{{ config('midtrans.client_key') }}"></script>
         <style>
             body {
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -20,18 +22,6 @@
                 border-color: #2CB38B;
             }
 
-            .ring-primary {
-                --tw-ring-color: #2CB38B;
-            }
-
-            .hover\:text-primary:hover {
-                color: #2CB38B;
-            }
-
-            .hover\:bg-primary:hover {
-                background-color: #2CB38B;
-            }
-
             .no-scrollbar::-webkit-scrollbar {
                 display: none;
             }
@@ -43,29 +33,33 @@
         </style>
     @endpush
 
-    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-        data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <nav class="bg-white shadow-sm fixed w-full top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="{{ asset('images/budgettrip-logo.png') }}" alt="BudgetTrip Logo"
+                        class="w-10 h-10 object-contain">
 
-    <nav class="bg-white shadow-sm fixed w-full top-0 z-50 h-20">
-        <div class="container mx-auto px-6 h-full">
-            <div class="flex items-center justify-between h-full">
-                <div class="flex items-center space-x-2">
-                    <svg class="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                    </svg>
-                    <span class="text-2xl font-bold tracking-tight"><span class="text-gray-900">BUDGET</span><span
-                            class="text-[#2CB38B]">TRIP</span></span>
+                    <span class="text-2xl font-bold tracking-tight">
+                        <span class="text-gray-900">BUDGET</span><span class="text-[#2CB38B]">TRIP</span>
+                    </span>
                 </div>
+
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="{{ route('dashboard') }}"
-                        class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
+                    <a href="#" class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
+                    <a href="#about" class="text-gray-600 hover:text-[#2CB38B] transition">About</a>
+                    <a href="#tutorial" class="text-gray-600 hover:text-[#2CB38B] transition">Tutorial</a>
+                    <a href="#testimonials" class="text-gray-600 hover:text-[#2CB38B] transition">Testimonials</a>
+                    <a href="#contact" class="text-gray-600 hover:text-[#2CB38B] transition">Contact Us</a>
                 </div>
+
                 <div class="flex items-center space-x-4 relative group">
                     <span class="text-gray-600 hidden md:inline font-medium">Welcome, {{ Auth::user()->name }}</span>
                     <div
-                        class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg">
-                        {{ substr(Auth::user()->name, 0, 1) }}</div>
+                        class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg transition transform group-hover:scale-105">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+
                     <div
                         class="absolute top-10 right-0 w-56 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
                         <div class="px-4 py-2 border-b border-gray-100 mb-1">
@@ -104,62 +98,29 @@
         </div>
     </nav>
 
-    <div class="min-h-screen bg-gray-50 pb-12 pt-20" x-data="{
-        activeTab: {{ $plan->itineraries->first()->itineraryID ?? 0 }},
-        showNewPlanModal: false
-    }">
+    <div class="min-h-screen bg-gray-50 pb-12 pt-20" x-data="{ activeTab: {{ $plan->itineraries->first()->itineraryID ?? 0 }} }">
 
-        {{-- LOGIKA POPUP --}}
+        {{-- LOGIKA POPUP MIDTRANS --}}
         @if (session('snapToken'))
-            <script type="text/javascript">
-                // Kita jalankan saat window load agar snap.js pasti sudah siap
-                window.onload = function() {
-                    console.log("Mencoba membuka Snap untuk Token: {{ session('snapToken') }}");
-
-                    // Cek lagi apakah snap sudah ada
-                    if (typeof window.snap !== 'undefined') {
-                        window.snap.pay('{{ session('snapToken') }}', {
-                            onSuccess: function(result) {
-                                window.location.href = "{{ route('payment.success') }}?order_id=" + result
-                                    .order_id;
-                            },
-                            onPending: function(result) {
-                                alert("Anda membatalkan pembayaran");
-                            },
-                            onError: function(result) {
-                                alert("Pembayaran gagal!");
-                            },
-                            onClose: function() {
-                                alert('Anda membatalkan popup pembayaran');
-                            }
-                        });
-                    } else {
-                        console.error("Snap JS tidak terload dengan benar.");
-                        alert("Gagal memuat sistem pembayaran. Coba refresh halaman.");
-                    }
-                };
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    window.snap.pay('{{ session('snapToken') }}', {
+                        onSuccess: function(result) {
+                            window.location.href = "{{ route('payment.success') }}?order_id=" + result
+                                .order_id;
+                        },
+                        onPending: function(result) {
+                            alert("Menunggu pembayaran!");
+                        },
+                        onError: function(result) {
+                            alert("Pembayaran gagal!");
+                        },
+                        onClose: function() {
+                            alert('Anda menutup popup pembayaran');
+                        }
+                    });
+                });
             </script>
-        @endif
-
-        {{-- ALERT ERROR --}}
-        @if (session('error'))
-            <div class="max-w-7xl mx-auto px-6 mt-4">
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Gagal!</strong>
-                    <span class="block sm:inline">{{ session('error') }}</span>
-                </div>
-            </div>
-        @endif
-
-        {{-- ALERT SUCCESS --}}
-        @if (session('success'))
-            <div class="max-w-7xl mx-auto px-6 mt-4">
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
-                    role="alert">
-                    <strong class="font-bold">Berhasil!</strong>
-                    <span class="block sm:inline">{{ session('success') }}</span>
-                </div>
-            </div>
         @endif
 
         <div class="bg-white shadow-sm py-8 mb-8 sticky top-20 z-40">
@@ -252,15 +213,25 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-8 py-8">
+            {{-- ALERT MESSAGES --}}
+            @if (session('error'))
+                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                    <strong>Gagal!</strong> {{ session('error') }}
+                </div>
+            @endif
+            @if (session('success'))
+                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                    <strong>Berhasil!</strong> {{ session('success') }}
+                </div>
+            @endif
+
             <div class="mb-8">
-                <h1 class="text-4xl font-bold flex items-center text-gray-900">
-                    <svg class="w-10 h-10 mr-3 text-[#2CB38B]" fill="none" stroke="currentColor"
+                <h1 class="text-4xl font-bold flex items-center text-gray-900"><svg
+                        class="w-10 h-10 mr-3 text-[#2CB38B]" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    {{ $plan->planName }}
-                </h1>
+                    </svg>{{ $plan->planName }}</h1>
                 <p class="text-gray-500 mt-2 ml-14">Total Budget: <span class="font-bold text-[#2CB38B]">Rp
                         {{ number_format($plan->amount, 0, ',', '.') }}</span></p>
             </div>
@@ -281,11 +252,9 @@
                         class="p-5 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500 col-span-3">
                         Belum ada folder rencana.</div>
                 @endforelse
-
                 <button onclick="openModal()"
-                    class="p-5 border-2 border-dashed border-gray-300 rounded-xl flex justify-center items-center hover:border-[#2CB38B] hover:bg-green-50 cursor-pointer transition group text-gray-400 hover:text-[#2CB38B] w-full">
-                    <span class="font-bold text-lg">+ Buat Rencana Baru</span>
-                </button>
+                    class="p-5 border-2 border-dashed border-gray-300 rounded-xl flex justify-center items-center hover:border-[#2CB38B] hover:bg-green-50 cursor-pointer transition group text-gray-400 hover:text-[#2CB38B] w-full"><span
+                        class="font-bold text-lg">+ Buat Rencana Baru</span></button>
             </div>
 
             <hr class="my-10 border-gray-200">
@@ -295,16 +264,11 @@
 
                     <div class="flex justify-end mb-4">
                         <form action="{{ route('itinerary.destroy', $itinerary->itineraryID) }}" method="POST"
-                            onsubmit="return confirm('Yakin ingin menghapus folder rencana {{ $itinerary->itineraryName }}? Semua item di dalamnya akan hilang permanen.');">
+                            onsubmit="return confirm('Yakin ingin menghapus folder rencana ini?');">
                             @csrf @method('DELETE')
                             <button type="submit"
-                                class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                                Hapus Folder Rencana Ini
-                            </button>
+                                class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition">Hapus
+                                Folder Rencana Ini</button>
                         </form>
                     </div>
 
@@ -314,10 +278,10 @@
                         $percentage = $plan->amount > 0 ? ($totalCost / $plan->amount) * 100 : 0;
                         $isOverBudget = $remaining < 0;
                     @endphp
+
                     <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-10">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-800">Ringkasan Anggaran</h3>
-                            <span
+                            <h3 class="text-xl font-bold text-gray-800">Ringkasan Anggaran</h3><span
                                 class="px-3 py-1 rounded-full text-xs font-bold {{ $isOverBudget ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600' }}">{{ $isOverBudget ? 'Over Budget' : 'Aman' }}</span>
                         </div>
                         <div class="flex justify-between text-sm mb-2"><span class="text-gray-500">Terpakai:
@@ -334,11 +298,11 @@
                     </div>
 
                     @foreach (['Transportasi' => '🚌', 'Akomodasi' => '🏨', 'Aktivitas' => '🏖️'] as $type => $icon)
+                        @php $items = $itinerary->planItems->whereIn('itemType', ($type == 'Aktivitas') ? ['Aktivitas', 'Wisata'] : [$type]); @endphp
                         <div class="mb-10">
                             <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2"><span
                                     class="bg-blue-100 text-blue-600 p-2 rounded-lg text-xl">{{ $icon }}</span>
                                 {{ $type == 'Aktivitas' ? 'Wisata' : $type }} Pilihan</h2>
-                            @php $items = $itinerary->planItems->whereIn('itemType', ($type == 'Aktivitas') ? ['Aktivitas', 'Wisata'] : [$type]); @endphp
 
                             @if ($items->isEmpty())
                                 <div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl">
@@ -347,19 +311,29 @@
                                 </div>
                             @else
                                 @foreach ($items as $item)
+                                    @php
+                                        $isBudgettrip = \Illuminate\Support\Str::contains(
+                                            strtolower($item->providerName),
+                                            'budgettrip',
+                                        );
+                                        $isPaid = $item->order && $item->order->status == 'paid';
+                                    @endphp
                                     <div
                                         class="border-2 border-gray-200 rounded-xl p-6 hover:border-[#2CB38B] transition mb-4 relative group bg-white">
-                                        <form action="{{ route('plan-item.destroy', $item->planItemID) }}"
-                                            method="POST" class="absolute top-4 right-4"
-                                            onsubmit="return confirm('Hapus item ini?');">@csrf
-                                            @method('DELETE')<button type="submit"
-                                                class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg
-                                                    class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg></button></form>
+
+                                        @if (!$isPaid)
+                                            <form action="{{ route('plan-item.destroy', $item->planItemID) }}"
+                                                method="POST" class="absolute top-4 right-4"
+                                                onsubmit="return confirm('Hapus item ini?');">@csrf
+                                                @method('DELETE')<button type="submit"
+                                                    class="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><svg
+                                                        class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg></button></form>
+                                        @endif
 
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center flex-1">
@@ -370,14 +344,6 @@
                                                     <p class="font-semibold text-gray-900 text-lg">
                                                         {{ $item->providerName }}</p>
                                                     <p class="text-base text-gray-500">{{ $item->description }}</p>
-
-                                                    @php
-                                                        $isBudgettrip = \Illuminate\Support\Str::contains(
-                                                            strtolower($item->providerName),
-                                                            'budgettrip',
-                                                        );
-                                                        $isPaid = $item->order && $item->order->status == 'paid';
-                                                    @endphp
                                                     @if ($isBudgettrip)
                                                         @if ($isPaid)
                                                             <span
@@ -402,22 +368,33 @@
                                                 <p class="font-bold text-gray-900 text-xl">
                                                     {{ $item->estimatedCost == 0 ? 'Gratis' : 'Rp ' . number_format($item->estimatedCost, 0, ',', '.') }}
                                                 </p>
-                                                <div
-                                                    class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                                                    <form
-                                                        action="{{ route('plan-item.decrease', $item->planItemID) }}"
-                                                        method="POST">@csrf @method('PATCH')<button type="submit"
-                                                            class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                                            {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
-                                                    </form>
-                                                    <span
-                                                        class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
-                                                    <form
-                                                        action="{{ route('plan-item.increase', $item->planItemID) }}"
-                                                        method="POST">@csrf @method('PATCH')<button type="submit"
-                                                            class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button>
-                                                    </form>
-                                                </div>
+
+                                                @if (!$isPaid)
+                                                    <div
+                                                        class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                                                        <form
+                                                            action="{{ route('plan-item.decrease', $item->planItemID) }}"
+                                                            method="POST">@csrf @method('PATCH')<button
+                                                                type="submit"
+                                                                class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                                {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
+                                                        </form>
+                                                        <span
+                                                            class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
+                                                        <form
+                                                            action="{{ route('plan-item.increase', $item->planItemID) }}"
+                                                            method="POST">@csrf @method('PATCH')<button
+                                                                type="submit"
+                                                                class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button>
+                                                        </form>
+                                                    </div>
+                                                @else
+                                                    <div
+                                                        class="bg-green-50 px-4 py-1.5 rounded-lg border border-green-200 text-green-700 text-sm font-bold">
+                                                        Qty: {{ $item->quantity }}
+                                                    </div>
+                                                @endif
+
                                             </div>
                                         </div>
                                     </div>
