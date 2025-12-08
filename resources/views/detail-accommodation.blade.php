@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Akomodasi - Budget Trip</title>
-
+<x-app-layout>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -21,8 +14,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-
-    <!-- LEAFLET CSS - WAJIB DI HEAD -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 
     <style>
@@ -30,17 +21,15 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        /* MAP STYLING - HEIGHT WAJIB! */
         #detailMap {
             height: 400px !important;
             width: 100% !important;
             border-radius: 12px;
             background: #f3f4f6;
             position: relative;
-            z-index: 1;
+            z-index: 0;
         }
 
-        /* Fix z-index untuk leaflet components */
         .leaflet-pane,
         .leaflet-top,
         .leaflet-bottom {
@@ -81,30 +70,58 @@
             border-radius: 50%;
         }
     </style>
-</head>
 
-<body class="bg-gray-50">
     <nav class="bg-white shadow-sm fixed w-full top-0 z-50 h-20">
-        <div class="container mx-auto px-6 h-full flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <svg class="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                </svg>
-                <span class="text-2xl font-bold"><span class="text-gray-900">BUDGET</span><span
-                        class="text-primary">TRIP</span></span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-600 hidden md:inline font-medium">Welcome,
-                    {{ Auth::user()->name ?? 'User' }}</span>
-                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
+        <div class="container mx-auto px-6 h-full">
+            <div class="flex items-center justify-between h-full">
+                <div class="flex items-center space-x-2">
+                    <img src="{{ asset('images/budgettrip-logo.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                    <span class="text-2xl font-bold tracking-tight">
+                        <span class="text-gray-900">BUDGET</span><span class="text-[#2CB38B]">TRIP</span>
+                    </span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{{ route('dashboard') }}"
+                        class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
+                </div>
+
+                <div class="flex items-center space-x-4 relative group">
+                    <span class="text-gray-600 hidden md:inline font-medium">Welcome, {{ Auth::user()->name }}</span>
+                    <div
+                        class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+
+                    <div
+                        class="absolute top-10 right-0 w-56 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down z-50">
+                        <div class="px-4 py-2 border-b border-gray-100 mb-1">
+                            <p class="text-sm font-bold text-gray-800">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                        </div>
+                        <a href="{{ route('profile.edit') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">View
+                            Profile</a>
+                        <a href="{{ route('travel-plan.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition font-bold">Rencana
+                            Saya</a>
+                        <a href="{{ route('profile.edit') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">Edit
+                            Profile</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); this.closest('form').submit();"
+                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition rounded-b-xl">Log
+                                Out</a>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="min-h-screen pt-28 pb-12" x-data="{ showModal: false, quantity: 1 }">
+    <div class="min-h-screen pt-28 pb-12 bg-gray-50" x-data="{ showModal: false, quantity: 1 }">
         <div class="container mx-auto px-6">
             <button onclick="history.back()" class="mb-6 hover:bg-gray-200 p-2 rounded-full transition">
                 <svg class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +136,6 @@
                             class="w-full h-full object-cover" alt="{{ $accommodation->hotelName ?? 'Hotel' }}">
                     </div>
 
-                    {{-- MAP SECTION --}}
                     @if (isset($accommodation->latitude) && isset($accommodation->longitude))
                         <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">📍 Lokasi Hotel
@@ -194,13 +210,12 @@
             </div>
         </div>
 
-        {{-- MODAL --}}
-        <div x-show="showModal" x-cloak @click.self="showModal = false"
-            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+        <div x-show="showModal" x-cloak
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
             style="display: none;">
-            <div @click.stop class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative m-4 z-[10000]">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative m-4">
                 <button @click="showModal = false"
-                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center">✖</button>
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✖</button>
                 <h3 class="text-2xl font-bold mb-4">Simpan ke Rencana</h3>
                 <form action="{{ route('plan.add-item', $travelPlan->planID ?? 1) }}" method="POST">
                     @csrf
@@ -226,11 +241,9 @@
         </div>
     </div>
 
-    {{-- LEAFLET JS - WAJIB SEBELUM SCRIPT INIT --}}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-    {{-- MAP INITIALIZATION --}}
     @if (isset($accommodation->latitude) && isset($accommodation->longitude))
         <script>
             (function() {
@@ -254,16 +267,11 @@
                         setTimeout(initMap, 500);
                         return;
                     }
-
                     const container = document.getElementById('detailMap');
-                    if (!container) {
-                        console.error('Map container not found');
-                        return;
-                    }
+                    if (!container) return;
 
                     try {
                         const map = L.map('detailMap').setView([lat, lng], 15);
-
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; OpenStreetMap contributors',
                             maxZoom: 19
@@ -274,8 +282,6 @@
                         }).addTo(map).bindPopup(`<b>🟡 ${name}</b><br><small>Akomodasi</small>`).openPopup();
 
                         setTimeout(() => map.invalidateSize(), 500);
-
-                        console.log('✅ Map rendered successfully');
                     } catch (error) {
                         console.error('Map error:', error);
                     }
@@ -289,6 +295,4 @@
             })();
         </script>
     @endif
-</body>
-
-</html>
+</x-app-layout>

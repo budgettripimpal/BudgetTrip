@@ -307,17 +307,15 @@ class TravelPlanController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        // Variabel penampung data
         $description = '';
         $unitPrice = 0;
         $bookingLink = '';
         $providerName = '';
         $itemTypeDB = '';
-
-        // Variabel Koordinat Baru
         $lat = null;
         $long = null;
 
+        // 1. Ambil Data Master
         if ($request->item_type == 'Transportasi') {
             $item = \App\Models\TransportRoute::with('serviceProvider')->find($request->item_id);
             $providerName = $item->serviceProvider->providerName;
@@ -325,7 +323,6 @@ class TravelPlanController extends Controller
             $unitPrice = $item->averagePrice;
             $bookingLink = $item->bookingLink;
             $itemTypeDB = 'Transportasi';
-            // Untuk transportasi, ambil titik awal sebagai lokasi pin
             $lat = $item->start_latitude;
             $long = $item->start_longitude;
         } elseif ($request->item_type == 'Akomodasi') {
@@ -348,22 +345,37 @@ class TravelPlanController extends Controller
             $long = $item->longitude;
         }
 
-        // Logic Create / Update
+        // 2. Logic Cek Eksistensi 
+        // Cari item yang sama di itinerary ini
+        // TAPI pastikan item tersebut BELUM DIBAYAR 
         $existingItem = \App\Models\PlanItem::where('itineraryID', $request->itinerary_id)
             ->where('itemType', $itemTypeDB)
             ->where('providerName', $providerName)
+            ->whereDoesntHave('order', function ($q) {
+                $q->where('status', 'paid');
+            })
             ->first();
 
+        // Jika item sudah ada dan BELUM DIBAYAR -> Update Quantity
         if ($existingItem) {
             $newQuantity = $existingItem->quantity + $request->quantity;
+
+            // Update deskripsi khusus Akomodasi
+            if ($itemTypeDB == 'Akomodasi') {
+                // Reset deskripsi lama agar formatnya konsisten
+                $description = "$providerName ({$item->type}) - {$newQuantity} Malam";
+            }
+
             $existingItem->update([
                 'quantity' => $newQuantity,
                 'estimatedCost' => $unitPrice * $newQuantity,
-                // Pastikan lat/long juga terupdate jika sebelumnya null
+                'description' => $description, // Update deskripsi juga
                 'latitude' => $lat,
                 'longitude' => $long
             ]);
-        } else {
+        }
+        // Jika item belum ada ATAU item yang ada sudah LUNAS -> Buat Baru
+        else {
             if ($itemTypeDB == 'Akomodasi') {
                 $description .= " - {$request->quantity} Malam";
             }
@@ -376,7 +388,6 @@ class TravelPlanController extends Controller
                 'quantity' => $request->quantity,
                 'bookingLink' => $bookingLink,
                 'providerName' => $providerName,
-                // SIMPAN KOORDINAT
                 'latitude' => $lat,
                 'longitude' => $long
             ]);
