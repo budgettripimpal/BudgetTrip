@@ -465,4 +465,22 @@ class TravelPlanController extends Controller
 
         return back()->with('success', 'Folder rencana berhasil dihapus.');
     }
+
+    public function overview(TravelPlan $travelPlan)
+    {
+        // 1. Validasi Kepemilikan
+        if ($travelPlan->userID !== Auth::id()) {
+            abort(403);
+        }
+
+        // 2. Load Relasi yang dibutuhkan (Cities, Itineraries, PlanItems)
+        $travelPlan->load([
+            'originCity', 
+            'destinationCity', 
+            'itineraries.planItems'
+        ]);
+
+        // 3. Tampilkan View
+        return view('overview-plan', ['plan' => $travelPlan]);
+    }
 }

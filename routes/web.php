@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/payment/checkout/{planItem}', [PaymentController::class, 'checkout'])->name('payment.checkout');
     Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/plan/{travelPlan}/overview', [TravelPlanController::class, 'overview'])->name('travel-plan.overview');
 });
 
 require __DIR__ . '/auth.php';
