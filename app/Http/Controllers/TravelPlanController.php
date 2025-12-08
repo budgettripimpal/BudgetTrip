@@ -307,11 +307,16 @@ class TravelPlanController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
+        // Variabel penampung data
         $description = '';
         $unitPrice = 0;
         $bookingLink = '';
         $providerName = '';
         $itemTypeDB = '';
+
+        // Variabel Koordinat Baru
+        $lat = null;
+        $long = null;
 
         if ($request->item_type == 'Transportasi') {
             $item = \App\Models\TransportRoute::with('serviceProvider')->find($request->item_id);
@@ -320,6 +325,9 @@ class TravelPlanController extends Controller
             $unitPrice = $item->averagePrice;
             $bookingLink = $item->bookingLink;
             $itemTypeDB = 'Transportasi';
+            // Untuk transportasi, ambil titik awal sebagai lokasi pin
+            $lat = $item->start_latitude;
+            $long = $item->start_longitude;
         } elseif ($request->item_type == 'Akomodasi') {
             $item = \App\Models\Accommodation::find($request->item_id);
             $providerName = $item->hotelName;
@@ -327,6 +335,8 @@ class TravelPlanController extends Controller
             $unitPrice = $item->averagePricePerNight;
             $bookingLink = $item->bookingLink;
             $itemTypeDB = 'Akomodasi';
+            $lat = $item->latitude;
+            $long = $item->longitude;
         } elseif ($request->item_type == 'Wisata') {
             $item = \App\Models\Attraction::find($request->item_id);
             $providerName = $item->attractionName;
@@ -334,58 +344,46 @@ class TravelPlanController extends Controller
             $unitPrice = $item->estimatedCost;
             $bookingLink = $item->bookingLink;
             $itemTypeDB = 'Aktivitas';
+            $lat = $item->latitude;
+            $long = $item->longitude;
         }
 
-        // Cek apakah item ini SUDAH ADA di itinerar
-        // cek berdasarkan ItineraryID, Tipe, dan Nama Provider/BookingLink
+        // Logic Create / Update
         $existingItem = \App\Models\PlanItem::where('itineraryID', $request->itinerary_id)
             ->where('itemType', $itemTypeDB)
             ->where('providerName', $providerName)
-            ->where('bookingLink', $bookingLink)
             ->first();
 
         if ($existingItem) {
-            // JIKA SUDAH ADA, UPDATE DATA LAMA
-
-            // Tambah quantity
             $newQuantity = $existingItem->quantity + $request->quantity;
-
-            // Hitung harga baru
-            // Harga Satuan * Total Quantity Baru
-            $newCost = $unitPrice * $newQuantity;
-
-            if ($itemTypeDB == 'Akomodasi') {
-                $description = "$providerName ({$item->type}) - {$newQuantity} Malam";
-            }
-
             $existingItem->update([
                 'quantity' => $newQuantity,
-                'estimatedCost' => $newCost,
-                'description' => $description // Update deskripsi jika berubah
+                'estimatedCost' => $unitPrice * $newQuantity,
+                // Pastikan lat/long juga terupdate jika sebelumnya null
+                'latitude' => $lat,
+                'longitude' => $long
             ]);
         } else {
-            // JIKA BELUM ADA,BUAT BARU
-
-            $totalCost = $unitPrice * $request->quantity;
-
-            // Format deskripsi awal untuk akomodasi
             if ($itemTypeDB == 'Akomodasi') {
-                $description = "$providerName ({$item->type}) - {$request->quantity} Malam";
+                $description .= " - {$request->quantity} Malam";
             }
 
             \App\Models\PlanItem::create([
                 'itineraryID' => $request->itinerary_id,
                 'description' => $description,
                 'itemType' => $itemTypeDB,
-                'estimatedCost' => $totalCost,
+                'estimatedCost' => $unitPrice * $request->quantity,
                 'quantity' => $request->quantity,
                 'bookingLink' => $bookingLink,
                 'providerName' => $providerName,
+                // SIMPAN KOORDINAT
+                'latitude' => $lat,
+                'longitude' => $long
             ]);
         }
 
         return redirect()->route('travel-plan.manage', $travelPlan->planID)
-            ->with('success', 'Rencana perjalanan berhasil diperbarui!');
+            ->with('success', 'Item berhasil ditambahkan!');
     }
 
     public function deleteItem(Request $request, $planItemID)
@@ -475,8 +473,8 @@ class TravelPlanController extends Controller
 
         // 2. Load Relasi yang dibutuhkan (Cities, Itineraries, PlanItems)
         $travelPlan->load([
-            'originCity', 
-            'destinationCity', 
+            'originCity',
+            'destinationCity',
             'itineraries.planItems'
         ]);
 
