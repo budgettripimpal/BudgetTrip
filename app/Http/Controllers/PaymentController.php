@@ -74,14 +74,13 @@ class PaymentController extends Controller
         // 6. Request Snap Token
         try {
             $snapToken = Snap::getSnapToken($params);
-            
+
             // Simpan token ke DB
             $order->snap_token = $snapToken;
             $order->save();
 
             // Redirect dengan token
             return back()->with('snapToken', $snapToken);
-
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -93,9 +92,48 @@ class PaymentController extends Controller
 
         if ($order) {
             $order->update(['status' => 'paid']);
-            
-            return redirect()->route('travel-plan.manage', $order->planItem->itinerary->planID)
-                ->with('success', 'Pembayaran Berhasil! Tiket/Voucher telah terbit.');
+            $planItem = $order->planItem;
+
+            // CEK BRAND BUDGETTRIP
+            $isBudgettrip = \Illuminate\Support\Str::contains(strtolower($planItem->providerName), 'budgettrip');
+
+            if ($isBudgettrip && empty($planItem->ticket_code)) {
+
+                // 1. GENERATE KODE UNIK (Booking ID / Ticket ID)
+                $planItem->ticket_code = 'BGT-' . strtoupper(uniqid()) . '-' . $planItem->planItemID;
+
+                // 2. LOGIKA TRANSPORTASI (Kursi)
+                if ($planItem->itemType == 'Transportasi') {
+                    $seats = [];
+                    $startSeat = rand(1, 20);
+                    for ($i = 0; $i < $planItem->quantity; $i++) {
+                        $seats[] = 'Seat ' . ($startSeat + $i);
+                    }
+                    $planItem->seat_numbers = $seats;
+                }
+
+                // 3. LOGIKA AKOMODASI (Kamar)
+                elseif ($planItem->itemType == 'Akomodasi') {
+                    $rooms = [];
+                    // Anggap satu grup ditaruh di lantai yang sama
+                    $floor = rand(1, 5);
+                    // Mulai dari nomor acak, lalu berurutan
+                    $startRoom = rand(1, 15);
+
+                    for ($i = 0; $i < $planItem->quantity; $i++) {
+                        // Format: Lantai + Nomor Urut (Misal 305, 306, 307)
+                        $rooms[] = $floor . sprintf("%02d", $startRoom + $i);
+                    }
+
+                    // Simpan sebagai string dipisah koma: "305, 306, 307"
+                    $planItem->room_number = implode(', ', $rooms);
+                }
+
+                $planItem->save();
+            }
+
+            return redirect()->route('travel-plan.manage', $planItem->itinerary->planID)
+                ->with('success', 'Pembayaran Berhasil! Tiket/Voucher telah diterbitkan.');
         }
 
         return redirect()->route('dashboard')->with('error', 'Transaksi tidak ditemukan.');

@@ -1,4 +1,5 @@
 <x-app-layout>
+    {{-- 1. LOAD LIBRARY & CSS DARI KODE 1 (Agar Peta Muncul) --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -71,6 +72,7 @@
         }
     </style>
 
+    {{-- NAVIGASI --}}
     <nav class="bg-white shadow-sm fixed w-full top-0 z-50 h-20">
         <div class="container mx-auto px-6 h-full">
             <div class="flex items-center justify-between h-full">
@@ -121,7 +123,7 @@
         </div>
     </nav>
 
-    <div class="min-h-screen pt-28 pb-12 bg-gray-50" x-data="{ showModal: false, quantity: 1 }">
+    <div class="min-h-screen bg-gray-50 pt-28 pb-12" x-data="{ showModal: false, quantity: 1, duration: 1 }">
         <div class="container mx-auto px-6">
             <button onclick="history.back()" class="mb-6 hover:bg-gray-200 p-2 rounded-full transition">
                 <svg class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,19 +132,24 @@
             </button>
 
             <div class="grid lg:grid-cols-2 gap-8">
-                <div class="space-y-6">
+
+                <div class="space-y-8">
+                    {{-- Gambar --}}
                     <div class="bg-white rounded-3xl shadow-lg overflow-hidden aspect-video">
                         <img src="{{ $accommodation->images[0] ?? 'https://placehold.co/600x400?text=Hotel' }}"
-                            class="w-full h-full object-cover" alt="{{ $accommodation->hotelName ?? 'Hotel' }}">
+                            class="w-full h-full object-cover">
                     </div>
 
+                    {{-- PETA (Wadah HTML Peta) --}}
                     @if (isset($accommodation->latitude) && isset($accommodation->longitude))
-                        <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
-                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">📍 Lokasi Hotel
+                        <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-100 relative">
+                            <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                <span class="bg-blue-50 text-blue-600 p-1.5 rounded-lg text-sm">📍</span> Lokasi Hotel
                             </h3>
+                            {{-- Container ID ini harus cocok dengan script di bawah --}}
                             <div id="detailMap"></div>
-                            <p class="text-xs text-gray-500 mt-3 text-center">
-                                Koordinat: {{ $accommodation->latitude }}, {{ $accommodation->longitude }}
+                            <p class="text-xs text-gray-400 mt-2 text-center font-mono">
+                                {{ $accommodation->latitude }}, {{ $accommodation->longitude }}
                             </p>
                         </div>
                     @endif
@@ -150,100 +157,135 @@
 
                 <div>
                     <div class="bg-white rounded-3xl shadow-lg p-8 sticky top-24">
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ $accommodation->hotelName ?? 'Hotel' }}
-                        </h1>
-                        <div class="text-yellow-400 text-lg mb-4">★ {{ $accommodation->rating ?? '0' }}</div>
-                        <p class="text-gray-600 leading-relaxed mb-6">
-                            {{ $accommodation->description ?? 'Deskripsi tidak tersedia' }}</p>
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ $accommodation->hotelName }}</h1>
+                        <div class="text-yellow-400 text-lg mb-4">
+                            {{ str_repeat('★', floor($accommodation->rating)) }} <span
+                                class="text-gray-400 text-sm">({{ $accommodation->rating }})</span></div>
+                        <p class="text-gray-600 leading-relaxed mb-6">{{ $accommodation->description }}</p>
 
                         <div class="bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 mb-8 text-center">
-                            <p class="text-3xl font-bold text-gray-900">
-                                Rp {{ number_format($accommodation->averagePricePerNight ?? 0, 0, ',', '.') }}
-                                <span class="text-sm text-gray-500 font-normal">/ Malam</span>
-                            </p>
+                            <p class="text-3xl font-bold text-gray-900">Rp
+                                {{ number_format($accommodation->averagePricePerNight, 0, ',', '.') }} <span
+                                    class="text-sm text-gray-500 font-normal">/ Malam</span></p>
                         </div>
 
                         <div class="space-y-4 mb-8 text-sm">
                             <div class="flex justify-between py-3 border-b border-gray-200">
-                                <span class="text-gray-600 font-medium">Tipe</span>
-                                <span class="text-gray-800 font-semibold">{{ $accommodation->type ?? '-' }}</span>
+                                <span class="text-gray-600 font-medium">Tipe</span><span
+                                    class="text-gray-800 font-bold">{{ $accommodation->type }}</span>
                             </div>
                             <div class="flex justify-between py-3 border-b border-gray-200">
                                 <span class="text-gray-600 font-medium">Fasilitas</span>
                                 <div class="text-right">
-                                    @if (isset($accommodation->facilities) && is_array($accommodation->facilities))
+                                    @if ($accommodation->facilities)
                                         @foreach ($accommodation->facilities as $f)
                                             <span
-                                                class="inline-block bg-green-50 text-primary text-xs px-2 py-1 rounded font-bold mb-1">{{ $f }}</span>
+                                                class="inline-block bg-green-50 text-[#2CB38B] text-xs px-2 py-1 rounded font-bold mb-1">{{ $f }}</span>
                                         @endforeach
                                     @else
-                                        <span class="text-gray-400">-</span>
+                                        -
                                     @endif
                                 </div>
                             </div>
                             <div class="flex justify-between py-3">
-                                <span class="text-gray-600 font-medium">Link Pemesanan</span>
-                                @if (isset($accommodation->bookingLink) && $accommodation->bookingLink)
+                                <span class="text-gray-600 font-medium">Link Booking</span>
+                                @if ($accommodation->bookingLink)
                                     <a href="{{ $accommodation->bookingLink }}" target="_blank"
-                                        class="text-primary hover:underline font-bold">🔗 Buka Link</a>
+                                        class="text-[#2CB38B] hover:underline font-bold">🔗 Buka Link</a>
                                 @else
                                     <span class="text-gray-400 italic">Tidak tersedia</span>
                                 @endif
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between gap-4">
-                            <div class="flex items-center space-x-4 bg-gray-100 rounded-full px-6 py-3">
-                                <button @click="if(quantity > 1) quantity--"
-                                    class="w-8 h-8 font-bold hover:bg-gray-200 rounded-full">-</button>
-                                <span class="text-2xl font-bold min-w-[40px] text-center" x-text="quantity">1</span>
-                                <button @click="quantity++"
-                                    class="w-8 h-8 font-bold hover:bg-gray-200 rounded-full">+</button>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Jumlah Kamar</label>
+                                <div
+                                    class="flex items-center justify-between bg-gray-100 rounded-xl px-4 py-3 border border-gray-200">
+                                    <button @click="if(quantity > 1) quantity--"
+                                        class="w-6 h-6 font-bold text-gray-500 hover:text-black transition">-</button>
+                                    <span class="text-lg font-bold text-gray-800" x-text="quantity">1</span>
+                                    <button @click="quantity++"
+                                        class="w-6 h-6 font-bold text-gray-500 hover:text-black transition">+</button>
+                                </div>
                             </div>
-                            <button @click="showModal = true"
-                                class="flex-1 bg-primary hover:bg-green-600 text-white font-bold py-4 rounded-full shadow-lg transition">
-                                Tambah ke Rencana
-                            </button>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Durasi (Malam)</label>
+                                <div
+                                    class="flex items-center justify-between bg-gray-100 rounded-xl px-4 py-3 border border-gray-200">
+                                    <button @click="if(duration > 1) duration--"
+                                        class="w-6 h-6 font-bold text-gray-500 hover:text-black transition">-</button>
+                                    <span class="text-lg font-bold text-gray-800" x-text="duration">1</span>
+                                    <button @click="duration++"
+                                        class="w-6 h-6 font-bold text-gray-500 hover:text-black transition">+</button>
+                                </div>
+                            </div>
                         </div>
+
+                        <button @click="showModal = true"
+                            class="w-full bg-[#2CB38B] hover:bg-[#249d78] text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:-translate-y-1">
+                            Tambah ke Rencana
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div x-show="showModal" x-cloak
-            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
+        {{-- MODAL --}}
+        <div x-show="showModal"
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
             style="display: none;">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative m-4">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative m-4 transform transition-all">
                 <button @click="showModal = false"
                     class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✖</button>
-                <h3 class="text-2xl font-bold mb-4">Simpan ke Rencana</h3>
-                <form action="{{ route('plan.add-item', $travelPlan->planID ?? 1) }}" method="POST">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Simpan ke Rencana</h3>
+
+                <div class="bg-green-50 p-4 rounded-xl mb-4 text-sm border border-green-100">
+                    <div class="flex justify-between mb-1 text-gray-600"><span>Kamar:</span> <span
+                            class="font-bold text-gray-900"><span x-text="quantity"></span> Unit</span></div>
+                    <div class="flex justify-between mb-2 text-gray-600"><span>Durasi:</span> <span
+                            class="font-bold text-gray-900"><span x-text="duration"></span> Malam</span></div>
+                    <div class="flex justify-between border-t border-green-200 pt-2 mt-2">
+                        <span class="font-bold text-gray-700">Total Estimasi:</span>
+                        <span class="font-bold text-xl text-[#2CB38B]">Rp <span
+                                x-text="(quantity * duration * {{ $accommodation->averagePricePerNight }}).toLocaleString('id-ID')"></span></span>
+                    </div>
+                </div>
+
+                <form action="{{ route('plan.add-item', $travelPlan->planID) }}" method="POST">
                     @csrf
                     <input type="hidden" name="item_type" value="Akomodasi">
-                    <input type="hidden" name="item_id" value="{{ $accommodation->accommodationID ?? 0 }}">
+                    <input type="hidden" name="item_id" value="{{ $accommodation->accommodationID }}">
                     <input type="hidden" name="quantity" x-model="quantity">
+                    <input type="hidden" name="duration" x-model="duration">
+
                     <div class="space-y-3 mb-6 max-h-60 overflow-y-auto">
-                        @if (isset($itineraries))
-                            @foreach ($itineraries as $itinerary)
-                                <label
-                                    class="flex items-center gap-3 p-3 border rounded cursor-pointer hover:bg-gray-50">
-                                    <input type="radio" name="itinerary_id" value="{{ $itinerary->itineraryID }}"
-                                        {{ $loop->first ? 'checked' : '' }}>
-                                    <span>{{ $itinerary->itineraryName }}</span>
-                                </label>
-                            @endforeach
-                        @endif
+                        <p class="text-xs font-bold text-gray-500 mb-2 uppercase">Pilih Folder Rencana:</p>
+                        @foreach ($itineraries as $itinerary)
+                            <label
+                                class="flex items-center justify-between p-3 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[#2CB38B] transition">
+                                <div class="flex items-center gap-3"><span class="text-lg">📁</span> <span
+                                        class="font-bold text-gray-700 text-sm">{{ $itinerary->itineraryName }}</span>
+                                </div>
+                                <input type="radio" name="itinerary_id" value="{{ $itinerary->itineraryID }}"
+                                    class="w-5 h-5 text-[#2CB38B]" required checked>
+                            </label>
+                        @endforeach
                     </div>
                     <button type="submit"
-                        class="w-full bg-primary hover:bg-green-600 text-white font-bold py-3 rounded-xl">Simpan</button>
+                        class="w-full bg-[#2CB38B] hover:bg-[#249d78] text-white font-bold py-3 rounded-xl shadow-lg">Simpan</button>
                 </form>
             </div>
         </div>
     </div>
 
+    {{-- SCRIPTS --}}
+    {{-- Load Library di sini, bukan di @push, untuk memastikan termuat --}}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
+    {{-- SCRIPT INIT PETA DARI KODE 1 (YANG BEKERJA) --}}
     @if (isset($accommodation->latitude) && isset($accommodation->longitude))
         <script>
             (function() {
@@ -251,6 +293,7 @@
                 const lng = {{ $accommodation->longitude }};
                 const name = "{{ $accommodation->hotelName ?? 'Hotel' }}";
 
+                // Fungsi membuat custom marker agar terlihat seperti Kode 1
                 function createMarker(color) {
                     return L.divIcon({
                         className: 'custom-marker',
@@ -262,8 +305,9 @@
                 }
 
                 function initMap() {
+                    // Cek apakah library Leaflet sudah termuat
                     if (typeof L === 'undefined') {
-                        console.error('Leaflet not loaded');
+                        console.error('Leaflet not loaded yet, retrying...');
                         setTimeout(initMap, 500);
                         return;
                     }
@@ -272,16 +316,20 @@
 
                     try {
                         const map = L.map('detailMap').setView([lat, lng], 15);
+                        
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; OpenStreetMap contributors',
                             maxZoom: 19
                         }).addTo(map);
 
+                        // Gunakan marker custom
                         L.marker([lat, lng], {
-                            icon: createMarker('#eab308')
+                            icon: createMarker('#eab308') // Warna kuning
                         }).addTo(map).bindPopup(`<b>🟡 ${name}</b><br><small>Akomodasi</small>`).openPopup();
 
+                        // Fix agar map tidak abu-abu saat baru diload
                         setTimeout(() => map.invalidateSize(), 500);
+
                     } catch (error) {
                         console.error('Map error:', error);
                     }
