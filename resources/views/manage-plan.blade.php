@@ -31,7 +31,7 @@
         </style>
     @endpush
 
-    {{-- 1. SCRIPT SNAP (DIPINDAHKAN KESINI AGAR PASTI TERLOAD) --}}
+    {{-- SCRIPT SNAP --}}
     <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
 
@@ -70,7 +70,7 @@
         showNewPlanModal: false
     }">
 
-        {{-- 2. LOGIKA POPUP (SAMA SEPERTI OVERVIEW) --}}
+        {{-- LOGIKA POPUP --}}
         @if (session('snapToken'))
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", function(event) {
