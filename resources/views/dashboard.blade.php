@@ -389,10 +389,12 @@
                     <div class="space-y-3 text-sm text-gray-600">
                         <div class="flex items-center gap-3"><span
                                 class="bg-green-50 p-2 rounded-full text-[#2CB38B]">📞</span>
-                            <span>+62-123-789-xxxx</span></div>
+                            <span>+62-123-789-xxxx</span>
+                        </div>
                         <div class="flex items-center gap-3"><span
                                 class="bg-green-50 p-2 rounded-full text-[#2CB38B]">✉</span>
-                            <span>support@budgettrip.com</span></div>
+                            <span>support@budgettrip.com</span>
+                        </div>
                         <div class="flex items-center gap-3"><span
                                 class="bg-green-50 p-2 rounded-full text-[#2CB38B]">🏢</span> <span>Bandung,
                                 Indonesia</span></div>
