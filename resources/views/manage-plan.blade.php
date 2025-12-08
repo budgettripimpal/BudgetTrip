@@ -3,8 +3,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
             rel="stylesheet">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="{{ config('midtrans.client_key') }}"></script>
         <style>
             body {
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -33,77 +31,50 @@
         </style>
     @endpush
 
-    <nav class="bg-white shadow-sm fixed w-full top-0 z-50">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <img src="{{ asset('images/budgettrip-logo.png') }}" alt="BudgetTrip Logo"
-                        class="w-10 h-10 object-contain">
+    {{-- 1. SCRIPT SNAP (DIPINDAHKAN KESINI AGAR PASTI TERLOAD) --}}
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
 
-                    <span class="text-2xl font-bold tracking-tight">
-                        <span class="text-gray-900">BUDGET</span><span class="text-[#2CB38B]">TRIP</span>
-                    </span>
-                </div>
+    <nav class="bg-white shadow-sm fixed w-full top-0 z-50 h-20">
+        <div class="container mx-auto px-6 h-full flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <img src="{{ asset('images/budgettrip-logo.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                <span class="text-2xl font-bold tracking-tight">
+                    <span class="text-gray-900">BUDGET</span><span class="text-[#2CB38B]">TRIP</span>
+                </span>
+            </div>
 
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
-                    <a href="#about" class="text-gray-600 hover:text-[#2CB38B] transition">About</a>
-                    <a href="#tutorial" class="text-gray-600 hover:text-[#2CB38B] transition">Tutorial</a>
-                    <a href="#testimonials" class="text-gray-600 hover:text-[#2CB38B] transition">Testimonials</a>
-                    <a href="#contact" class="text-gray-600 hover:text-[#2CB38B] transition">Contact Us</a>
-                </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{{ route('dashboard') }}"
+                    class="text-gray-900 hover:text-[#2CB38B] font-bold transition">Home</a>
+            </div>
 
-                <div class="flex items-center space-x-4 relative group">
-                    <span class="text-gray-600 hidden md:inline font-medium">Welcome, {{ Auth::user()->name }}</span>
-                    <div
-                        class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center cursor-pointer shadow-md text-white font-bold text-lg transition transform group-hover:scale-105">
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    </div>
-
-                    <div
-                        class="absolute top-10 right-0 w-56 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
-                        <div class="px-4 py-2 border-b border-gray-100 mb-1">
-                            <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
-                        </div>
-
-                        <a href="{{ route('profile.show') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
-                            View Profile
-                        </a>
-
-                        <a href="{{ route('travel-plan.index') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition font-semibold">
-                            Rencana Saya
-                        </a>
-
-                        <a href="{{ route('profile.edit') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition">
-                            Edit Profile
-                        </a>
-
-                        <div class="border-t border-gray-100 mt-1"></div>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <a href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition rounded-b-xl">
-                                Log Out
-                            </a>
-                        </form>
-                    </div>
+            <div class="flex items-center space-x-4 relative group">
+                <span class="text-gray-600 hidden md:inline font-medium">Welcome, {{ Auth::user()->name }}</span>
+                <div
+                    class="w-10 h-10 bg-[#2CB38B] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {{ substr(Auth::user()->name, 0, 1) }}</div>
+                <div
+                    class="absolute top-10 right-0 w-48 bg-white rounded-xl shadow-xl py-2 hidden group-hover:block border border-gray-100 animate-fade-in-down">
+                    <form method="POST" action="{{ route('logout') }}">@csrf<a href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); this.closest('form').submit();"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-[#2CB38B] transition rounded-md mx-2">Log
+                            Out</a></form>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="min-h-screen bg-gray-50 pb-12 pt-20" x-data="{ activeTab: {{ $plan->itineraries->first()->itineraryID ?? 0 }} }">
+    <div class="min-h-screen bg-gray-50 pb-12 pt-20" x-data="{
+        activeTab: {{ $plan->itineraries->first()->itineraryID ?? 0 }},
+        showNewPlanModal: false
+    }">
 
-        {{-- LOGIKA POPUP MIDTRANS --}}
+        {{-- 2. LOGIKA POPUP (SAMA SEPERTI OVERVIEW) --}}
         @if (session('snapToken'))
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
+            <script type="text/javascript">
+                document.addEventListener("DOMContentLoaded", function(event) {
+                    console.log("Snap Token ditemukan: {{ session('snapToken') }}");
                     window.snap.pay('{{ session('snapToken') }}', {
                         onSuccess: function(result) {
                             window.location.href = "{{ route('payment.success') }}?order_id=" + result
@@ -123,6 +94,23 @@
             </script>
         @endif
 
+        {{-- ALERT MESSAGES --}}
+        @if (session('error'))
+            <div class="max-w-7xl mx-auto px-6 mt-4">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                    <strong class="font-bold">Gagal!</strong> {{ session('error') }}
+                </div>
+            </div>
+        @endif
+        @if (session('success'))
+            <div class="max-w-7xl mx-auto px-6 mt-4">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                    <strong class="font-bold">Berhasil!</strong> {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        {{-- STEPPER --}}
         <div class="bg-white shadow-sm py-8 mb-8 sticky top-20 z-40">
             <div class="container mx-auto px-6">
                 <div class="flex items-center justify-between max-w-6xl mx-auto">
@@ -199,8 +187,7 @@
                     <div class="flex flex-col items-center relative z-10">
                         <div
                             class="w-16 h-16 bg-[#2CB38B] rounded-full flex items-center justify-center mb-2 shadow-lg ring-4 ring-green-100 transform scale-110">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -213,18 +200,6 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-8 py-8">
-            {{-- ALERT MESSAGES --}}
-            @if (session('error'))
-                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                    <strong>Gagal!</strong> {{ session('error') }}
-                </div>
-            @endif
-            @if (session('success'))
-                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                    <strong>Berhasil!</strong> {{ session('success') }}
-                </div>
-            @endif
-
             <div class="mb-8">
                 <h1 class="text-4xl font-bold flex items-center text-gray-900"><svg
                         class="w-10 h-10 mr-3 text-[#2CB38B]" fill="none" stroke="currentColor"
@@ -264,12 +239,10 @@
 
                     <div class="flex justify-end mb-4">
                         <form action="{{ route('itinerary.destroy', $itinerary->itineraryID) }}" method="POST"
-                            onsubmit="return confirm('Yakin ingin menghapus folder rencana ini?');">
-                            @csrf @method('DELETE')
-                            <button type="submit"
+                            onsubmit="return confirm('Yakin ingin menghapus folder rencana ini?');">@csrf
+                            @method('DELETE')<button type="submit"
                                 class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition">Hapus
-                                Folder Rencana Ini</button>
-                        </form>
+                                Folder Rencana Ini</button></form>
                     </div>
 
                     @php
@@ -298,11 +271,11 @@
                     </div>
 
                     @foreach (['Transportasi' => '🚌', 'Akomodasi' => '🏨', 'Aktivitas' => '🏖️'] as $type => $icon)
-                        @php $items = $itinerary->planItems->whereIn('itemType', ($type == 'Aktivitas') ? ['Aktivitas', 'Wisata'] : [$type]); @endphp
                         <div class="mb-10">
                             <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2"><span
                                     class="bg-blue-100 text-blue-600 p-2 rounded-lg text-xl">{{ $icon }}</span>
                                 {{ $type == 'Aktivitas' ? 'Wisata' : $type }} Pilihan</h2>
+                            @php $items = $itinerary->planItems->whereIn('itemType', ($type == 'Aktivitas') ? ['Aktivitas', 'Wisata'] : [$type]); @endphp
 
                             @if ($items->isEmpty())
                                 <div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl">
@@ -320,7 +293,6 @@
                                     @endphp
                                     <div
                                         class="border-2 border-gray-200 rounded-xl p-6 hover:border-[#2CB38B] transition mb-4 relative group bg-white">
-
                                         @if (!$isPaid)
                                             <form action="{{ route('plan-item.destroy', $item->planItemID) }}"
                                                 method="POST" class="absolute top-4 right-4"
@@ -344,6 +316,7 @@
                                                     <p class="font-semibold text-gray-900 text-lg">
                                                         {{ $item->providerName }}</p>
                                                     <p class="text-base text-gray-500">{{ $item->description }}</p>
+
                                                     @if ($isBudgettrip)
                                                         @if ($isPaid)
                                                             <span
@@ -368,7 +341,6 @@
                                                 <p class="font-bold text-gray-900 text-xl">
                                                     {{ $item->estimatedCost == 0 ? 'Gratis' : 'Rp ' . number_format($item->estimatedCost, 0, ',', '.') }}
                                                 </p>
-
                                                 @if (!$isPaid)
                                                     <div
                                                         class="flex items-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
@@ -391,10 +363,8 @@
                                                 @else
                                                     <div
                                                         class="bg-green-50 px-4 py-1.5 rounded-lg border border-green-200 text-green-700 text-sm font-bold">
-                                                        Qty: {{ $item->quantity }}
-                                                    </div>
+                                                        Qty: {{ $item->quantity }}</div>
                                                 @endif
-
                                             </div>
                                         </div>
                                     </div>
@@ -402,7 +372,6 @@
                             @endif
                         </div>
                     @endforeach
-
                 </div>
             @endforeach
 
