@@ -26,10 +26,6 @@
             background-color: #2CB38B;
         }
 
-        .hover\:bg-brand-green:hover {
-            background-color: #2CB38B;
-        }
-
         .table-header {
             @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
         }
@@ -37,72 +33,81 @@
         .table-cell {
             @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
         }
+
+        input:disabled,
+        select:disabled,
+        textarea:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
     </style>
 </head>
 
-<body class="bg-gray-100" x-data="{ currentTab: 'overview', showModal: false, modalType: '' }">
+<body class="bg-gray-100" x-data="{
+    currentTab: '{{ request('routes_page') ? 'routes' : (request('accommodations_page') ? 'accommodations' : (request('attractions_page') ? 'attractions' : 'overview')) }}',
+    showModal: false,
+    modalType: '',
+    isEdit: false,
+    formAction: '',
+    formData: {},
+
+    openAddModal(type, url) {
+        this.modalType = type;
+        this.isEdit = false;
+        this.formAction = url;
+        this.formData = { facilities: [], providerID: '' };
+        this.showModal = true;
+    },
+
+    openEditModal(type, data, url) {
+        this.modalType = type;
+        this.isEdit = true;
+        this.formAction = url;
+        let dataClone = JSON.parse(JSON.stringify(data));
+
+        if (dataClone.facilities) {
+            if (typeof dataClone.facilities === 'string') {
+                try { dataClone.facilities = JSON.parse(dataClone.facilities); } catch (e) { dataClone.facilities = []; }
+            }
+            if (!dataClone.facilities) dataClone.facilities = [];
+        } else {
+            dataClone.facilities = [];
+        }
+
+        this.formData = dataClone;
+        this.showModal = true;
+    }
+}">
 
     <div class="flex h-screen overflow-hidden">
-
         <div class="w-64 bg-sidebar text-white flex-shrink-0 hidden md:flex flex-col">
             <div class="p-6 flex items-center gap-3 border-b border-gray-700">
                 <div class="w-8 h-8 bg-brand-green rounded-lg flex items-center justify-center font-bold text-white">B
                 </div>
                 <span class="text-xl font-bold tracking-wide">Admin Panel</span>
             </div>
-
             <nav class="flex-1 px-4 py-6 space-y-2">
                 <a href="#" @click.prevent="currentTab = 'overview'"
-                    :class="currentTab === 'overview' ? 'bg-gray-700 text-brand-green' :
-                        'text-gray-400 hover:bg-gray-700 hover:text-white'"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                    Dashboard
-                </a>
-
+                    :class="currentTab === 'overview' ? 'bg-gray-700 text-brand-green' : 'text-gray-400 hover:bg-gray-700'"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition"><span>📊</span> Dashboard</a>
                 <p class="px-4 text-xs font-semibold text-gray-500 uppercase mt-6 mb-2">Master Data</p>
-
                 <a href="#" @click.prevent="currentTab = 'cities'"
-                    :class="currentTab === 'cities' ? 'bg-gray-700 text-brand-green' :
-                        'text-gray-400 hover:bg-gray-700 hover:text-white'"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition">
-                    <span>🏙️</span> Kota & Lokasi
-                </a>
+                    :class="currentTab === 'cities' ? 'bg-gray-700 text-brand-green' : 'text-gray-400 hover:bg-gray-700'"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition"><span>🏙️</span> Kota</a>
                 <a href="#" @click.prevent="currentTab = 'providers'"
-                    :class="currentTab === 'providers' ? 'bg-gray-700 text-brand-green' :
-                        'text-gray-400 hover:bg-gray-700 hover:text-white'"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition">
-                    <span>🏢</span> Provider Jasa
-                </a>
+                    :class="currentTab === 'providers' ? 'bg-gray-700 text-brand-green' : 'text-gray-400 hover:bg-gray-700'"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition"><span>🏢</span> Provider</a>
                 <a href="#" @click.prevent="currentTab = 'routes'"
-                    :class="currentTab === 'routes' ? 'bg-gray-700 text-brand-green' :
-                        'text-gray-400 hover:bg-gray-700 hover:text-white'"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition">
-                    <span>🚌</span> Rute Transport
-                </a>
+                    :class="currentTab === 'routes' ? 'bg-gray-700 text-brand-green' : 'text-gray-400 hover:bg-gray-700'"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition"><span>🚌</span> Rute</a>
                 <a href="#" @click.prevent="currentTab = 'accommodations'"
-                    :class="currentTab === 'accommodations' ? 'bg-gray-700 text-brand-green' :
-                        'text-gray-400 hover:bg-gray-700 hover:text-white'"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition">
-                    <span>🏨</span> Akomodasi
-                </a>
+                    :class="currentTab === 'accommodations' ? 'bg-gray-700 text-brand-green' : 'text-gray-400 hover:bg-gray-700'"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition"><span>🏨</span> Akomodasi</a>
                 <a href="#" @click.prevent="currentTab = 'attractions'"
-                    :class="currentTab === 'attractions' ? 'bg-gray-700 text-brand-green' :
-                        'text-gray-400 hover:bg-gray-700 hover:text-white'"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition">
-                    <span>🏖️</span> Wisata
-                </a>
-                <a href="#" @click.prevent="currentTab = 'promotions'"
-                    :class="currentTab === 'promotions' ? 'bg-gray-700 text-brand-green' :
-                        'text-gray-400 hover:bg-gray-700 hover:text-white'"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition">
-                    <span>🎫</span> Promo
-                </a>
+                    :class="currentTab === 'attractions' ? 'bg-gray-700 text-brand-green' : 'text-gray-400 hover:bg-gray-700'"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition"><span>🏖️</span> Wisata</a>
             </nav>
-
             <div class="p-4 border-t border-gray-700">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -111,8 +116,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
+                        </svg> Logout
                     </button>
                 </form>
             </div>
@@ -124,7 +128,7 @@
                 </h2>
                 <div class="flex items-center gap-4">
                     <span class="text-sm text-gray-600">Halo, <span
-                            class="font-bold text-gray-900">{{ Auth::user()->name }}</span></span>
+                            class="font-bold">{{ Auth::user()->name }}</span></span>
                     <div
                         class="w-8 h-8 bg-brand-green rounded-full flex items-center justify-center text-white font-bold">
                         {{ substr(Auth::user()->name, 0, 1) }}</div>
@@ -132,15 +136,16 @@
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-8">
-
                 @if (session('success'))
                     <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                        {{ session('success') }}
-                    </div>
+                        {{ session('success') }}</div>
+                @endif
+                @if (session('error'))
+                    <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                        {{ session('error') }}</div>
                 @endif
 
                 <div x-show="currentTab === 'overview'" class="space-y-8">
-
                     <div>
                         <h3 class="text-lg font-bold text-gray-700 mb-4 border-l-4 border-brand-green pl-3">Statistik
                             Pengguna & Rencana</h3>
@@ -151,12 +156,11 @@
                                     <p class="text-sm text-gray-500">Total Users</p>
                                     <p class="text-3xl font-bold text-gray-800">{{ \App\Models\User::count() }}</p>
                                 </div>
-                                <div class="p-3 bg-blue-50 rounded-full text-blue-500">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="p-3 bg-blue-50 rounded-full text-blue-500"><svg class="w-8 h-8"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                    </svg>
-                                </div>
+                                    </svg></div>
                             </div>
                             <div
                                 class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-green-500 flex items-center justify-between">
@@ -165,127 +169,81 @@
                                     <p class="text-3xl font-bold text-gray-800">{{ \App\Models\TravelPlan::count() }}
                                     </p>
                                 </div>
-                                <div class="p-3 bg-green-50 rounded-full text-brand-green">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="p-3 bg-green-50 rounded-full text-brand-green"><svg class="w-8 h-8"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
-                                    </svg>
-                                </div>
+                                    </svg></div>
                             </div>
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-lg font-bold text-gray-700 mb-4 border-l-4 border-brand-green pl-3">Statistik
-                            Data Master (Database)</h3>
+                        </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                            <div
-                                class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-400 hover:shadow-md transition">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-medium">Kota & Lokasi</p>
-                                        <p class="text-2xl font-bold text-gray-800">{{ \App\Models\City::count() }}</p>
-                                    </div>
-                                    <div class="text-3xl bg-orange-50 p-2 rounded-lg">🏙️</div>
-                                </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                                <p class="text-sm text-gray-500">Total Users</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ \App\Models\User::count() }}</p>
                             </div>
-
-                            <div
-                                class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-teal-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-medium">Provider Jasa</p>
-                                        <p class="text-2xl font-bold text-gray-800">
-                                            {{ \App\Models\ServiceProvider::count() }}</p>
-                                    </div>
-                                    <div class="text-3xl bg-teal-50 p-2 rounded-lg">🏢</div>
-                                </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
+                                <p class="text-sm text-gray-500">Rencana Perjalanan</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ \App\Models\TravelPlan::count() }}</p>
                             </div>
-
-                            <div
-                                class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-cyan-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-medium">Rute Transportasi</p>
-                                        <p class="text-2xl font-bold text-gray-800">
-                                            {{ \App\Models\TransportRoute::count() }}</p>
-                                    </div>
-                                    <div class="text-3xl bg-cyan-50 p-2 rounded-lg">🚌</div>
-                                </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500">
+                                <p class="text-sm text-gray-500">Total Kota</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ \App\Models\City::count() }}</p>
                             </div>
-
-                            <div
-                                class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-medium">Akomodasi</p>
-                                        <p class="text-2xl font-bold text-gray-800">
-                                            {{ \App\Models\Accommodation::count() }}</p>
-                                    </div>
-                                    <div class="text-3xl bg-yellow-50 p-2 rounded-lg">🏨</div>
-                                </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-cyan-500">
+                                <p class="text-sm text-gray-500">Rute</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ \App\Models\TransportRoute::count() }}
+                                </p>
                             </div>
-
-                            <div
-                                class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-purple-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-medium">Destinasi Wisata</p>
-                                        <p class="text-2xl font-bold text-gray-800">
-                                            {{ \App\Models\Attraction::count() }}</p>
-                                    </div>
-                                    <div class="text-3xl bg-purple-50 p-2 rounded-lg">🏖️</div>
-                                </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500">
+                                <p class="text-sm text-gray-500">Akomodasi</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Accommodation::count() }}
+                                </p>
                             </div>
-
-                            <div
-                                class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-pink-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="text-sm text-gray-500 font-medium">Promo Aktif</p>
-                                        <p class="text-2xl font-bold text-gray-800">
-                                            {{ \App\Models\Promotion::count() }}</p>
-                                    </div>
-                                    <div class="text-3xl bg-pink-50 p-2 rounded-lg">🎫</div>
-                                </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-purple-500">
+                                <p class="text-sm text-gray-500">Wisata</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ \App\Models\Attraction::count() }}</p>
                             </div>
-
                         </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow-sm text-center border border-gray-200 mt-4">
-                        <h3 class="text-lg font-bold text-gray-800 mb-1">Panel Kontrol Admin</h3>
-                        <p class="text-sm text-gray-500">Gunakan sidebar di sebelah kiri untuk menambah, mengedit, atau
-                            melihat detail data master aplikasi BudgetTrip.</p>
                     </div>
                 </div>
 
                 <div x-show="currentTab === 'cities'">
                     <div class="flex justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-700">Daftar Kota</h3>
-                        <button @click="showModal = true; modalType = 'city'"
+                        <button @click="openAddModal('city', '{{ route('admin.store.city') }}')"
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
-                            Tambah Kota</button>
+                            Tambah</button>
                     </div>
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="table-header">ID</th>
-                                    <th class="table-header">Nama Kota</th>
+                                    <th class="table-header">Nama</th>
                                     <th class="table-header">Provinsi</th>
                                     <th class="table-header">Tipe</th>
+                                    <th class="table-header">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach ($cities as $city)
                                     <tr>
-                                        <td class="table-cell">{{ $city->cityID }}</td>
                                         <td class="table-cell font-medium">{{ $city->cityName }}</td>
                                         <td class="table-cell">{{ $city->province }}</td>
-                                        <td class="table-cell"><span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{{ $city->locationType }}</span>
+                                        <td class="table-cell">{{ $city->locationType }}</td>
+                                        <td class="table-cell flex gap-2">
+                                            <button
+                                                @click="openEditModal('city', {{ $city }}, '{{ route('admin.update.city', $city->cityID) }}')"
+                                                class="text-blue-600 hover:text-blue-900 font-bold">Edit</button>
+                                            <form action="{{ route('admin.destroy.city', $city->cityID) }}"
+                                                method="POST" onsubmit="return confirm('Yakin hapus?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900 font-bold">Hapus</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -296,26 +254,36 @@
 
                 <div x-show="currentTab === 'providers'">
                     <div class="flex justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-700">Daftar Provider Jasa</h3>
-                        <button @click="showModal = true; modalType = 'provider'"
+                        <h3 class="text-lg font-bold text-gray-700">Daftar Provider</h3>
+                        <button @click="openAddModal('provider', '{{ route('admin.store.provider') }}')"
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
-                            Tambah Provider</button>
+                            Tambah</button>
                     </div>
                     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="table-header">ID</th>
-                                    <th class="table-header">Nama Provider</th>
-                                    <th class="table-header">Tipe Layanan</th>
+                                    <th class="table-header">Nama</th>
+                                    <th class="table-header">Tipe</th>
+                                    <th class="table-header">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach ($providers as $p)
                                     <tr>
-                                        <td class="table-cell">{{ $p->providerID }}</td>
                                         <td class="table-cell font-bold">{{ $p->providerName }}</td>
                                         <td class="table-cell">{{ $p->serviceType }}</td>
+                                        <td class="table-cell flex gap-2">
+                                            <button
+                                                @click="openEditModal('provider', {{ $p }}, '{{ route('admin.update.provider', $p->providerID) }}')"
+                                                class="text-blue-600 hover:text-blue-900 font-bold">Edit</button>
+                                            <form action="{{ route('admin.destroy.provider', $p->providerID) }}"
+                                                method="POST" onsubmit="return confirm('Yakin hapus?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900 font-bold">Hapus</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -326,19 +294,18 @@
                 <div x-show="currentTab === 'routes'">
                     <div class="flex justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-700">Rute Transportasi</h3>
-                        <button @click="showModal = true; modalType = 'route'"
+                        <button @click="openAddModal('route', '{{ route('admin.store.route') }}')"
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
-                            Tambah Rute</button>
+                            Tambah</button>
                     </div>
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="table-header">Provider</th>
-                                    <th class="table-header">Asal - Tujuan</th>
+                                    <th class="table-header">Rute</th>
                                     <th class="table-header">Harga</th>
-                                    <th class="table-header">Jam</th>
-                                    <th class="table-header">Booking Link</th>
+                                    <th class="table-header">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -349,116 +316,108 @@
                                         <td class="table-cell">{{ $r->originCity->cityName }} ➝
                                             {{ $r->destinationCity->cityName }}</td>
                                         <td class="table-cell">Rp {{ number_format($r->averagePrice) }}</td>
-                                        <td class="table-cell text-xs">
-                                            {{ \Carbon\Carbon::parse($r->departureTime)->format('H:i') }} -
-                                            {{ \Carbon\Carbon::parse($r->arrivalTime)->format('H:i') }}</td>
-                                        <td class="table-cell">
-                                            <a href="{{ $r->bookingLink }}" target="_blank"
-                                                class="text-blue-500 hover:underline text-xs truncate max-w-[150px] block">
-                                                {{ $r->bookingLink }}
-                                            </a>
+                                        <td class="table-cell flex gap-2">
+                                            <button
+                                                @click="openEditModal('route', {{ $r }}, '{{ route('admin.update.route', $r->routeID) }}')"
+                                                class="text-blue-600 hover:text-blue-900 font-bold">Edit</button>
+                                            <form action="{{ route('admin.destroy.route', $r->routeID) }}"
+                                                method="POST" onsubmit="return confirm('Yakin hapus?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900 font-bold">Hapus</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="px-6 py-3">{{ $routes->links() }}</div>
                     </div>
                 </div>
 
                 <div x-show="currentTab === 'accommodations'">
                     <div class="flex justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-700">Daftar Akomodasi</h3>
-                        <button @click="showModal = true; modalType = 'accommodation'"
+                        <h3 class="text-lg font-bold text-gray-700">Akomodasi</h3>
+                        <button @click="openAddModal('accommodation', '{{ route('admin.store.accommodation') }}')"
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
-                            Tambah Akomodasi</button>
+                            Tambah</button>
                     </div>
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="table-header">Nama Hotel</th>
+                                    <th class="table-header">Nama</th>
                                     <th class="table-header">Kota</th>
-                                    <th class="table-header">Harga/Malam</th>
-                                    <th class="table-header">Rating</th>
-                                    <th class="table-header">Booking Link</th>
+                                    <th class="table-header">Harga</th>
+                                    <th class="table-header">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @if ($accommodations->isEmpty())
+                                @foreach ($accommodations as $acc)
                                     <tr>
-                                        <td colspan="5" class="table-cell text-center text-gray-400">Belum ada data
-                                            akomodasi</td>
+                                        <td class="table-cell font-bold">{{ $acc->hotelName }}</td>
+                                        <td class="table-cell">{{ $acc->city->cityName }}</td>
+                                        <td class="table-cell">Rp {{ number_format($acc->averagePricePerNight) }}</td>
+                                        <td class="table-cell flex gap-2">
+                                            <button
+                                                @click="openEditModal('accommodation', {{ $acc }}, '{{ route('admin.update.accommodation', $acc->accommodationID) }}')"
+                                                class="text-blue-600 hover:text-blue-900 font-bold">Edit</button>
+                                            <form
+                                                action="{{ route('admin.destroy.accommodation', $acc->accommodationID) }}"
+                                                method="POST" onsubmit="return confirm('Yakin hapus?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900 font-bold">Hapus</button>
+                                            </form>
+                                        </td>
                                     </tr>
-                                @else
-                                    @foreach ($accommodations as $acc)
-                                        <tr>
-                                            <td class="table-cell font-bold">{{ $acc->hotelName }} <span
-                                                    class="text-xs font-normal text-gray-500 block">{{ $acc->type }}</span>
-                                            </td>
-                                            <td class="table-cell">{{ $acc->city->cityName }}</td>
-                                            <td class="table-cell">Rp {{ number_format($acc->averagePricePerNight) }}
-                                            </td>
-                                            <td class="table-cell text-yellow-500">★ {{ $acc->rating }}</td>
-                                            <td class="table-cell">
-                                                <a href="{{ $acc->bookingLink }}" target="_blank"
-                                                    class="text-blue-500 hover:underline text-xs truncate max-w-[150px] block">
-                                                    {{ $acc->bookingLink }}
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
+                                @endforeach
                             </tbody>
                         </table>
+                        <div class="px-6 py-3">{{ $accommodations->links() }}</div>
                     </div>
                 </div>
 
                 <div x-show="currentTab === 'attractions'">
                     <div class="flex justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-700">Destinasi Wisata</h3>
-                        <button @click="showModal = true; modalType = 'attraction'"
+                        <h3 class="text-lg font-bold text-gray-700">Wisata</h3>
+                        <button @click="openAddModal('attraction', '{{ route('admin.store.attraction') }}')"
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
-                            Tambah Wisata</button>
+                            Tambah</button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        @foreach ($attractions as $attr)
-                            <div class="bg-white rounded-lg shadow p-4 border border-gray-100">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="font-bold text-gray-800">{{ $attr->attractionName }}</h4>
-                                    <span
-                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{{ $attr->category }}</span>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-1">{{ $attr->city->cityName }}</p>
-                                <div class="mt-4 flex justify-between items-end">
-                                    <span class="text-yellow-500 text-sm font-bold">★ {{ $attr->rating }}</span>
-                                    <span
-                                        class="text-brand-green font-bold">{{ $attr->estimatedCost == 0 ? 'Gratis' : 'Rp ' . number_format($attr->estimatedCost) }}</span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                <div x-show="currentTab === 'promotions'">
-                    <div class="flex justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-700">Daftar Promo</h3>
-                        <button @click="showModal = true; modalType = 'promotion'"
-                            class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
-                            Tambah Promo</button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach ($promotions as $promo)
-                            <div
-                                class="bg-gradient-to-r from-brand-green to-teal-500 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
-                                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white opacity-10 rounded-full">
-                                </div>
-                                <h4 class="font-bold text-xl mb-1">{{ $promo->discountValue * 100 }}% OFF</h4>
-                                <p class="font-medium mb-4 text-green-50">{{ $promo->description }}</p>
-                                <div class="text-xs bg-white/20 inline-block px-3 py-1 rounded-full">
-                                    Valid until: {{ $promo->validUntil }}
-                                </div>
-                            </div>
-                        @endforeach
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="table-header">Nama</th>
+                                    <th class="table-header">Kota</th>
+                                    <th class="table-header">Kategori</th>
+                                    <th class="table-header">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach ($attractions as $attr)
+                                    <tr>
+                                        <td class="table-cell font-bold">{{ $attr->attractionName }}</td>
+                                        <td class="table-cell">{{ $attr->city->cityName }}</td>
+                                        <td class="table-cell">{{ $attr->category }}</td>
+                                        <td class="table-cell flex gap-2">
+                                            <button
+                                                @click="openEditModal('attraction', {{ $attr }}, '{{ route('admin.update.attraction', $attr->attractionID) }}')"
+                                                class="text-blue-600 hover:text-blue-900 font-bold">Edit</button>
+                                            <form
+                                                action="{{ route('admin.destroy.attraction', $attr->attractionID) }}"
+                                                method="POST" onsubmit="return confirm('Yakin hapus?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900 font-bold">Hapus</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <div class="px-6 py-3">{{ $attractions->links() }}</div>
                     </div>
                 </div>
 
@@ -472,178 +431,235 @@
             <button @click="showModal = false"
                 class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✖</button>
 
-            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Tambah Data Baru</h3>
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
+                <span x-text="isEdit ? 'Edit Data' : 'Tambah Data'"></span>
+            </h3>
 
-            <form x-show="modalType === 'city'" action="{{ route('admin.store.city') }}" method="POST"
-                class="space-y-4">
+            <form :action="formAction" method="POST" class="space-y-4">
                 @csrf
-                <input type="text" name="cityName" placeholder="Nama Kota" class="w-full border p-3 rounded-lg"
-                    required>
-                <input type="text" name="province" placeholder="Provinsi" class="w-full border p-3 rounded-lg">
-                <select name="locationType" class="w-full border p-3 rounded-lg">
-                    <option value="Kota">Kota</option>
-                    <option value="Bandara">Bandara</option>
-                    <option value="Pelabuhan">Pelabuhan</option>
-                </select>
-                <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
-                    Kota</button>
+                <input type="hidden" name="_method" :value="isEdit ? 'PUT' : 'POST'">
+
+                <template x-if="modalType === 'city'">
+                    <div class="space-y-4">
+                        <input type="text" name="cityName" x-model="formData.cityName" placeholder="Nama Kota"
+                            class="w-full border p-3 rounded-lg" required>
+                        <input type="text" name="province" x-model="formData.province" placeholder="Provinsi"
+                            class="w-full border p-3 rounded-lg">
+                        <input type="text" name="island" x-model="formData.island" placeholder="Pulau"
+                            class="w-full border p-3 rounded-lg">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" step="0.0001" name="latitude" x-model="formData.latitude"
+                                placeholder="Latitude" class="w-full border p-3 rounded-lg">
+                            <input type="number" step="0.0001" name="longitude" x-model="formData.longitude"
+                                placeholder="Longitude" class="w-full border p-3 rounded-lg">
+                        </div>
+                        <select name="locationType" x-model="formData.locationType"
+                            class="w-full border p-3 rounded-lg">
+                            <option value="Kota">Kota</option>
+                            <option value="Kabupaten">Kabupaten</option>
+                            <option value="Bandara">Bandara</option>
+                            <option value="Pelabuhan">Pelabuhan</option>
+                        </select>
+                    </div>
+                </template>
+
+                <template x-if="modalType === 'provider'">
+                    <div class="space-y-4">
+                        <input type="text" name="providerName" x-model="formData.providerName"
+                            placeholder="Nama Provider" class="w-full border p-3 rounded-lg" required>
+                        <select name="serviceType" x-model="formData.serviceType"
+                            class="w-full border p-3 rounded-lg">
+                            <option value="Transportasi">Transportasi</option>
+                            <option value="Akomodasi">Akomodasi</option>
+                        </select>
+                    </div>
+                </template>
+
+                <template x-if="modalType === 'route'">
+                    <div class="space-y-4">
+                        <select name="providerID" x-model="formData.providerID" class="w-full border p-3 rounded-lg"
+                            required>
+                            <option value="" disabled>Pilih Provider</option>
+                            @foreach ($providers as $p)
+                                <option value="{{ $p->providerID }}">{{ $p->providerName }}</option>
+                            @endforeach
+                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <select name="originCityID" x-model="formData.originCityID"
+                                class="w-full border p-3 rounded-lg" required>
+                                <option value="" disabled>Asal</option>
+                                @foreach ($cities as $c)
+                                    <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
+                                @endforeach
+                            </select>
+                            <select name="destinationCityID" x-model="formData.destinationCityID"
+                                class="w-full border p-3 rounded-lg" required>
+                                <option value="" disabled>Tujuan</option>
+                                @foreach ($cities as $c)
+                                    <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" name="averagePrice" x-model="formData.averagePrice"
+                                placeholder="Harga" class="w-full border p-3 rounded-lg" required>
+                            <input type="number" name="total_seats" x-model="formData.total_seats"
+                                placeholder="Kursi" class="w-full border p-3 rounded-lg" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="time" name="departureTime" x-model="formData.departureTime"
+                                class="w-full border p-3 rounded-lg" required>
+                            <input type="time" name="arrivalTime" x-model="formData.arrivalTime"
+                                class="w-full border p-3 rounded-lg" required>
+                        </div>
+                        <input type="text" name="class" x-model="formData.class" placeholder="Kelas"
+                            class="w-full border p-3 rounded-lg">
+
+                        <textarea name="description" x-model="formData.description" placeholder="Deskripsi Rute"
+                            class="w-full border p-3 rounded-lg"></textarea>
+
+                        <input type="text" name="bookingLink" x-model="formData.bookingLink"
+                            placeholder="Link Booking" class="w-full border p-3 rounded-lg"
+                            x-bind:disabled="formData.providerID == 99" x-bind:required="formData.providerID != 99"
+                            x-effect="if(formData.providerID == 99) formData.bookingLink = ''">
+
+                        <p class="text-sm font-bold text-gray-700">Fasilitas:</p>
+                        <div class="flex gap-4 text-sm flex-wrap">
+                            <template x-for="fac in ['AC', 'Wifi', 'Makanan', 'Bagasi', 'Toilet']">
+                                <label class="flex items-center gap-1">
+                                    <input type="checkbox" name="facilities[]" :value="fac"
+                                        x-model="formData.facilities"> <span x-text="fac"></span>
+                                </label>
+                            </template>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" step="0.0001" name="start_latitude"
+                                x-model="formData.start_latitude" placeholder="Lat Asal"
+                                class="w-full border p-3 rounded-lg">
+                            <input type="number" step="0.0001" name="start_longitude"
+                                x-model="formData.start_longitude" placeholder="Long Asal"
+                                class="w-full border p-3 rounded-lg">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" step="0.0001" name="end_latitude" x-model="formData.end_latitude"
+                                placeholder="Lat Tujuan" class="w-full border p-3 rounded-lg">
+                            <input type="number" step="0.0001" name="end_longitude"
+                                x-model="formData.end_longitude" placeholder="Long Tujuan"
+                                class="w-full border p-3 rounded-lg">
+                        </div>
+
+                    </div>
+                </template>
+
+                <template x-if="modalType === 'accommodation'">
+                    <div class="space-y-4">
+                        <input type="text" name="hotelName" x-model="formData.hotelName" placeholder="Nama Hotel"
+                            class="w-full border p-3 rounded-lg" required>
+                        <select name="providerID" x-model="formData.providerID" class="w-full border p-3 rounded-lg"
+                            required>
+                            <option value="" disabled>Provider</option>
+                            @foreach ($providers as $p)
+                                @if ($p->serviceType == 'Akomodasi')
+                                    <option value="{{ $p->providerID }}">{{ $p->providerName }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        <select name="cityID" x-model="formData.cityID" class="w-full border p-3 rounded-lg"
+                            required>
+                            <option value="" disabled>Kota</option>
+                            @foreach ($cities as $c)
+                                <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
+                            @endforeach
+                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" name="averagePricePerNight" x-model="formData.averagePricePerNight"
+                                placeholder="Harga/Malam" class="w-full border p-3 rounded-lg" required>
+                            <input type="number" step="0.1" name="rating" x-model="formData.rating"
+                                placeholder="Rating" class="w-full border p-3 rounded-lg">
+                        </div>
+                        <select name="type" x-model="formData.type" class="w-full border p-3 rounded-lg">
+                            <option value="Hotel">Hotel</option>
+                            <option value="Villa">Villa</option>
+                            <option value="Hostel">Hostel</option>
+                        </select>
+
+                        <textarea name="description" x-model="formData.description" placeholder="Deskripsi Hotel"
+                            class="w-full border p-3 rounded-lg"></textarea>
+
+                        <input type="text" name="bookingLink" x-model="formData.bookingLink"
+                            placeholder="Link Booking" class="w-full border p-3 rounded-lg"
+                            x-bind:disabled="formData.providerID == 100" x-bind:required="formData.providerID != 100"
+                            x-effect="if(formData.providerID == 100) formData.bookingLink = ''">
+
+                        <p class="text-sm font-bold text-gray-700">Fasilitas:</p>
+                        <div class="flex gap-4 text-sm flex-wrap">
+                            <template x-for="fac in ['WiFi Gratis', 'Sarapan', 'Kolam Renang', 'Gym', 'Parkir']">
+                                <label class="flex items-center gap-1">
+                                    <input type="checkbox" name="facilities[]" :value="fac"
+                                        x-model="formData.facilities"> <span x-text="fac"></span>
+                                </label>
+                            </template>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" step="0.0001" name="latitude" x-model="formData.latitude"
+                                placeholder="Latitude" class="w-full border p-3 rounded-lg">
+                            <input type="number" step="0.0001" name="longitude" x-model="formData.longitude"
+                                placeholder="Longitude" class="w-full border p-3 rounded-lg">
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="modalType === 'attraction'">
+                    <div class="space-y-4">
+                        <input type="text" name="attractionName" x-model="formData.attractionName"
+                            placeholder="Nama Wisata" class="w-full border p-3 rounded-lg" required>
+                        <select name="cityID" x-model="formData.cityID" class="w-full border p-3 rounded-lg">
+                            <option value="" disabled>Kota</option>
+                            @foreach ($cities as $c)
+                                <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
+                            @endforeach
+                        </select>
+                        <select name="category" x-model="formData.category" class="w-full border p-3 rounded-lg">
+                            <option value="Alam">Alam</option>
+                            <option value="Sejarah & Budaya">Sejarah</option>
+                            <option value="Hiburan">Hiburan</option>
+                            <option value="Landmark">Landmark</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" name="estimatedCost" x-model="formData.estimatedCost"
+                                placeholder="Tiket Masuk (0 jika gratis)" class="w-full border p-3 rounded-lg">
+                            <input type="number" step="0.1" name="rating" x-model="formData.rating"
+                                placeholder="Rating" class="w-full border p-3 rounded-lg">
+                        </div>
+                        <input type="number" name="reviewCount" x-model="formData.reviewCount"
+                            placeholder="Jumlah Review" class="w-full border p-3 rounded-lg">
+
+                        <input type="text" name="bookingLink" x-model="formData.bookingLink"
+                            placeholder="Link Booking Tiket (Opsional)" class="w-full border p-3 rounded-lg">
+
+                        <input type="text" name="images" x-model="formData.images"
+                            placeholder="URL Gambar Utama" class="w-full border p-3 rounded-lg">
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" step="0.0001" name="latitude" x-model="formData.latitude"
+                                placeholder="Latitude" class="w-full border p-3 rounded-lg">
+                            <input type="number" step="0.0001" name="longitude" x-model="formData.longitude"
+                                placeholder="Longitude" class="w-full border p-3 rounded-lg">
+                        </div>
+                        <textarea name="description" x-model="formData.description" placeholder="Deskripsi"
+                            class="w-full border p-3 rounded-lg"></textarea>
+                    </div>
+                </template>
+
+                <button type="submit"
+                    class="w-full bg-brand-green text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">
+                    <span x-text="isEdit ? 'Simpan Perubahan' : 'Simpan Data Baru'"></span>
+                </button>
             </form>
-
-            <form x-show="modalType === 'provider'" action="{{ route('admin.store.provider') }}" method="POST"
-                class="space-y-4">
-                @csrf
-                <input type="text" name="providerName" placeholder="Nama Provider (misal: Cititrans)"
-                    class="w-full border p-3 rounded-lg" required>
-                <select name="serviceType" class="w-full border p-3 rounded-lg">
-                    <option value="Transportasi">Transportasi</option>
-                    <option value="Akomodasi">Akomodasi</option>
-                </select>
-                <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
-                    Provider</button>
-            </form>
-
-            <form x-show="modalType === 'route'" action="{{ route('admin.store.route') }}" method="POST"
-                class="space-y-4">
-                @csrf
-                <select name="providerID" class="w-full border p-3 rounded-lg" required>
-                    <option disabled selected>Pilih Provider</option>
-                    @foreach ($providers as $p)
-                        <option value="{{ $p->providerID }}">{{ $p->providerName }}</option>
-                    @endforeach
-                </select>
-                <div class="grid grid-cols-2 gap-4">
-                    <select name="originCityID" class="w-full border p-3 rounded-lg" required>
-                        <option disabled selected>Asal</option>
-                        @foreach ($cities as $c)
-                            <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
-                        @endforeach
-                    </select>
-                    <select name="destinationCityID" class="w-full border p-3 rounded-lg" required>
-                        <option disabled selected>Tujuan</option>
-                        @foreach ($cities as $c)
-                            <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <input type="number" name="averagePrice" placeholder="Harga (Rp)"
-                    class="w-full border p-3 rounded-lg" required>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="time" name="departureTime" class="w-full border p-3 rounded-lg" required>
-                    <input type="time" name="arrivalTime" class="w-full border p-3 rounded-lg" required>
-                </div>
-                <input type="text" name="class" placeholder="Kelas (e.g. Eksekutif)"
-                    class="w-full border p-3 rounded-lg" required>
-
-                <input type="url" name="bookingLink" placeholder="Link Booking (https://...)"
-                    class="w-full border p-3 rounded-lg" required>
-
-                <p class="text-sm font-bold text-gray-700">Fasilitas:</p>
-                <div class="flex gap-4 text-sm flex-wrap">
-                    <label><input type="checkbox" name="facilities[]" value="AC"> AC</label>
-                    <label><input type="checkbox" name="facilities[]" value="Wifi"> Wifi</label>
-                    <label><input type="checkbox" name="facilities[]" value="Makanan"> Makanan</label>
-                    <label><input type="checkbox" name="facilities[]" value="Bagasi"> Bagasi</label>
-                </div>
-
-                <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
-                    Rute</button>
-            </form>
-
-            <form x-show="modalType === 'accommodation'" action="{{ route('admin.store.accommodation') }}"
-                method="POST" class="space-y-4">
-                @csrf
-                <input type="text" name="hotelName" placeholder="Nama Hotel / Penginapan"
-                    class="w-full border p-3 rounded-lg" required>
-                <select name="providerID" class="w-full border p-3 rounded-lg" required>
-                    <option disabled selected>Provider (Booking Source)</option>
-                    @foreach ($providers as $p)
-                        @if ($p->serviceType == 'Akomodasi')
-                            <option value="{{ $p->providerID }}">{{ $p->providerName }}</option>
-                        @endif
-                    @endforeach
-                </select>
-                <select name="cityID" class="w-full border p-3 rounded-lg" required>
-                    <option disabled selected>Lokasi Kota</option>
-                    @foreach ($cities as $c)
-                        <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
-                    @endforeach
-                </select>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" name="averagePricePerNight" placeholder="Harga/Malam (Rp)"
-                        class="w-full border p-3 rounded-lg" required>
-                    <input type="number" step="0.1" name="rating" placeholder="Rating (1-5)"
-                        class="w-full border p-3 rounded-lg">
-                </div>
-                <select name="type" class="w-full border p-3 rounded-lg">
-                    <option value="Hotel">Hotel</option>
-                    <option value="Villa">Villa</option>
-                    <option value="Apartemen">Apartemen</option>
-                    <option value="Hostel">Hostel</option>
-                </select>
-
-                <input type="url" name="bookingLink" placeholder="Link Booking (https://...)"
-                    class="w-full border p-3 rounded-lg" required>
-
-                <p class="text-sm font-bold text-gray-700">Fasilitas:</p>
-                <div class="flex gap-4 text-sm flex-wrap">
-                    <label><input type="checkbox" name="facilities[]" value="WiFi Gratis"> WiFi</label>
-                    <label><input type="checkbox" name="facilities[]" value="Sarapan"> Sarapan</label>
-                    <label><input type="checkbox" name="facilities[]" value="Kolam Renang"> Pool</label>
-                    <label><input type="checkbox" name="facilities[]" value="Gym"> Gym</label>
-                    <label><input type="checkbox" name="facilities[]" value="Parkir"> Parkir</label>
-                </div>
-                <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
-                    Akomodasi</button>
-            </form>
-
-            <form x-show="modalType === 'attraction'" action="{{ route('admin.store.attraction') }}" method="POST"
-                class="space-y-4">
-                @csrf
-                <input type="text" name="attractionName" placeholder="Nama Tempat Wisata"
-                    class="w-full border p-3 rounded-lg" required>
-                <select name="cityID" class="w-full border p-3 rounded-lg">
-                    <option disabled selected>Lokasi Kota</option>
-                    @foreach ($cities as $c)
-                        <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
-                    @endforeach
-                </select>
-                <select name="category" class="w-full border p-3 rounded-lg">
-                    <option value="Alam">Alam</option>
-                    <option value="Sejarah & Budaya">Sejarah & Budaya</option>
-                    <option value="Kuliner">Kuliner</option>
-                    <option value="Belanja">Belanja</option>
-                    <option value="Hiburan">Hiburan</option>
-                    <option value="Landmark">Landmark</option>
-                </select>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" name="estimatedCost" placeholder="Tiket Masuk (Rp)"
-                        class="w-full border p-3 rounded-lg">
-                    <input type="number" step="0.1" name="rating" placeholder="Rating (1-5)"
-                        class="w-full border p-3 rounded-lg">
-                </div>
-                <textarea name="description" placeholder="Deskripsi singkat..." class="w-full border p-3 rounded-lg"></textarea>
-                <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
-                    Wisata</button>
-            </form>
-
-            <form x-show="modalType === 'promotion'" action="{{ route('admin.store.promotion') }}" method="POST"
-                class="space-y-4">
-                @csrf
-                <input type="text" name="description" placeholder="Judul Promo"
-                    class="w-full border p-3 rounded-lg" required>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" step="0.01" name="discountValue"
-                        placeholder="Diskon (misal 0.10 untuk 10%)" class="w-full border p-3 rounded-lg" required>
-                    <input type="date" name="validUntil" placeholder="Berlaku Sampai"
-                        class="w-full border p-3 rounded-lg">
-                </div>
-                <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
-                    Promo</button>
-            </form>
-
         </div>
     </div>
-
 </body>
 
 </html>
