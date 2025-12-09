@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,7 +21,7 @@ class DatabaseSeeder extends Seeder
         ], ['id']);
 
         // -------------------------
-        // 2) CITIES (final list)
+        // 2) CITIES (Kota Utama & Transit Point)
         // -------------------------
         $cities = [
             // SUMATERA
@@ -49,7 +50,7 @@ class DatabaseSeeder extends Seeder
             ['id' => 41, 'name' => 'Denpasar (Bali)', 'prov' => 'Bali', 'island' => 'Bali', 'lat' => -8.6705, 'lng' => 115.2126],
             ['id' => 40, 'name' => 'Gilimanuk', 'prov' => 'Bali', 'island' => 'Bali', 'lat' => -8.1561, 'lng' => 114.4373],
 
-            // BANDARA / STUBS
+            // BANDARA (Lokasi Fisik)
             ['id' => 90, 'name' => 'Deli Serdang (KNO)', 'prov' => 'Sumut', 'island' => 'Sumatera', 'lat' => 3.6422, 'lng' => 98.8852],
             ['id' => 91, 'name' => 'Kulon Progo (YIA)', 'prov' => 'DIY', 'island' => 'Jawa', 'lat' => -7.9042, 'lng' => 110.0631],
         ];
@@ -69,7 +70,7 @@ class DatabaseSeeder extends Seeder
         // 3) TRANSPORT TERMINALS
         // -------------------------
         $terminals = [
-            // SUMATERA bandara
+            // SUMATERA
             ['id' => 1, 'name' => 'Kualanamu (KNO)', 'type' => 'Bandara', 'cityID' => 90],
             ['id' => 2, 'name' => 'Sultan Syarif Kasim II (PKU)', 'type' => 'Bandara', 'cityID' => 11],
             ['id' => 3, 'name' => 'Minangkabau (PDG)', 'type' => 'Bandara', 'cityID' => 12],
@@ -77,17 +78,17 @@ class DatabaseSeeder extends Seeder
             ['id' => 5, 'name' => 'Sultan Mahmud Badaruddin II (PLM)', 'type' => 'Bandara', 'cityID' => 14],
             ['id' => 6, 'name' => 'Radin Inten II (TKG)', 'type' => 'Bandara', 'cityID' => 15],
 
-            // JAWA bandara
+            // JAWA
             ['id' => 7, 'name' => 'Soekarno-Hatta (CGK)', 'type' => 'Bandara', 'cityID' => 21],
             ['id' => 8, 'name' => 'Juanda (SUB)', 'type' => 'Bandara', 'cityID' => 29],
             ['id' => 9, 'name' => 'YIA Yogyakarta', 'type' => 'Bandara', 'cityID' => 91],
             ['id' => 10, 'name' => 'Husein Sastranegara (BDO)', 'type' => 'Bandara', 'cityID' => 25],
             ['id' => 11, 'name' => 'Banyuwangi (BWX)', 'type' => 'Bandara', 'cityID' => 30],
 
-            // Bali bandara
+            // BALI
             ['id' => 12, 'name' => 'I Gusti Ngurah Rai (DPS)', 'type' => 'Bandara', 'cityID' => 41],
 
-            // Pelabuhan
+            // PELABUHAN
             ['id' => 20, 'name' => 'Pelabuhan Bakauheni', 'type' => 'Pelabuhan', 'cityID' => 16],
             ['id' => 21, 'name' => 'Pelabuhan Merak', 'type' => 'Pelabuhan', 'cityID' => 20],
             ['id' => 22, 'name' => 'Pelabuhan Ketapang', 'type' => 'Pelabuhan', 'cityID' => 30],
@@ -101,7 +102,7 @@ class DatabaseSeeder extends Seeder
                 'type' => $t['type'],
                 'cityID' => $t['cityID'],
                 'created_at' => now(),
-                'updated_at' => now(),
+                'updated_at' => now()
             ], ['terminalID']);
         }
 
@@ -148,14 +149,10 @@ class DatabaseSeeder extends Seeder
         $providers = [
             ['id' => 99, 'name' => 'Budgettrip Travel', 'type' => 'Transportasi'],
             ['id' => 100, 'name' => 'Budgettrip Hotel', 'type' => 'Akomodasi'],
-
-            // airlines
             ['id' => 6, 'name' => 'Garuda Indonesia', 'type' => 'Transportasi'],
             ['id' => 7, 'name' => 'Lion Air', 'type' => 'Transportasi'],
             ['id' => 10, 'name' => 'Batik Air', 'type' => 'Transportasi'],
             ['id' => 11, 'name' => 'Super Air Jet', 'type' => 'Transportasi'],
-
-            // ferry & buses & travel
             ['id' => 8, 'name' => 'Ferry ASDP', 'type' => 'Transportasi'],
             ['id' => 15, 'name' => 'ALS', 'type' => 'Transportasi'],
             ['id' => 16, 'name' => 'NPM', 'type' => 'Transportasi'],
@@ -169,8 +166,6 @@ class DatabaseSeeder extends Seeder
             ['id' => 3, 'name' => 'Sinar Jaya', 'type' => 'Transportasi'],
             ['id' => 4, 'name' => 'Rosalia Indah', 'type' => 'Transportasi'],
             ['id' => 19, 'name' => 'Baraya Travel', 'type' => 'Transportasi'],
-
-            // accommodation booking partners
             ['id' => 13, 'name' => 'Traveloka', 'type' => 'Akomodasi'],
             ['id' => 14, 'name' => 'Booking.com', 'type' => 'Akomodasi'],
             ['id' => 101, 'name' => 'Agoda', 'type' => 'Akomodasi'],
@@ -192,15 +187,15 @@ class DatabaseSeeder extends Seeder
         $accProviders = [13, 14, 101, 102, 103, 104];
 
         foreach ($cities as $city) {
-            if ($city['id'] >= 90) continue; // skip airport stubs
+            if ($city['id'] >= 90) continue;
 
-            // 1) Budgettrip accommodation
+            // Budgettrip
             $accommodations[] = [
                 'accommodationID' => $accID++,
                 'providerID' => 100,
                 'cityID' => $city['id'],
                 'hotelName' => 'Budgettrip ' . $city['name'],
-                'averagePricePerNight' => rand(125000, 250000),
+                'averagePricePerNight' => rand(150000, 300000),
                 'rating' => 4.2,
                 'type' => 'Hostel',
                 'facilities' => json_encode(['WiFi']),
@@ -210,18 +205,18 @@ class DatabaseSeeder extends Seeder
                 'latitude' => $city['lat'] + 0.002,
                 'longitude' => $city['lng'] + 0.002,
                 'created_at' => now(),
-                'updated_at' => now(),
+                'updated_at' => now()
             ];
 
-            // 2..7) Partner accommodations
+            // Partner Hotels
             foreach ($accProviders as $provider) {
                 $avg = match ($provider) {
-                    13 => rand(350000, 750000), // Traveloka
-                    14 => rand(450000, 1800000), // Booking.com
-                    101 => rand(300000, 800000), // Agoda
-                    102 => rand(150000, 250000), // RedDoorz
-                    103 => rand(130000, 280000), // OYO
-                    104 => rand(180000, 380000), // Bobobox
+                    13 => rand(300000, 600000),
+                    14 => rand(400000, 1500000),
+                    101 => rand(250000, 700000),
+                    102 => rand(120000, 200000),
+                    103 => rand(120000, 250000),
+                    104 => rand(180000, 350000),
                     default => rand(200000, 500000)
                 };
                 $namePrefix = match ($provider) {
@@ -287,7 +282,7 @@ class DatabaseSeeder extends Seeder
             return $cands[0]['terminalID'];
         };
 
-        // Create 3 schedules helper
+        // Create 3 schedules helper with DURATION LOGIC FIXED
         $createSchedules = function ($providerID, $originId, $destId, $type, $price, $class, $seats, $facilities, &$routeID, $cities) {
             $origin = null;
             $dest = null;
@@ -301,13 +296,22 @@ class DatabaseSeeder extends Seeder
             $classes = [' (Pagi)', ' (Siang)', ' (Malam)'];
             $batch = [];
 
-            // Estimate duration
+            // Calculate Duration in SECONDS
             $dist = sqrt(pow($origin['lat'] - $dest['lat'], 2) + pow($origin['lng'] - $dest['lng'], 2)) * 111;
             $speed = str_contains($type, 'Pesawat') ? 700 : (str_contains($type, 'Ferry') ? 25 : 50);
-            $durationHours = max(1, round($dist / $speed));
+
+            // Base duration in hours
+            $hours = $dist / $speed;
+
+            // Convert to seconds and enforce minimum 1 hour (3600 sec)
+            $durationSeconds = intval($hours * 3600);
+            $durationSeconds = max(3600, $durationSeconds); // Min 1 hour
+
+            // Add some random variation (0-45 mins)
+            $durationSeconds += rand(0, 2700);
 
             foreach ($times as $i => $time) {
-                $arrival = date('H:i:s', strtotime($time) + $durationHours * 3600);
+                $arrival = date('H:i:s', strtotime($time) + $durationSeconds);
                 $batch[] = [
                     'routeID' => $routeID++,
                     'providerID' => $providerID,
@@ -333,7 +337,7 @@ class DatabaseSeeder extends Seeder
             return $batch;
         };
 
-        // 7A) Budgettrip MESH (All cities connected - Updated Prices)
+        // 7A) Budgettrip MESH (All cities connected)
         $cityIDsMesh = array_column(array_filter($cities, fn($c) => $c['id'] < 90), 'id');
         foreach ($cityIDsMesh as $orig) {
             foreach ($cityIDsMesh as $dest) {
@@ -349,21 +353,18 @@ class DatabaseSeeder extends Seeder
                     if ($dist <= 200) {
                         $type = 'Travel';
                         $class = 'Budgettrip Shuttle';
-                        // Travel Short: 75k base + dist cost
-                        $price = max(75000, round(50000 + $dist * 800));
+                        $price = round(70000 + $dist * 400);
                         $seats = 12;
                     } else {
                         $type = 'Bus';
                         $class = 'Budgettrip Executive';
-                        // Bus Long: 150k base + dist cost
-                        $price = max(150000, round(100000 + $dist * 600));
+                        $price = round(120000 + $dist * 350);
                         $seats = 30;
                     }
                 } else {
                     $type = 'Bus Antar Pulau (via Ferry)';
                     $class = 'Budgettrip Longhaul';
-                    // Cross Island: expensive
-                    $price = max(350000, round(250000 + $dist * 600));
+                    $price = round(350000 + $dist * 400);
                     $seats = 30;
                 }
 
@@ -371,7 +372,7 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 7B) FEEDER ROUTES (City <-> Nearest Airport - Updated Prices)
+        // 7B) FEEDER ROUTES (City <-> Nearest Airport)
         foreach ($cityIDsMesh as $cid) {
             $tid = $nearestTerminal($cid);
             if (!$tid) continue;
@@ -380,7 +381,6 @@ class DatabaseSeeder extends Seeder
             if (!$destCityID) continue;
 
             $dist = sqrt(pow($findCity($cid)['lat'] - $findCity($destCityID)['lat'], 2) + pow($findCity($cid)['lng'] - $findCity($destCityID)['lng'], 2)) * 111;
-            // Feeder price: Expensive per km (taxi/private shuttle rate)
             $price = round(50000 + $dist * 1000);
 
             $routesData = array_merge(
@@ -390,7 +390,7 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 7C) FLIGHT MESH (Airport <-> Airport - Updated Prices)
+        // 7C) FLIGHT MESH
         $airportTerminals = array_filter($terminals, fn($t) => $t['type'] === 'Bandara');
         $airportCityIDs = array_column($airportTerminals, 'cityID');
         $airlines = [6, 7, 10, 11];
@@ -402,12 +402,11 @@ class DatabaseSeeder extends Seeder
                 $d = $findCity($b);
                 $dist = sqrt(pow($o['lat'] - $d['lat'], 2) + pow($o['lng'] - $d['lng'], 2)) * 111;
 
-                // Flight Base Price + Distance Factor
                 $basePrice = 800000;
                 $price = round($basePrice + ($dist * 2000));
 
                 foreach ($airlines as $prov) {
-                    $finalPrice = ($prov == 6 || $prov == 10) ? $price * 1.3 : $price; // Garuda/Batik more expensive
+                    $finalPrice = ($prov == 6 || $prov == 10) ? $price * 1.3 : $price;
                     $routesData = array_merge($routesData, $createSchedules($prov, $a, $b, 'Pesawat', $finalPrice, 'Economy', 150, ['Bagasi 20kg'], $routeID, $cities));
                 }
             }
@@ -416,29 +415,28 @@ class DatabaseSeeder extends Seeder
         // 7D) FERRY ROUTES
         $ferryPairs = [
             [20, 16, 25000],
-            [16, 20, 25000], // Merak-Bakauheni
+            [16, 20, 25000],
             [30, 40, 15000],
-            [40, 30, 15000], // Ketapang-Gilimanuk
+            [40, 30, 15000],
         ];
         foreach ($ferryPairs as [$a, $b, $price]) {
             $routesData = array_merge($routesData, $createSchedules(8, $a, $b, 'Ferry ASDP', $price, 'Reguler', 400, ['Kantin'], $routeID, $cities));
         }
 
-        // 7E) REAL BUS & TRAIN (Updated Prices)
+        // 7E) REAL BUS & TRAIN
         $longBusPairs = [
             [15, 10, 22],
             [14, 10, 22],
             [11, 10, 22],
-            [12, 10, 22], // Sumatera->Jawa
+            [12, 10, 22],
             [18, 22, 28],
-            [18, 24, 25], // Primajasa
-            [16, 12, 22], // NPM Padang-Jkt
-            [15, 14, 22], // ALS Palembang-Jkt
-            [17, 28, 41], // Pahala Kencana Sby-Bali
+            [18, 24, 25],
+            [16, 12, 22],
+            [15, 14, 22],
+            [17, 28, 41],
         ];
         foreach ($longBusPairs as [$prov, $a, $b]) {
             $provID = in_array($prov, array_column($providers, 'id')) ? $prov : 15;
-            // Bus AKAP Price
             $price = rand(400000, 850000);
             $routesData = array_merge($routesData, $createSchedules($provID, $a, $b, 'Bus AKAP', $price, 'Executive', 30, ['AC', 'Toilet'], $routeID, $cities));
             $routesData = array_merge($routesData, $createSchedules($provID, $b, $a, 'Bus AKAP', $price, 'Executive', 30, ['AC', 'Toilet'], $routeID, $cities));
@@ -457,7 +455,7 @@ class DatabaseSeeder extends Seeder
             [23, 25]
         ];
         foreach ($trainPairs as [$a, $b]) {
-            $price = rand(150000, 650000); // Train price range
+            $price = rand(150000, 650000);
             $routesData = array_merge($routesData, $createSchedules(5, $a, $b, 'Kereta', $price, 'Eksekutif', 60, ['AC'], $routeID, $cities));
             $routesData = array_merge($routesData, $createSchedules(5, $b, $a, 'Kereta', $price, 'Eksekutif', 60, ['AC'], $routeID, $cities));
         }
@@ -492,7 +490,7 @@ class DatabaseSeeder extends Seeder
         ];
         foreach ($travelPairs as $idx => [$a, $b]) {
             $op = $travelOperators[$idx % count($travelOperators)];
-            $price = rand(90000, 200000); // Travel price range
+            $price = rand(90000, 200000);
             $routesData = array_merge($routesData, $createSchedules($op, $a, $b, 'Travel', $price, 'Shuttle', 12, ['AC'], $routeID, $cities));
             $routesData = array_merge($routesData, $createSchedules($op, $b, $a, 'Travel', $price, 'Shuttle', 12, ['AC'], $routeID, $cities));
         }

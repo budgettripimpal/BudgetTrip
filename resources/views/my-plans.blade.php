@@ -125,22 +125,31 @@
                             </div>
 
                             <div class="p-6">
-                                <div class="flex justify-between items-center mb-4">
+                                <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
                                     <div>
-                                        <p class="text-xs text-gray-400 uppercase font-bold">Budget</p>
-                                        <p class="text-lg font-bold text-[#2CB38B]">Rp
-                                            {{ number_format($plan->amount, 0, ',', '.') }}</p>
+                                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">
+                                            Rute Perjalanan</p>
+                                        <div class="flex items-center gap-2 text-gray-800 font-bold text-sm">
+                                            <span>{{ $plan->originCity->cityName ?? 'Asal' }}</span>
+                                            <svg class="w-4 h-4 text-[#2CB38B]" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                            </svg>
+                                            <span>{{ $plan->destinationCity->cityName ?? 'Tujuan' }}</span>
+                                        </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-xs text-gray-400 uppercase font-bold">Tujuan</p>
-                                        <p class="text-gray-800 font-medium">
-                                            {{ $plan->destinationCity->cityName ?? 'Unknown' }}</p>
+                                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">
+                                            Total Budget</p>
+                                        <p class="text-lg font-extrabold text-[#2CB38B]">Rp
+                                            {{ number_format($plan->amount, 0, ',', '.') }}</p>
                                     </div>
                                 </div>
 
                                 <div class="space-y-3">
                                     <a href="{{ route('travel-plan.transport', $plan->planID) }}"
-                                        class="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-green-50 transition group/item">
+                                        class="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-green-50 transition group/item border border-transparent hover:border-green-100">
                                         <div class="flex items-center gap-3">
                                             <div
                                                 class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-lg">
@@ -148,14 +157,14 @@
                                             <span
                                                 class="text-sm font-medium text-gray-600 group-hover/item:text-[#2CB38B]">Transportasi</span>
                                         </div>
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 text-gray-400 group-hover/item:text-[#2CB38B]"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 5l7 7-7 7" />
                                         </svg>
                                     </a>
                                     <a href="{{ route('travel-plan.accommodation', $plan->planID) }}"
-                                        class="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-green-50 transition group/item">
+                                        class="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-green-50 transition group/item border border-transparent hover:border-green-100">
                                         <div class="flex items-center gap-3">
                                             <div
                                                 class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-lg">
@@ -163,17 +172,17 @@
                                             <span
                                                 class="text-sm font-medium text-gray-600 group-hover/item:text-[#2CB38B]">Akomodasi</span>
                                         </div>
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 text-gray-400 group-hover/item:text-[#2CB38B]"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 5l7 7-7 7" />
                                         </svg>
                                     </a>
                                 </div>
 
-                                <div class="mt-6 pt-4 border-t border-gray-100 grid grid-cols-2 gap-3">
+                                <div class="mt-6 pt-4 grid grid-cols-2 gap-3">
                                     <a href="{{ route('travel-plan.overview', $plan->planID) }}"
-                                        class="flex items-center justify-center gap-2 py-2 text-center text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition border border-gray-200 hover:border-blue-200">
+                                        class="flex items-center justify-center gap-2 py-2.5 text-center text-sm font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition border border-gray-200 hover:border-blue-200">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -184,7 +193,7 @@
                                         Overview
                                     </a>
                                     <a href="{{ route('travel-plan.manage', $plan->planID) }}"
-                                        class="flex items-center justify-center gap-2 py-2 text-center text-sm font-bold text-[#2CB38B] hover:text-white hover:bg-[#2CB38B] rounded-lg transition border border-[#2CB38B]">
+                                        class="flex items-center justify-center gap-2 py-2.5 text-center text-sm font-bold text-white bg-[#2CB38B] hover:bg-[#249d78] rounded-xl transition shadow-md hover:shadow-lg transform active:scale-95">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

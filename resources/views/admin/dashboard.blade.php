@@ -138,9 +138,18 @@
                         {{ session('success') }}
                     </div>
                 @endif
+                @if ($errors->any())
+                    <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                        <ul class="list-disc pl-5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
 
                 <div x-show="currentTab === 'overview'" class="space-y-8">
-
                     <div>
                         <h3 class="text-lg font-bold text-gray-700 mb-4 border-l-4 border-brand-green pl-3">Statistik
                             Pengguna & Rencana</h3>
@@ -268,14 +277,16 @@
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
                             Tambah Kota</button>
                     </div>
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="table-header">ID</th>
                                     <th class="table-header">Nama Kota</th>
                                     <th class="table-header">Provinsi</th>
+                                    <th class="table-header">Pulau</th>
                                     <th class="table-header">Tipe</th>
+                                    <th class="table-header">Lat/Long</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -284,8 +295,11 @@
                                         <td class="table-cell">{{ $city->cityID }}</td>
                                         <td class="table-cell font-medium">{{ $city->cityName }}</td>
                                         <td class="table-cell">{{ $city->province }}</td>
+                                        <td class="table-cell">{{ $city->island }}</td>
                                         <td class="table-cell"><span
                                                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{{ $city->locationType }}</span>
+                                        </td>
+                                        <td class="table-cell text-xs">{{ $city->latitude }}, {{ $city->longitude }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -330,7 +344,7 @@
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
                             Tambah Rute</button>
                     </div>
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -338,7 +352,8 @@
                                     <th class="table-header">Asal - Tujuan</th>
                                     <th class="table-header">Harga</th>
                                     <th class="table-header">Jam</th>
-                                    <th class="table-header">Booking Link</th>
+                                    <th class="table-header">Kursi</th>
+                                    <th class="table-header">Fasilitas</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -352,16 +367,18 @@
                                         <td class="table-cell text-xs">
                                             {{ \Carbon\Carbon::parse($r->departureTime)->format('H:i') }} -
                                             {{ \Carbon\Carbon::parse($r->arrivalTime)->format('H:i') }}</td>
-                                        <td class="table-cell">
-                                            <a href="{{ $r->bookingLink }}" target="_blank"
-                                                class="text-blue-500 hover:underline text-xs truncate max-w-[150px] block">
-                                                {{ $r->bookingLink }}
-                                            </a>
+                                        <td class="table-cell">{{ $r->total_seats }} Kursi</td>
+                                        <td class="table-cell text-xs truncate max-w-[150px]">
+                                            {{-- FIX JSON DECODE ERROR --}}
+                                            {{ implode(', ', is_array($r->facilities) ? $r->facilities : json_decode($r->facilities, true) ?? []) }}
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="px-6 py-3">
+                            {{ $routes->links() }}
+                        </div>
                     </div>
                 </div>
 
@@ -372,7 +389,7 @@
                             class="bg-brand-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">+
                             Tambah Akomodasi</button>
                     </div>
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -380,7 +397,7 @@
                                     <th class="table-header">Kota</th>
                                     <th class="table-header">Harga/Malam</th>
                                     <th class="table-header">Rating</th>
-                                    <th class="table-header">Booking Link</th>
+                                    <th class="table-header">Lat/Long</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -396,20 +413,20 @@
                                                     class="text-xs font-normal text-gray-500 block">{{ $acc->type }}</span>
                                             </td>
                                             <td class="table-cell">{{ $acc->city->cityName }}</td>
-                                            <td class="table-cell">Rp {{ number_format($acc->averagePricePerNight) }}
+                                            <td class="table-cell">Rp
+                                                {{ number_format($acc->averagePricePerNight) }}
                                             </td>
                                             <td class="table-cell text-yellow-500">★ {{ $acc->rating }}</td>
-                                            <td class="table-cell">
-                                                <a href="{{ $acc->bookingLink }}" target="_blank"
-                                                    class="text-blue-500 hover:underline text-xs truncate max-w-[150px] block">
-                                                    {{ $acc->bookingLink }}
-                                                </a>
-                                            </td>
+                                            <td class="table-cell text-xs">{{ $acc->latitude }},
+                                                {{ $acc->longitude }}</td>
                                         </tr>
                                     @endforeach
                                 @endif
                             </tbody>
                         </table>
+                        <div class="px-6 py-3">
+                            {{ $accommodations->links() }}
+                        </div>
                     </div>
                 </div>
 
@@ -436,6 +453,9 @@
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+                    <div class="mt-4">
+                        {{ $attractions->links() }}
                     </div>
                 </div>
 
@@ -480,10 +500,17 @@
                 <input type="text" name="cityName" placeholder="Nama Kota" class="w-full border p-3 rounded-lg"
                     required>
                 <input type="text" name="province" placeholder="Provinsi" class="w-full border p-3 rounded-lg">
+                <input type="text" name="island" placeholder="Pulau (e.g. Jawa)"
+                    class="w-full border p-3 rounded-lg">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" step="0.0001" name="latitude" placeholder="Latitude"
+                        class="w-full border p-3 rounded-lg">
+                    <input type="number" step="0.0001" name="longitude" placeholder="Longitude"
+                        class="w-full border p-3 rounded-lg">
+                </div>
                 <select name="locationType" class="w-full border p-3 rounded-lg">
                     <option value="Kota">Kota</option>
-                    <option value="Bandara">Bandara</option>
-                    <option value="Pelabuhan">Pelabuhan</option>
+                    <option value="Kabupaten">Kabupaten</option>
                 </select>
                 <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
                     Kota</button>
@@ -525,8 +552,12 @@
                         @endforeach
                     </select>
                 </div>
-                <input type="number" name="averagePrice" placeholder="Harga (Rp)"
-                    class="w-full border p-3 rounded-lg" required>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" name="averagePrice" placeholder="Harga (Rp)"
+                        class="w-full border p-3 rounded-lg" required>
+                    <input type="number" name="total_seats" placeholder="Jumlah Kursi"
+                        class="w-full border p-3 rounded-lg" required>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <input type="time" name="departureTime" class="w-full border p-3 rounded-lg" required>
                     <input type="time" name="arrivalTime" class="w-full border p-3 rounded-lg" required>
@@ -543,6 +574,7 @@
                     <label><input type="checkbox" name="facilities[]" value="Wifi"> Wifi</label>
                     <label><input type="checkbox" name="facilities[]" value="Makanan"> Makanan</label>
                     <label><input type="checkbox" name="facilities[]" value="Bagasi"> Bagasi</label>
+                    <label><input type="checkbox" name="facilities[]" value="Toilet"> Toilet</label>
                 </div>
 
                 <button type="submit" class="w-full bg-brand-green text-white py-3 rounded-lg font-bold">Simpan
@@ -572,6 +604,12 @@
                     <input type="number" name="averagePricePerNight" placeholder="Harga/Malam (Rp)"
                         class="w-full border p-3 rounded-lg" required>
                     <input type="number" step="0.1" name="rating" placeholder="Rating (1-5)"
+                        class="w-full border p-3 rounded-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" step="0.0001" name="latitude" placeholder="Lat"
+                        class="w-full border p-3 rounded-lg">
+                    <input type="number" step="0.0001" name="longitude" placeholder="Long"
                         class="w-full border p-3 rounded-lg">
                 </div>
                 <select name="type" class="w-full border p-3 rounded-lg">
@@ -619,6 +657,12 @@
                     <input type="number" name="estimatedCost" placeholder="Tiket Masuk (Rp)"
                         class="w-full border p-3 rounded-lg">
                     <input type="number" step="0.1" name="rating" placeholder="Rating (1-5)"
+                        class="w-full border p-3 rounded-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" step="0.0001" name="latitude" placeholder="Lat"
+                        class="w-full border p-3 rounded-lg">
+                    <input type="number" step="0.0001" name="longitude" placeholder="Long"
                         class="w-full border p-3 rounded-lg">
                 </div>
                 <textarea name="description" placeholder="Deskripsi singkat..." class="w-full border p-3 rounded-lg"></textarea>

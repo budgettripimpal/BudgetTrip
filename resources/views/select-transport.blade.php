@@ -185,15 +185,7 @@
                     <div class="w-full lg:w-80 flex-shrink-0">
                         <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
                             <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-[#2CB38B]" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
-                                        </path>
-                                    </svg>
-                                    Filter
-                                </h2>
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">Filter</h2>
                                 <button type="submit"
                                     class="text-xs font-bold text-[#2CB38B] hover:underline">Terapkan</button>
                             </div>
@@ -247,88 +239,90 @@
 
                     <div class="flex-1">
 
-                        {{-- 1. BAGIAN REKOMENDASI TRANSIT (DENGAN KETERANGAN RUTE) --}}
+                        {{-- 1. BAGIAN REKOMENDASI TRANSIT --}}
                         @if (isset($transitRoutes) && $transitRoutes->isNotEmpty())
                             <div class="mb-8">
                                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="bg-blue-100 text-blue-700 p-1.5 rounded-lg text-lg">✈️ 🚢</span>
-                                    Rute Transit
+                                    <span class="bg-blue-100 text-blue-700 p-1.5 rounded-lg text-lg">✈️</span>
+                                    Rekomendasi Transit
                                 </h2>
-                                <div
-                                    class="bg-white rounded-2xl shadow-sm border border-blue-200 p-6 relative overflow-hidden">
+
+                                {{-- LOOPING TRANSIT ROUTES (INI YANG MEMPERBAIKI ERROR UNDEFINED VARIABLE) --}}
+                                @foreach ($transitRoutes as $transit)
                                     <div
-                                        class="absolute top-0 right-0 bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-bl-xl">
-                                        Via {{ $transitRoutes[0]['hub_name'] }} atau Pelabuhan</div>
+                                        class="bg-white rounded-2xl shadow-sm border border-blue-200 p-6 relative overflow-hidden mb-6">
+                                        <div
+                                            class="absolute top-0 right-0 bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-bl-xl">
+                                            Via {{ $transit['hub_name'] }}</div>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                                        <div>
-                                            <div class="flex items-center gap-2 mb-3">
-                                                <span
-                                                    class="w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">1</span>
-                                                <div>
-                                                    <h3 class="font-bold text-gray-700 text-sm">Menuju Kota Transit
-                                                    </h3>
-                                                    <p class="text-[10px] text-gray-500 font-medium">
-                                                        {{ $plan->originCity->cityName }} &rarr;
-                                                        {{ $transitRoutes[0]['feeders']->first()->destinationCity->cityName }}
-                                                    </p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-3">
+                                                    <span
+                                                        class="w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">1</span>
+                                                    <h3 class="font-bold text-gray-700 text-sm">
+                                                        {{ $transit['step1_label'] }}</h3>
+                                                </div>
+                                                <div class="space-y-3">
+                                                    @foreach ($transit['feeders'] as $transport)
+                                                        <div
+                                                            class="border border-gray-200 rounded-lg p-3 flex justify-between items-center hover:border-blue-400 transition bg-gray-50">
+                                                            <div>
+                                                                <p class="font-bold text-sm">
+                                                                    {{ $transport->serviceProvider->providerName }}</p>
+                                                                <p class="text-xs text-gray-500">
+                                                                    {{ \Carbon\Carbon::parse($transport->departureTime)->format('H:i') }}
+                                                                    WIB</p>
+                                                                <p class="text-[10px] text-gray-400 mt-0.5">
+                                                                    {{ $transport->originCity->cityName }} &rarr;
+                                                                    {{ $transport->destinationCity->cityName }}</p>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <p class="text-xs font-bold text-[#2CB38B] mb-1">Rp
+                                                                    {{ number_format($transport->averagePrice, 0, ',', '.') }}
+                                                                </p>
+                                                                <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
+                                                                    class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm inline-block">Lihat Detail</a>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                             </div>
-                                            <div class="space-y-3">
-                                                @foreach ($transitRoutes[0]['feeders'] as $transport)
-                                                    <div
-                                                        class="border border-gray-200 rounded-lg p-3 flex justify-between items-center hover:border-blue-400 transition bg-gray-50">
-                                                        <div>
-                                                            <p class="font-bold text-sm">
-                                                                {{ $transport->serviceProvider->providerName }}</p>
-                                                            <p class="text-xs text-gray-500">
-                                                                {{ \Carbon\Carbon::parse($transport->departureTime)->format('H:i') }}
-                                                                WIB</p>
-                                                            <p class="text-[10px] text-gray-400 mt-0.5">
-                                                                {{ $transport->originCity->cityName }} &rarr;
-                                                                {{ $transport->destinationCity->cityName }}</p>
-                                                        </div>
-                                                        <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
-                                                            class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm">Pilih</a>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <div class="flex items-center gap-2 mb-3">
-                                                <span
-                                                    class="w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">2</span>
-                                                <div>
-                                                    <h3 class="font-bold text-gray-700 text-sm">Menuju Kota Tujuan</h3>
-                                                    <p class="text-[10px] text-gray-500 font-medium">
-                                                        {{ $transitRoutes[0]['main_transport']->first()->originCity->cityName }}
-                                                        &rarr; {{ $plan->destinationCity->cityName }}
-                                                    </p>
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-3">
+                                                    <span
+                                                        class="w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">2</span>
+                                                    <h3 class="font-bold text-gray-700 text-sm">
+                                                        {{ $transit['step2_label'] }}</h3>
                                                 </div>
-                                            </div>
-                                            <div class="space-y-3">
-                                                @foreach ($transitRoutes[0]['main_transport'] as $transport)
-                                                    <div
-                                                        class="border border-gray-200 rounded-lg p-3 flex justify-between items-center hover:border-blue-400 transition bg-gray-50">
-                                                        <div>
-                                                            <p class="font-bold text-sm">
-                                                                {{ $transport->serviceProvider->providerName }}</p>
-                                                            <p class="text-xs text-gray-500">
-                                                                {{ \Carbon\Carbon::parse($transport->departureTime)->format('H:i') }}
-                                                                WIB</p>
-                                                            <p class="text-[10px] text-gray-400 mt-0.5">
-                                                                {{ $transport->originCity->cityName }} &rarr;
-                                                                {{ $transport->destinationCity->cityName }}</p>
+                                                <div class="space-y-3">
+                                                    @foreach ($transit['main_transport'] as $transport)
+                                                        <div
+                                                            class="border border-gray-200 rounded-lg p-3 flex justify-between items-center hover:border-blue-400 transition bg-gray-50">
+                                                            <div>
+                                                                <p class="font-bold text-sm">
+                                                                    {{ $transport->serviceProvider->providerName }}</p>
+                                                                <p class="text-xs text-gray-500">
+                                                                    {{ \Carbon\Carbon::parse($transport->departureTime)->format('H:i') }}
+                                                                    WIB</p>
+                                                                <p class="text-[10px] text-gray-400 mt-0.5">
+                                                                    {{ $transport->originCity->cityName }} &rarr;
+                                                                    {{ $transport->destinationCity->cityName }}</p>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <p class="text-xs font-bold text-[#2CB38B] mb-1">Rp
+                                                                    {{ number_format($transport->averagePrice, 0, ',', '.') }}
+                                                                </p>
+                                                                <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
+                                                                    class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm inline-block">Pilih</a>
+                                                            </div>
                                                         </div>
-                                                        <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
-                                                            class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm">Pilih</a>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                @endforeach
                             </div>
                         @endif
 
