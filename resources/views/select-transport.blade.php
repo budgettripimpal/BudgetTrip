@@ -19,25 +19,15 @@
                 border-color: #2CB38B;
             }
 
-            .ring-primary {
+            .ring-primary:focus {
                 --tw-ring-color: #2CB38B;
             }
 
-            .focus\:ring-primary:focus {
-                --tw-ring-color: #2CB38B;
-            }
-
-            /* Checkbox Custom */
             input[type="checkbox"]:checked {
                 background-color: #2CB38B;
                 border-color: #2CB38B;
             }
 
-            input[type="checkbox"]:focus {
-                --tw-ring-color: #2CB38B;
-            }
-
-            /* Smooth Transition */
             .accordion-content {
                 transition: max-height 0.3s ease-out;
                 overflow: hidden;
@@ -96,7 +86,6 @@
     </nav>
 
     <div class="min-h-screen bg-gray-50 pb-12 pt-20">
-
         <div class="bg-white shadow-sm py-8 mb-8 sticky top-20 z-40">
             <div class="container mx-auto px-6">
                 <div class="flex items-center justify-between max-w-6xl mx-auto">
@@ -191,8 +180,8 @@
 
         <div class="container mx-auto px-6 py-4">
             <form action="{{ route('travel-plan.transport', $plan->planID) }}" method="GET" id="filterForm">
-
                 <div class="flex flex-col lg:flex-row gap-8">
+
                     <div class="w-full lg:w-80 flex-shrink-0">
                         <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-44 border border-gray-100">
                             <div class="flex justify-between items-center mb-6">
@@ -242,54 +231,144 @@
                             <div>
                                 <h3 class="font-semibold text-gray-700 mb-3">Waktu Berangkat</h3>
                                 <div class="space-y-2">
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="times[]" value="pagi"
-                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
-                                            {{ in_array('pagi', request('times', [])) ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
-                                        <span class="text-gray-600">Pagi (06-12)</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="times[]" value="siang"
-                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
-                                            {{ in_array('siang', request('times', [])) ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
-                                        <span class="text-gray-600">Siang (12-18)</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="times[]" value="malam"
-                                            class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
-                                            {{ in_array('malam', request('times', [])) ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
-                                        <span class="text-gray-600">Malam (18-06)</span>
-                                    </label>
+                                    @foreach (['pagi' => 'Pagi (06-12)', 'siang' => 'Siang (12-18)', 'malam' => 'Malam (18-06)'] as $val => $label)
+                                        <label class="flex items-center space-x-3 cursor-pointer">
+                                            <input type="checkbox" name="times[]" value="{{ $val }}"
+                                                class="w-5 h-5 text-[#2CB38B] rounded border-gray-300"
+                                                {{ in_array($val, request('times', [])) ? 'checked' : '' }}
+                                                onchange="this.form.submit()">
+                                            <span class="text-gray-600">{{ $label }}</span>
+                                        </label>
+                                    @endforeach
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
                     <div class="flex-1">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekomendasi Transportasi</h2>
+
+                        {{-- 1. BAGIAN REKOMENDASI TRANSIT (DENGAN KETERANGAN RUTE) --}}
+                        @if (isset($transitRoutes) && $transitRoutes->isNotEmpty())
+                            <div class="mb-8">
+                                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="bg-blue-100 text-blue-700 p-1.5 rounded-lg text-lg">✈️ 🚢</span>
+                                    Rute Transit
+                                </h2>
+                                <div
+                                    class="bg-white rounded-2xl shadow-sm border border-blue-200 p-6 relative overflow-hidden">
+                                    <div
+                                        class="absolute top-0 right-0 bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-bl-xl">
+                                        Via {{ $transitRoutes[0]['hub_name'] }} atau Pelabuhan</div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <span
+                                                    class="w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">1</span>
+                                                <div>
+                                                    <h3 class="font-bold text-gray-700 text-sm">Menuju Kota Transit
+                                                    </h3>
+                                                    <p class="text-[10px] text-gray-500 font-medium">
+                                                        {{ $plan->originCity->cityName }} &rarr;
+                                                        {{ $transitRoutes[0]['feeders']->first()->destinationCity->cityName }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-3">
+                                                @foreach ($transitRoutes[0]['feeders'] as $transport)
+                                                    <div
+                                                        class="border border-gray-200 rounded-lg p-3 flex justify-between items-center hover:border-blue-400 transition bg-gray-50">
+                                                        <div>
+                                                            <p class="font-bold text-sm">
+                                                                {{ $transport->serviceProvider->providerName }}</p>
+                                                            <p class="text-xs text-gray-500">
+                                                                {{ \Carbon\Carbon::parse($transport->departureTime)->format('H:i') }}
+                                                                WIB</p>
+                                                            <p class="text-[10px] text-gray-400 mt-0.5">
+                                                                {{ $transport->originCity->cityName }} &rarr;
+                                                                {{ $transport->destinationCity->cityName }}</p>
+                                                        </div>
+                                                        <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
+                                                            class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm">Pilih</a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <span
+                                                    class="w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">2</span>
+                                                <div>
+                                                    <h3 class="font-bold text-gray-700 text-sm">Menuju Kota Tujuan</h3>
+                                                    <p class="text-[10px] text-gray-500 font-medium">
+                                                        {{ $transitRoutes[0]['main_transport']->first()->originCity->cityName }}
+                                                        &rarr; {{ $plan->destinationCity->cityName }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-3">
+                                                @foreach ($transitRoutes[0]['main_transport'] as $transport)
+                                                    <div
+                                                        class="border border-gray-200 rounded-lg p-3 flex justify-between items-center hover:border-blue-400 transition bg-gray-50">
+                                                        <div>
+                                                            <p class="font-bold text-sm">
+                                                                {{ $transport->serviceProvider->providerName }}</p>
+                                                            <p class="text-xs text-gray-500">
+                                                                {{ \Carbon\Carbon::parse($transport->departureTime)->format('H:i') }}
+                                                                WIB</p>
+                                                            <p class="text-[10px] text-gray-400 mt-0.5">
+                                                                {{ $transport->originCity->cityName }} &rarr;
+                                                                {{ $transport->destinationCity->cityName }}</p>
+                                                        </div>
+                                                        <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
+                                                            class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm">Pilih</a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- 2. BAGIAN RUTE LANGSUNG (DEFAULT) --}}
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <span class="bg-green-100 text-green-700 p-1.5 rounded-lg text-lg">🚌</span> Transportasi
+                            Langsung
+                        </h2>
 
                         @if ($transportRoutes->isEmpty())
-                            <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm">
-                                <p class="text-gray-500 text-lg">Tidak ada transportasi yang ditemukan untuk rute ini.
+                            <div class="bg-white rounded-2xl p-12 text-center border border-dashed border-gray-300">
+                                <div
+                                    class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-2">Tidak ada rute langsung ditemukan</h3>
+                                <p class="text-gray-500 mb-6">Coba ubah filter atau gunakan opsi transit jika tersedia.
                                 </p>
                                 <a href="{{ route('travel-plan.edit', $plan->planID) }}"
-                                    class="text-[#2CB38B] font-bold hover:underline mt-2 inline-block">Ubah Kota
-                                    Asal/Tujuan</a>
+                                    class="text-[#2CB38B] font-bold hover:underline">Ubah Pencarian</a>
                             </div>
                         @else
                             @foreach ($transportRoutes as $route)
+                                @php $isFull = $route->remaining_seats <= 0; @endphp
+
                                 <div
-                                    class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group relative overflow-hidden">
-                                    <div class="absolute top-0 left-0 w-1 h-full bg-[#2CB38B]"></div>
+                                    class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5 hover:shadow-xl hover:border-[#2CB38B]/30 transition duration-300 group relative overflow-hidden {{ $isFull ? 'opacity-80 grayscale-[0.5]' : '' }}">
+                                    <div
+                                        class="absolute top-0 left-0 w-1 h-full {{ $isFull ? 'bg-gray-300' : 'bg-[#2CB38B]' }}">
+                                    </div>
 
                                     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
                                         <div class="flex items-center gap-4">
                                             <div
-                                                class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-2xl">
+                                                class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-2xl shadow-sm">
                                                 @if (str_contains($route->serviceProvider->providerName, 'KA') ||
                                                         str_contains($route->serviceProvider->providerName, 'Kereta'))
                                                     🚂
@@ -297,7 +376,8 @@
                                                         str_contains($route->serviceProvider->providerName, 'Kapal'))
                                                     🚢
                                                 @elseif(str_contains($route->serviceProvider->providerName, 'Air') ||
-                                                        str_contains($route->serviceProvider->providerName, 'Plane'))
+                                                        str_contains($route->serviceProvider->providerName, 'Plane') ||
+                                                        str_contains($route->serviceProvider->providerName, 'Garuda'))
                                                     ✈️
                                                 @else
                                                     🚌
@@ -307,13 +387,23 @@
                                                 <h3
                                                     class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">
                                                     {{ $route->serviceProvider->providerName }}</h3>
-                                                <span
-                                                    class="inline-block bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full font-medium mt-1">{{ $route->class }}</span>
+                                                <div class="flex items-center gap-2 mt-1">
+                                                    <span
+                                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full font-medium">{{ $route->class }}</span>
+                                                    @if ($isFull)
+                                                        <span
+                                                            class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-bold">Habis</span>
+                                                    @else
+                                                        <span
+                                                            class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold">Sisa
+                                                            {{ $route->remaining_seats }}</span>
+                                                    @endif
+                                                </div>
                                                 @if ($route->facilities)
-                                                    <div class="flex gap-1 mt-1">
+                                                    <div class="flex gap-1 mt-2">
                                                         @foreach ($route->facilities as $facility)
                                                             <span
-                                                                class="text-[10px] bg-green-50 text-[#2CB38B] px-1.5 py-0.5 rounded">{{ $facility }}</span>
+                                                                class="text-[10px] bg-green-50 text-[#2CB38B] px-1.5 py-0.5 rounded border border-green-100">{{ $facility }}</span>
                                                         @endforeach
                                                     </div>
                                                 @endif
@@ -327,7 +417,7 @@
                                     </div>
 
                                     <div
-                                        class="flex flex-col md:flex-row items-center justify-between bg-gray-50 rounded-xl p-4">
+                                        class="flex flex-col md:flex-row items-center justify-between bg-gray-50 rounded-xl p-4 border border-gray-100">
                                         <div class="flex items-center justify-between w-full md:w-auto gap-8">
                                             <div class="text-center">
                                                 <p class="text-xl font-bold text-gray-800">
@@ -341,7 +431,7 @@
                                                     $end = \Carbon\Carbon::parse($route->arrivalTime);
                                                     if ($end->lt($start)) {
                                                         $end->addDay();
-                                                    } // Jika sampai besok
+                                                    }
                                                     $diff = $start->diff($end);
                                                 @endphp
                                                 <p class="text-xs text-gray-400 font-medium mb-1">{{ $diff->h }}j
@@ -349,11 +439,6 @@
                                                 <div
                                                     class="w-24 h-0.5 bg-gray-300 relative flex items-center justify-between">
                                                     <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                                    <svg class="w-4 h-4 text-gray-400" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M5 12h14m-7-7l7 7-7 7" />
-                                                    </svg>
                                                     <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
                                                 </div>
                                             </div>
@@ -365,18 +450,20 @@
                                             </div>
                                         </div>
 
-                                        <button type="button"
-                                            class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2">
+                                        @if ($isFull)
+                                            <button disabled
+                                                class="w-full md:w-auto mt-4 md:mt-0 bg-gray-300 text-gray-500 px-6 py-3 rounded-xl font-semibold cursor-not-allowed">Kursi
+                                                Penuh</button>
+                                        @else
                                             <a href="{{ route('transport.show', ['travelPlan' => $plan->planID, 'id' => $route->routeID]) }}"
-                                                class="...">
+                                                class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2">
                                                 Lihat Detail
                                             </a>
-                                        </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
                         @endif
-
                     </div>
                 </div>
             </form>

@@ -6,6 +6,7 @@ use App\Models\TravelPlan;
 use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Itinerary;
 
 class TravelPlanController extends Controller
@@ -98,70 +99,100 @@ class TravelPlanController extends Controller
             ->with('success', 'Rencana perjalanan berhasil diperbarui!');
     }
 
-    public function selectTransport(Request $request, TravelPlan $travelPlan)
+public function selectTransport(Request $request, TravelPlan $travelPlan)
     {
         if ($travelPlan->userID !== Auth::id()) {
             abort(403);
         }
 
-        // 1. Query Dasar: Cari rute yang sesuai Kota Asal & Tujuan
-        $query = \App\Models\TransportRoute::with('serviceProvider')
+        // 1. DIRECT ROUTES
+        $directRoutes = \App\Models\TransportRoute::with('serviceProvider')
             ->where('originCityID', $travelPlan->originCityID)
-            ->where('destinationCityID', $travelPlan->destinationCityID);
-
-        // 2. Filter: Jenis Transportasi
-        if ($request->has('types')) {
-            $types = $request->input('types');
-            $query->whereHas('serviceProvider', function ($q) use ($types) {
-                $q->where(function ($subQ) use ($types) {
-                    foreach ($types as $type) {
-                        if ($type == 'Bus') $subQ->orWhere('providerName', 'like', '%Bus%')->orWhere('providerName', 'like', '%Travel%')->orWhere('serviceType', 'Transportasi');
-                        if ($type == 'Kereta') $subQ->orWhere('providerName', 'like', '%KA%')->orWhere('providerName', 'like', '%Kereta%');
-                        if ($type == 'Kapal') $subQ->orWhere('providerName', 'like', '%Ferry%')->orWhere('providerName', 'like', '%Kapal%');
-                        if ($type == 'Pesawat') $subQ->orWhere('providerName', 'like', '%Air%');
-                    }
-                });
+            ->where('destinationCityID', $travelPlan->destinationCityID)
+            ->get()->map(function ($t) {
+                $booked = \App\Models\PlanItem::where('transport_route_id', $t->routeID)
+                    ->whereHas('order', function($q){ $q->where('status', 'paid'); })->sum('quantity');
+                $t->remaining_seats = ($t->total_seats ?? 40) - $booked;
+                return $t;
             });
-        }
 
-        // 3. Filter: Fasilitas
-        if ($request->has('facilities')) {
-            foreach ($request->input('facilities') as $facility) {
-                $query->whereJsonContains('facilities', $facility);
+        // 2. TRANSIT ROUTES
+        $transitRoutes = collect();
+
+        // Cari Terminal yang relevan
+        $originTerminals = DB::table('city_terminals')->where('cityID', $travelPlan->originCityID)->pluck('terminalID');
+        $destTerminals = DB::table('city_terminals')->where('cityID', $travelPlan->destinationCityID)->pluck('terminalID');
+
+        // CASE A: DEPARTURE TRANSIT (Darat -> Pesawat)
+        // Contoh: Bandung -> CGK (Travel) -> Palembang (Pesawat)
+        foreach ($originTerminals as $termID) {
+            $terminalInfo = DB::table('transport_terminals')->where('terminalID', $termID)->first();
+            // Jika terminal bukan di kota asal (berarti butuh feeder)
+            if ($terminalInfo->cityID != $travelPlan->originCityID) {
+                // 1. Feeder: Kota Asal -> Kota Terminal
+                $feeders = \App\Models\TransportRoute::with('serviceProvider')
+                    ->where('originCityID', $travelPlan->originCityID)
+                    ->where('destinationCityID', $terminalInfo->cityID)
+                    ->get();
+                
+                // 2. Flight: Kota Terminal -> Kota Tujuan
+                $flights = \App\Models\TransportRoute::with('serviceProvider')
+                    ->where('originCityID', $terminalInfo->cityID)
+                    ->where('destinationCityID', $travelPlan->destinationCityID)
+                    ->whereHas('serviceProvider', function($q){ $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%'); })
+                    ->get();
+
+                if ($feeders->isNotEmpty() && $flights->isNotEmpty()) {
+                    $transitRoutes->push([
+                        'type' => 'Transit Berangkat',
+                        'hub_name' => $terminalInfo->name,
+                        'step1_label' => 'Ke Bandara',
+                        'step2_label' => 'Penerbangan',
+                        'feeders' => $feeders,
+                        'main_transport' => $flights
+                    ]);
+                }
             }
         }
 
-        // 4. Filter: Waktu Keberangkatan
-        if ($request->has('times')) {
-            $query->where(function ($q) use ($request) {
-                foreach ($request->input('times') as $time) {
-                    if ($time == 'pagi') $q->orWhereBetween('departureTime', ['06:00:00', '11:59:59']);
-                    if ($time == 'siang') $q->orWhereBetween('departureTime', ['12:00:00', '17:59:59']);
-                    if ($time == 'malam') $q->orWhereBetween('departureTime', ['18:00:00', '05:59:59']);
+        // CASE B: ARRIVAL TRANSIT (Pesawat -> Darat)
+        // Contoh: Palembang -> CGK (Pesawat) -> Bandung (Travel)
+        foreach ($destTerminals as $termID) {
+            $terminalInfo = DB::table('transport_terminals')->where('terminalID', $termID)->first();
+            
+            // Jika terminal bukan di kota tujuan (berarti butuh travel lanjutan)
+            if ($terminalInfo->cityID != $travelPlan->destinationCityID) {
+                
+                // 1. Flight: Kota Asal -> Kota Terminal
+                $flights = \App\Models\TransportRoute::with('serviceProvider')
+                    ->where('originCityID', $travelPlan->originCityID)
+                    ->where('destinationCityID', $terminalInfo->cityID)
+                    ->whereHas('serviceProvider', function($q){ $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%'); })
+                    ->get();
+
+                // 2. Feeder: Kota Terminal -> Kota Tujuan
+                $feeders = \App\Models\TransportRoute::with('serviceProvider')
+                    ->where('originCityID', $terminalInfo->cityID)
+                    ->where('destinationCityID', $travelPlan->destinationCityID)
+                    ->get();
+
+                if ($flights->isNotEmpty() && $feeders->isNotEmpty()) {
+                    $transitRoutes->push([
+                        'type' => 'Transit Kedatangan',
+                        'hub_name' => $terminalInfo->name,
+                        'step1_label' => 'Penerbangan',
+                        'step2_label' => 'Ke Kota Tujuan',
+                        'feeders' => $flights, 
+                        'main_transport' => $feeders 
+                    ]);
                 }
-            });
+            }
         }
-
-        // 5. Eksekusi Query & Hitung Sisa Kursi
-        $transportRoutes = $query->get()->map(function ($transport) {
-            // Hitung kursi yang SUDAH DIBAYAR (Paid) berdasarkan ID Rute
-            $bookedSeats = \App\Models\PlanItem::where('transport_route_id', $transport->routeID)
-                ->whereHas('order', function ($q) {
-                    $q->where('status', 'paid');
-                })
-                ->sum('quantity');
-
-            // Default 40 jika kolom total_seats belum diisi/null
-            $totalCapacity = $transport->total_seats ?? 40;
-
-            $transport->remaining_seats = $totalCapacity - $bookedSeats;
-
-            return $transport;
-        });
 
         return view('select-transport', [
             'plan' => $travelPlan,
-            'transportRoutes' => $transportRoutes
+            'transportRoutes' => $directRoutes,
+            'transitRoutes' => $transitRoutes
         ]);
     }
 
