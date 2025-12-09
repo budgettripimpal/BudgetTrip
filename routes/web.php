@@ -15,7 +15,22 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/accommodation', [AdminController::class, 'storeAccommodation'])->name('admin.store.accommodation');
     Route::post('/attraction', [AdminController::class, 'storeAttraction'])->name('admin.store.attraction');
     Route::post('/promotion', [AdminController::class, 'storePromotion'])->name('admin.store.promotion');
+
+    Route::put('/admin/city/{id}', [AdminController::class, 'updateCity'])->name('admin.update.city');
+    Route::put('/admin/provider/{id}', [AdminController::class, 'updateProvider'])->name('admin.update.provider');
+    Route::put('/admin/route/{id}', [AdminController::class, 'updateRoute'])->name('admin.update.route');
+    Route::put('/admin/accommodation/{id}', [AdminController::class, 'updateAccommodation'])->name('admin.update.accommodation');
+    Route::put('/admin/attraction/{id}', [AdminController::class, 'updateAttraction'])->name('admin.update.attraction');
+    Route::put('/admin/promotion/{id}', [AdminController::class, 'updatePromotion'])->name('admin.update.promotion');
+
+    Route::delete('/admin/city/{id}', [AdminController::class, 'destroyCity'])->name('admin.destroy.city');
+    Route::delete('/admin/provider/{id}', [AdminController::class, 'destroyProvider'])->name('admin.destroy.provider');
+    Route::delete('/admin/route/{id}', [AdminController::class, 'destroyRoute'])->name('admin.destroy.route');
+    Route::delete('/admin/accommodation/{id}', [AdminController::class, 'destroyAccommodation'])->name('admin.destroy.accommodation');
+    Route::delete('/admin/attraction/{id}', [AdminController::class, 'destroyAttraction'])->name('admin.destroy.attraction');
+    Route::delete('/admin/promotion/{id}', [AdminController::class, 'destroyPromotion'])->name('admin.destroy.promotion');
 });
+
 Route::get('/', function () {
     return view('welcome');
 });

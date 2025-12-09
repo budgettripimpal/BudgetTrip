@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
@@ -62,7 +63,9 @@ class DatabaseSeeder extends Seeder
                 'province' => $c['prov'],
                 'locationType' => 'Kota',
                 'latitude' => $c['lat'],
-                'longitude' => $c['lng']
+                'longitude' => $c['lng'],
+                'created_at' => now(),
+                'updated_at' => now()
             ], ['cityID']);
         }
 
@@ -184,92 +187,185 @@ class DatabaseSeeder extends Seeder
         $attractions = [];
         $accID = DB::table('accommodations')->max('accommodationID') ?? 1;
         $attID = DB::table('attractions')->max('attractionID') ?? 1;
-        $accProviders = [13, 14, 101, 102, 103, 104];
 
+        // helper to create realistic booking links per provider
+        $providerBookingUrl = function ($providerID, $entityType, $cityName, $suffix = '') {
+            $slug = Str::slug($cityName);
+            return match ($providerID) {
+                13 => "https://www.traveloka.com/hotel/id/{$slug}{$suffix}",
+                14 => "https://www.booking.com/searchresults.html?ss={$slug}",
+                101 => "https://www.agoda.com/search?city={$slug}",
+                102 => "https://www.reddoorz.com/en-id/hotel/{$slug}",
+                103 => "https://www.oyorooms.com/id/hotel/{$slug}",
+                104 => "https://www.bobobox.com/search?location={$slug}",
+                6, 7, 10, 11 => "https://www.tiket.com/pesawat/{$slug}",
+                5 => "https://ticket.kai.id/search?from={$slug}",
+                8 => "https://www.asdp.id/jadwal/{$slug}",
+                default => ($entityType === 'accommodation' ? "https://www.tiket.com/hotel/{$slug}" : "https://www.tiket.com/transport/{$slug}")
+            };
+        };
+
+        // iconic attractions per city (name, category, estimatedCost, optional booking link)
+        $iconic = [
+            // SOME EXAMPLES; will be used where relevant
+            22 => [ // Jakarta
+                ['name' => 'Monumen Nasional (Monas)', 'category' => 'Landmark', 'price' => 5000, 'link' => null],
+                ['name' => 'Kota Tua Jakarta', 'category' => 'Sejarah & Budaya', 'price' => 0, 'link' => null],
+            ],
+            27 => [ // Yogyakarta
+                ['name' => 'Candi Prambanan', 'category' => 'Sejarah & Budaya', 'price' => 50000, 'link' => 'https://www.ticket.prambanan.com'],
+                ['name' => 'Keraton Yogyakarta', 'category' => 'Sejarah & Budaya', 'price' => 15000, 'link' => null],
+                ['name' => 'Candi Borobudur (Magelang dekat Yogyakarta)', 'category' => 'Sejarah & Budaya', 'price' => 75000, 'link' => 'https://www.borobudurpark.com/tickets'],
+            ],
+            28 => [ // Surabaya
+                ['name' => 'Tugu Pahlawan', 'category' => 'Sejarah & Budaya', 'price' => 0, 'link' => null],
+                ['name' => 'House of Sampoerna', 'category' => 'Museum', 'price' => 20000, 'link' => null],
+            ],
+            41 => [ // Denpasar/Bali
+                ['name' => 'Pura Tanah Lot (Bali)', 'category' => 'Sejarah & Budaya', 'price' => 30000, 'link' => 'https://www.tanahlot.net/ticket'],
+                ['name' => 'Garuda Wisnu Kencana (GWK)', 'category' => 'Landmark', 'price' => 50000, 'link' => 'https://www.gwk.co.id/tickets'],
+            ],
+            10 => [ // Medan
+                ['name' => 'Danau Toba (akses dari Medan)', 'category' => 'Alam', 'price' => 0, 'link' => null],
+                ['name' => 'Istana Maimun', 'category' => 'Sejarah & Budaya', 'price' => 10000, 'link' => null],
+            ],
+            25 => [ // Bandung
+                ['name' => 'Tangkuban Perahu', 'category' => 'Alam', 'price' => 30000, 'link' => null],
+                ['name' => 'Kawah Putih', 'category' => 'Alam', 'price' => 20000, 'link' => null],
+            ],
+            30 => [ // Banyuwangi
+                ['name' => 'Kawah Ijen', 'category' => 'Alam', 'price' => 45000, 'link' => 'https://www.kawahijen.com/tickets'],
+                ['name' => 'Pantai Pulau Merah', 'category' => 'Alam', 'price' => 0, 'link' => null],
+            ],
+            12 => [ // Padang
+                ['name' => 'Pantai Air Manis', 'category' => 'Alam', 'price' => 0, 'link' => null],
+            ],
+            14 => [ // Palembang
+                ['name' => 'Jembatan Ampera', 'category' => 'Landmark', 'price' => 0, 'link' => null],
+            ],
+            15 => [ // Bandar Lampung
+                ['name' => 'Taman Gajah', 'category' => 'Rekreasi', 'price' => 0, 'link' => null],
+            ],
+            26 => [ // Cirebon
+                ['name' => 'Keraton Kasepuhan', 'category' => 'Sejarah & Budaya', 'price' => 10000, 'link' => null],
+            ],
+            // fallback and additional cities can be extended similarly
+        ];
+
+        // For each city (except airport-only ones), create 6 accommodations and multiple attractions (including iconic)
         foreach ($cities as $city) {
-            if ($city['id'] >= 90) continue;
+            if ($city['id'] >= 90) continue; // skip airport-only entries for accommodations/attractions
 
-            // Budgettrip
+            $cityName = $city['name'];
+            $slugCity = Str::slug($cityName);
+
+            // 1) Budgettrip property
             $accommodations[] = [
                 'accommodationID' => $accID++,
-                'providerID' => 100,
+                'providerID' => 100, // Budgettrip Hotel
                 'cityID' => $city['id'],
-                'hotelName' => 'Budgettrip ' . $city['name'],
+                'hotelName' => "Budgettrip {$cityName}",
                 'averagePricePerNight' => rand(150000, 300000),
-                'rating' => 4.2,
+                'rating' => round(rand(35, 45) / 10, 1),
                 'type' => 'Hostel',
-                'facilities' => json_encode(['WiFi']),
+                'facilities' => json_encode(['WiFi', 'AC']),
                 'bookingLink' => null,
-                'description' => 'Budgettrip official property.',
-                'images' => json_encode(['https://placehold.co/600x400?text=Budgettrip+' . urlencode($city['name'])]),
-                'latitude' => $city['lat'] + 0.002,
-                'longitude' => $city['lng'] + 0.002,
+                'description' => 'Official Budgettrip property. Hemat dan nyaman.',
+                'images' => json_encode(["https://placehold.co/600x400?text=" . urlencode("Budgettrip {$cityName}")]),
+                'latitude' => $city['lat'] + 0.001,
+                'longitude' => $city['lng'] + 0.001,
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
 
-            // Partner Hotels
-            foreach ($accProviders as $provider) {
-                $avg = match ($provider) {
-                    13 => rand(300000, 600000),
-                    14 => rand(400000, 1500000),
-                    101 => rand(250000, 700000),
-                    102 => rand(120000, 200000),
-                    103 => rand(120000, 250000),
-                    104 => rand(180000, 350000),
-                    default => rand(200000, 500000)
-                };
-                $namePrefix = match ($provider) {
-                    13 => 'Traveloka Stay',
-                    14 => 'Premier Hotel',
-                    101 => 'Agoda Inn',
-                    102 => 'RedDoorz Room',
-                    103 => 'OYO Comfort',
-                    104 => 'Bobobox Pod',
-                    default => 'Partner Hotel'
-                };
+            // 2..6) Partner hotels (5 partners)
+            $accPartners = [
+                ['provider' => 13, 'prefix' => 'Traveloka Stay', 'min' => 300000, 'max' => 600000],
+                ['provider' => 14, 'prefix' => 'Premier Hotel', 'min' => 400000, 'max' => 1500000],
+                ['provider' => 101, 'prefix' => 'Agoda Inn', 'min' => 250000, 'max' => 700000],
+                ['provider' => 102, 'prefix' => 'RedDoorz Room', 'min' => 120000, 'max' => 200000],
+                ['provider' => 103, 'prefix' => 'OYO Comfort', 'min' => 120000, 'max' => 250000],
+            ];
+
+            foreach ($accPartners as $pinfo) {
+                $avg = rand($pinfo['min'], $pinfo['max']);
                 $accommodations[] = [
                     'accommodationID' => $accID++,
-                    'providerID' => $provider,
+                    'providerID' => $pinfo['provider'],
                     'cityID' => $city['id'],
-                    'hotelName' => "{$namePrefix} {$city['name']}",
+                    'hotelName' => "{$pinfo['prefix']} {$cityName}",
                     'averagePricePerNight' => $avg,
-                    'rating' => rand(3, 5),
+                    'rating' => round(rand(30, 50) / 10, 1),
                     'type' => ($avg > 600000 ? 'Hotel' : 'Budget Hotel'),
-                    'facilities' => json_encode(['WiFi', 'AC']),
-                    'bookingLink' => 'https://booking.com',
-                    'description' => "Booking via provider ID {$provider}.",
-                    'images' => json_encode(['https://placehold.co/600x400?text=' . urlencode($namePrefix)]),
-                    'latitude' => $city['lat'] + (rand(-5, 5) * 0.0005),
-                    'longitude' => $city['lng'] + (rand(-5, 5) * 0.0005),
+                    'facilities' => json_encode(['WiFi', 'AC', 'Sarapan']),
+                    'bookingLink' => $providerBookingUrl($pinfo['provider'], 'accommodation', $cityName),
+                    'description' => "Booking via provider ID {$pinfo['provider']}.",
+                    'images' => json_encode(["https://placehold.co/600x400?text=" . urlencode("{$pinfo['prefix']} {$cityName}")]),
+                    'latitude' => $city['lat'] + (rand(-5, 5) * 0.0007),
+                    'longitude' => $city['lng'] + (rand(-5, 5) * 0.0007),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // Attractions: Add iconic ones if defined
+            if (isset($iconic[$city['id']])) {
+                foreach ($iconic[$city['id']] as $icon) {
+                    $attractions[] = [
+                        'attractionID' => $attID++,
+                        'cityID' => $city['id'],
+                        'attractionName' => $icon['name'],
+                        'category' => $icon['category'],
+                        'estimatedCost' => $icon['price'],
+                        'rating' => round(rand(30, 50) / 10, 1),
+                        'reviewCount' => rand(50, 2000),
+                        'description' => "Ikon & destinasi populer - {$icon['name']}.",
+                        'bookingLink' => $icon['link'] ?? null,
+                        'images' => json_encode(["https://placehold.co/600x400?text=" . urlencode($icon['name'])]),
+                        'latitude' => $city['lat'] + (rand(-3, 3) * 0.0008),
+                        'longitude' => $city['lng'] + (rand(-3, 3) * 0.0008),
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }
+            }
+
+            // Add 2-3 additional random attractions per city (some free, some paid)
+            $extraCount = rand(2, 3);
+            for ($i = 0; $i < $extraCount; $i++) {
+                $isFree = rand(0, 2) === 0; // ~33% free
+                $price = $isFree ? 0 : rand(10000, 150000);
+                $hasLink = !$isFree && (rand(0, 1) === 1); // if paid, 50% chance has link
+                $name = ($isFree ? "Taman Kota " : "Atraksi ") . ($i + 1) . " {$cityName}";
+                $attractions[] = [
+                    'attractionID' => $attID++,
+                    'cityID' => $city['id'],
+                    'attractionName' => $name,
+                    'category' => $isFree ? 'Rekreasi' : 'Wisata',
+                    'estimatedCost' => $price,
+                    'rating' => round(rand(25, 50) / 10, 1),
+                    'reviewCount' => rand(5, 800),
+                    'description' => "Tempat populer di {$cityName}.",
+                    'bookingLink' => $hasLink ? "https://www.tiket.com/ticket/{$slugCity}/" . rand(100, 999) : null,
+                    'images' => json_encode(["https://placehold.co/600x400?text=" . urlencode($name)]),
+                    'latitude' => $city['lat'] + (rand(-6, 6) * 0.0006),
+                    'longitude' => $city['lng'] + (rand(-6, 6) * 0.0006),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
             }
-
-            // Attraction
-            $attractions[] = [
-                'attractionID' => $attID++,
-                'cityID' => $city['id'],
-                'attractionName' => 'Landmark ' . $city['name'],
-                'category' => 'Hiburan',
-                'estimatedCost' => 0,
-                'rating' => 4.4,
-                'reviewCount' => rand(20, 500),
-                'description' => 'Ikon kota.',
-                'bookingLink' => null,
-                'images' => json_encode(['https://placehold.co/600x400?text=Attraction']),
-                'latitude' => $city['lat'],
-                'longitude' => $city['lng'],
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
         }
-        if (!empty($accommodations)) DB::table('accommodations')->insert($accommodations);
-        if (!empty($attractions)) DB::table('attractions')->insert($attractions);
+
+        if (!empty($accommodations)) {
+            // delete existing (optional) or upsert; to avoid duplicates we'll insert only missing ones
+            DB::table('accommodations')->insert($accommodations);
+        }
+        if (!empty($attractions)) {
+            DB::table('attractions')->insert($attractions);
+        }
 
         // -------------------------
-        // 7) ROUTES GENERATOR
+        // 7) ROUTES GENERATOR (transport_routes)
         // -------------------------
         $routesData = [];
         $routeID = DB::table('transport_routes')->max('routeID') ?? 1;
@@ -282,7 +378,7 @@ class DatabaseSeeder extends Seeder
             return $cands[0]['terminalID'];
         };
 
-        // Create 3 schedules helper with DURATION LOGIC FIXED
+        // createSchedules helper (reused)
         $createSchedules = function ($providerID, $originId, $destId, $type, $price, $class, $seats, $facilities, &$routeID, $cities) {
             $origin = null;
             $dest = null;
@@ -293,21 +389,16 @@ class DatabaseSeeder extends Seeder
             if (!$origin || !$dest) return [];
 
             $times = ['07:00:00', '13:00:00', '19:00:00'];
-            $classes = [' (Pagi)', ' (Siang)', ' (Malam)'];
+            $classesTag = [' (Pagi)', ' (Siang)', ' (Malam)'];
             $batch = [];
 
-            // Calculate Duration in SECONDS
+            // Calculate Distance (approx) and duration
             $dist = sqrt(pow($origin['lat'] - $dest['lat'], 2) + pow($origin['lng'] - $dest['lng'], 2)) * 111;
-            $speed = str_contains($type, 'Pesawat') ? 700 : (str_contains($type, 'Ferry') ? 25 : 50);
-
-            // Base duration in hours
-            $hours = $dist / $speed;
-
-            // Convert to seconds and enforce minimum 1 hour (3600 sec)
+            // Speed heuristic
+            $speed = str_contains(strtolower($type), 'pesawat') ? 700 : (str_contains(strtolower($type), 'ferry') ? 25 : (str_contains(strtolower($type), 'kereta') ? 80 : 50));
+            $hours = $dist / max(1, $speed);
             $durationSeconds = intval($hours * 3600);
-            $durationSeconds = max(3600, $durationSeconds); // Min 1 hour
-
-            // Add some random variation (0-45 mins)
+            $durationSeconds = max(3600, $durationSeconds);
             $durationSeconds += rand(0, 2700);
 
             foreach ($times as $i => $time) {
@@ -320,11 +411,11 @@ class DatabaseSeeder extends Seeder
                     'averagePrice' => $price,
                     'departureTime' => $time,
                     'arrivalTime' => $arrival,
-                    'class' => $class . $classes[$i],
+                    'class' => $class . $classesTag[$i],
                     'total_seats' => $seats,
                     'facilities' => json_encode($facilities),
-                    'bookingLink' => ($providerID == 99 ? null : "https://ticket.com/route/{$routeID}"),
-                    'description' => "{$type} {$origin['name']} -> {$dest['name']}",
+                    'bookingLink' => ($providerID == 99 ? null : (str_contains((string)$providerID, 'http') ? (string)$providerID : (in_array($providerID, [6, 7, 10, 11]) ? "https://www.tiket.com/pesawat" : "https://www.tiket.com/transport"))),
+                    'description' => "{$type} from {$origin['name']} to {$dest['name']}",
                     'images' => json_encode(['https://placehold.co/600x400?text=' . urlencode($type)]),
                     'start_latitude' => $origin['lat'],
                     'start_longitude' => $origin['lng'],
@@ -337,7 +428,7 @@ class DatabaseSeeder extends Seeder
             return $batch;
         };
 
-        // 7A) Budgettrip MESH (All cities connected)
+        // 7A) Budgettrip mesh (connect most cities)
         $cityIDsMesh = array_column(array_filter($cities, fn($c) => $c['id'] < 90), 'id');
         foreach ($cityIDsMesh as $orig) {
             foreach ($cityIDsMesh as $dest) {
@@ -372,12 +463,12 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 7B) FEEDER ROUTES (City <-> Nearest Airport)
+        // 7B) Feeder (city <-> nearest airport)
         foreach ($cityIDsMesh as $cid) {
             $tid = $nearestTerminal($cid);
             if (!$tid) continue;
             $termInfo = collect($terminals)->firstWhere('id', $tid);
-            $destCityID = $termInfo['cityID'];
+            $destCityID = $termInfo['cityID'] ?? null;
             if (!$destCityID) continue;
 
             $dist = sqrt(pow($findCity($cid)['lat'] - $findCity($destCityID)['lat'], 2) + pow($findCity($cid)['lng'] - $findCity($destCityID)['lng'], 2)) * 111;
@@ -390,29 +481,27 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 7C) FLIGHT MESH
+        // 7C) Flights mesh between airports
         $airportTerminals = array_filter($terminals, fn($t) => $t['type'] === 'Bandara');
         $airportCityIDs = array_column($airportTerminals, 'cityID');
         $airlines = [6, 7, 10, 11];
-
         foreach ($airportCityIDs as $a) {
             foreach ($airportCityIDs as $b) {
                 if ($a == $b) continue;
                 $o = $findCity($a);
                 $d = $findCity($b);
+                if (!$o || !$d) continue;
                 $dist = sqrt(pow($o['lat'] - $d['lat'], 2) + pow($o['lng'] - $d['lng'], 2)) * 111;
-
                 $basePrice = 800000;
                 $price = round($basePrice + ($dist * 2000));
-
                 foreach ($airlines as $prov) {
-                    $finalPrice = ($prov == 6 || $prov == 10) ? $price * 1.3 : $price;
+                    $finalPrice = ($prov == 6 || $prov == 10) ? round($price * 1.3) : $price;
                     $routesData = array_merge($routesData, $createSchedules($prov, $a, $b, 'Pesawat', $finalPrice, 'Economy', 150, ['Bagasi 20kg'], $routeID, $cities));
                 }
             }
         }
 
-        // 7D) FERRY ROUTES
+        // 7D) Ferry routes (ASDP)
         $ferryPairs = [
             [20, 16, 25000],
             [16, 20, 25000],
@@ -423,7 +512,7 @@ class DatabaseSeeder extends Seeder
             $routesData = array_merge($routesData, $createSchedules(8, $a, $b, 'Ferry ASDP', $price, 'Reguler', 400, ['Kantin'], $routeID, $cities));
         }
 
-        // 7E) REAL BUS & TRAIN
+        // 7E) Bus & train realistic pairs
         $longBusPairs = [
             [15, 10, 22],
             [14, 10, 22],
@@ -460,6 +549,7 @@ class DatabaseSeeder extends Seeder
             $routesData = array_merge($routesData, $createSchedules(5, $b, $a, 'Kereta', $price, 'Eksekutif', 60, ['AC'], $routeID, $cities));
         }
 
+        // 7F) Travel operators (shuttle) realistic pairs
         $travelOperators = [12, 2, 1, 3, 19];
         $travelPairs = [
             [22, 25],
@@ -495,11 +585,14 @@ class DatabaseSeeder extends Seeder
             $routesData = array_merge($routesData, $createSchedules($op, $b, $a, 'Travel', $price, 'Shuttle', 12, ['AC'], $routeID, $cities));
         }
 
+        // Insert routes in chunks to avoid oversized queries
         foreach (array_chunk($routesData, 500) as $chunk) {
             DB::table('transport_routes')->insert($chunk);
         }
 
-        // 8) DUMMY PLAN
+        // -------------------------
+        // 8) DUMMY PLAN & ITINERARY
+        // -------------------------
         DB::table('travel_plans')->upsert([[
             'planID' => 1,
             'userID' => 1,
