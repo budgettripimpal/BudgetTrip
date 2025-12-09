@@ -6,6 +6,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\ServiceProvider;
+use App\Models\TransportRoute;
+use App\Models\City;
+
 use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
@@ -150,35 +154,51 @@ class DatabaseSeeder extends Seeder
         // 5) SERVICE PROVIDERS
         // -------------------------
         $providers = [
-            ['id' => 99, 'name' => 'Budgettrip Travel', 'type' => 'Transportasi'],
-            ['id' => 100, 'name' => 'Budgettrip Hotel', 'type' => 'Akomodasi'],
-            ['id' => 6, 'name' => 'Garuda Indonesia', 'type' => 'Transportasi'],
-            ['id' => 7, 'name' => 'Lion Air', 'type' => 'Transportasi'],
-            ['id' => 10, 'name' => 'Batik Air', 'type' => 'Transportasi'],
-            ['id' => 11, 'name' => 'Super Air Jet', 'type' => 'Transportasi'],
-            ['id' => 8, 'name' => 'Ferry ASDP', 'type' => 'Transportasi'],
-            ['id' => 15, 'name' => 'ALS', 'type' => 'Transportasi'],
-            ['id' => 16, 'name' => 'NPM', 'type' => 'Transportasi'],
-            ['id' => 18, 'name' => 'Primajasa', 'type' => 'Transportasi'],
-            ['id' => 5, 'name' => 'KAI', 'type' => 'Transportasi'],
-            ['id' => 9, 'name' => 'DAMRI', 'type' => 'Transportasi'],
-            ['id' => 20, 'name' => 'Railink', 'type' => 'Transportasi'],
-            ['id' => 12, 'name' => 'XTrans', 'type' => 'Transportasi'],
-            ['id' => 2, 'name' => 'DayTrans', 'type' => 'Transportasi'],
-            ['id' => 1, 'name' => 'Cititrans', 'type' => 'Transportasi'],
-            ['id' => 3, 'name' => 'Sinar Jaya', 'type' => 'Transportasi'],
-            ['id' => 4, 'name' => 'Rosalia Indah', 'type' => 'Transportasi'],
-            ['id' => 19, 'name' => 'Baraya Travel', 'type' => 'Transportasi'],
-            ['id' => 13, 'name' => 'Traveloka', 'type' => 'Akomodasi'],
-            ['id' => 14, 'name' => 'Booking.com', 'type' => 'Akomodasi'],
-            ['id' => 101, 'name' => 'Agoda', 'type' => 'Akomodasi'],
-            ['id' => 102, 'name' => 'RedDoorz', 'type' => 'Akomodasi'],
-            ['id' => 103, 'name' => 'OYO', 'type' => 'Akomodasi'],
-            ['id' => 104, 'name' => 'Bobobox', 'type' => 'Akomodasi'],
+            // SHUTTLE
+            ['providerID' => 1, 'providerName' => 'Shuttle Cititrans', 'serviceType' => 'Transportasi'],
+            ['providerID' => 2, 'providerName' => 'Shuttle DayTrans', 'serviceType' => 'Transportasi'],
+            ['providerID' => 12, 'providerName' => 'Shuttle XTrans', 'serviceType' => 'Transportasi'],
+            ['providerID' => 19, 'providerName' => 'Shuttle Baraya Travel', 'serviceType' => 'Transportasi'],
+            ['providerID' => 99, 'providerName' => 'Shuttle Budgettrip', 'serviceType' => 'Transportasi'],
+
+            // BUS
+            ['providerID' => 3, 'providerName' => 'Bus Sinar Jaya', 'serviceType' => 'Transportasi'],
+            ['providerID' => 4, 'providerName' => 'Bus Rosalia Indah', 'serviceType' => 'Transportasi'],
+            ['providerID' => 15, 'providerName' => 'Bus ALS', 'serviceType' => 'Transportasi'],
+            ['providerID' => 16, 'providerName' => 'Bus NPM', 'serviceType' => 'Transportasi'],
+            ['providerID' => 18, 'providerName' => 'Bus Primajasa', 'serviceType' => 'Transportasi'],
+            ['providerID' => 9, 'providerName' => 'Bus DAMRI', 'serviceType' => 'Transportasi'],
+
+            // KERETA
+            ['providerID' => 5, 'providerName' => 'Kereta KAI', 'serviceType' => 'Transportasi'],
+            ['providerID' => 20, 'providerName' => 'Kereta Railink', 'serviceType' => 'Transportasi'],
+
+            // PESAWAT
+            ['providerID' => 6, 'providerName' => 'Pesawat Garuda Indonesia', 'serviceType' => 'Transportasi'],
+            ['providerID' => 7, 'providerName' => 'Pesawat Lion Air', 'serviceType' => 'Transportasi'],
+            ['providerID' => 10, 'providerName' => 'Pesawat Batik Air', 'serviceType' => 'Transportasi'],
+            ['providerID' => 11, 'providerName' => 'Pesawat Super Air Jet', 'serviceType' => 'Transportasi'],
+
+            // KAPAL
+            ['providerID' => 8, 'providerName' => 'Kapal Ferry ASDP', 'serviceType' => 'Transportasi'],
+
+            // AKOMODASI
+            ['providerID' => 100, 'providerName' => 'Hotel BudgetTrip', 'serviceType' => 'Akomodasi'],
+            ['providerID' => 13, 'providerName' => 'Hotel Traveloka', 'serviceType' => 'Akomodasi'],
+            ['providerID' => 14, 'providerName' => 'Hotel Booking.com', 'serviceType' => 'Akomodasi'],
+            ['providerID' => 101, 'providerName' => 'Hotel Agoda', 'serviceType' => 'Akomodasi'],
+            ['providerID' => 102, 'providerName' => 'Hotel RedDoorz', 'serviceType' => 'Akomodasi'],
+            ['providerID' => 103, 'providerName' => 'Hotel OYO', 'serviceType' => 'Akomodasi'],
+            ['providerID' => 104, 'providerName' => 'Hotel Bobobox', 'serviceType' => 'Akomodasi'],
         ];
+
         foreach ($providers as $p) {
-            DB::table('service_providers')->upsert(['providerID' => $p['id'], 'providerName' => $p['name'], 'serviceType' => $p['type']], ['providerID']);
+            ServiceProvider::updateOrCreate(
+                ['providerID' => $p['providerID']],
+                $p
+            );
         }
+
 
         // -------------------------
         // 6) ACCOMMODATIONS & ATTRACTIONS
@@ -188,20 +208,24 @@ class DatabaseSeeder extends Seeder
         $accID = DB::table('accommodations')->max('accommodationID') ?? 1;
         $attID = DB::table('attractions')->max('attractionID') ?? 1;
 
-        // helper to create realistic booking links per provider
-        $providerBookingUrl = function ($providerID, $entityType, $cityName, $suffix = '') {
+        $facilitiesList = [
+            "WiFi Gratis",
+            "Sarapan",
+            "Kolam Renang",
+            "Gym",
+            "Parkir"
+        ];
+
+        $providerBookingUrl = function ($providerID, $cityName) {
             $slug = Str::slug($cityName);
             return match ($providerID) {
-                13 => "https://www.traveloka.com/hotel/id/{$slug}{$suffix}",
+                13 => "https://www.traveloka.com/hotel/id/{$slug}",
                 14 => "https://www.booking.com/searchresults.html?ss={$slug}",
                 101 => "https://www.agoda.com/search?city={$slug}",
-                102 => "https://www.reddoorz.com/en-id/hotel/{$slug}",
+                102 => "https://www.reddoorz.com/hotel/{$slug}",
                 103 => "https://www.oyorooms.com/id/hotel/{$slug}",
                 104 => "https://www.bobobox.com/search?location={$slug}",
-                6, 7, 10, 11 => "https://www.tiket.com/pesawat/{$slug}",
-                5 => "https://ticket.kai.id/search?from={$slug}",
-                8 => "https://www.asdp.id/jadwal/{$slug}",
-                default => ($entityType === 'accommodation' ? "https://www.tiket.com/hotel/{$slug}" : "https://www.tiket.com/transport/{$slug}")
+                default => "https://www.tiket.com/hotel/{$slug}",
             };
         };
 
@@ -259,18 +283,20 @@ class DatabaseSeeder extends Seeder
             $cityName = $city['name'];
             $slugCity = Str::slug($cityName);
 
-            // 1) Budgettrip property
+            // ---------------------
+            // 1) Budgettrip Hostel
+            // ---------------------
             $accommodations[] = [
                 'accommodationID' => $accID++,
-                'providerID' => 100, // Budgettrip Hotel
+                'providerID' => 100,
                 'cityID' => $city['id'],
                 'hotelName' => "Budgettrip {$cityName}",
                 'averagePricePerNight' => rand(150000, 300000),
                 'rating' => round(rand(35, 45) / 10, 1),
                 'type' => 'Hostel',
-                'facilities' => json_encode(['WiFi', 'AC']),
+                'facilities' => json_encode(["WiFi Gratis", "Parkir"]),
                 'bookingLink' => null,
-                'description' => 'Official Budgettrip property. Hemat dan nyaman.',
+                'description' => "Budgettrip official property di {$cityName}.",
                 'images' => json_encode(["https://placehold.co/600x400?text=" . urlencode("Budgettrip {$cityName}")]),
                 'latitude' => $city['lat'] + 0.001,
                 'longitude' => $city['lng'] + 0.001,
@@ -278,29 +304,43 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ];
 
-            // 2..6) Partner hotels (5 partners)
-            $accPartners = [
-                ['provider' => 13, 'prefix' => 'Traveloka Stay', 'min' => 300000, 'max' => 600000],
-                ['provider' => 14, 'prefix' => 'Premier Hotel', 'min' => 400000, 'max' => 1500000],
-                ['provider' => 101, 'prefix' => 'Agoda Inn', 'min' => 250000, 'max' => 700000],
-                ['provider' => 102, 'prefix' => 'RedDoorz Room', 'min' => 120000, 'max' => 200000],
-                ['provider' => 103, 'prefix' => 'OYO Comfort', 'min' => 120000, 'max' => 250000],
+            // ---------------------
+            // 2..6) Partner Hotels/Villas/Hostels
+            // ---------------------
+            $partners = [
+                ['provider' => 13,  'prefix' => 'Traveloka Stay',   'min' => 300000, 'max' => 700000],
+                ['provider' => 14,  'prefix' => 'Premier Hotel',     'min' => 500000, 'max' => 1500000],
+                ['provider' => 101, 'prefix' => 'Agoda Inn',         'min' => 250000, 'max' => 700000],
+                ['provider' => 102, 'prefix' => 'RedDoorz Room',     'min' => 120000, 'max' => 300000],
+                ['provider' => 103, 'prefix' => 'OYO Comfort',       'min' => 120000, 'max' => 280000],
             ];
 
-            foreach ($accPartners as $pinfo) {
-                $avg = rand($pinfo['min'], $pinfo['max']);
+            foreach ($partners as $p) {
+                $avg = rand($p['min'], $p['max']);
+
+                // Random Type: Hotel / Villa / Hostel
+                $types = ['Hotel', 'Villa', 'Hostel'];
+                $type = $types[array_rand($types)];
+
+                // Facilities based on type
+                $facilities = match ($type) {
+                    'Villa' => ['WiFi Gratis', 'Parkir', 'Kolam Renang'],
+                    'Hostel' => ['WiFi Gratis', 'Parkir'],
+                    default => collect($facilitiesList)->random(rand(3, 5))->values()->toArray()
+                };
+
                 $accommodations[] = [
                     'accommodationID' => $accID++,
-                    'providerID' => $pinfo['provider'],
+                    'providerID' => $p['provider'],
                     'cityID' => $city['id'],
-                    'hotelName' => "{$pinfo['prefix']} {$cityName}",
+                    'hotelName' => "{$p['prefix']} {$cityName}",
                     'averagePricePerNight' => $avg,
                     'rating' => round(rand(30, 50) / 10, 1),
-                    'type' => ($avg > 600000 ? 'Hotel' : 'Budget Hotel'),
-                    'facilities' => json_encode(['WiFi', 'AC', 'Sarapan']),
-                    'bookingLink' => $providerBookingUrl($pinfo['provider'], 'accommodation', $cityName),
-                    'description' => "Booking via provider ID {$pinfo['provider']}.",
-                    'images' => json_encode(["https://placehold.co/600x400?text=" . urlencode("{$pinfo['prefix']} {$cityName}")]),
+                    'type' => $type,
+                    'facilities' => json_encode($facilities),
+                    'bookingLink' => $providerBookingUrl($p['provider'], $cityName),
+                    'description' => "Akomodasi tipe {$type} di {$cityName}.",
+                    'images' => json_encode(["https://placehold.co/600x400?text=" . urlencode("{$p['prefix']} {$cityName}")]),
                     'latitude' => $city['lat'] + (rand(-5, 5) * 0.0007),
                     'longitude' => $city['lng'] + (rand(-5, 5) * 0.0007),
                     'created_at' => now(),

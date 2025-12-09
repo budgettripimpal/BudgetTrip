@@ -223,7 +223,7 @@
                             <div class="mb-6 pb-6 border-b border-gray-100">
                                 <h3 class="font-semibold text-gray-700 mb-3">Fasilitas</h3>
                                 <div class="space-y-2">
-                                    @foreach (['WiFi Gratis', 'Sarapan', 'Kolam Renang', 'Gym', 'Spa', 'Parkir'] as $facility)
+                                    @foreach (['WiFi Gratis', 'Sarapan', 'Kolam Renang', 'Gym', 'Parkir'] as $facility)
                                         <label class="flex items-center space-x-3 cursor-pointer">
                                             <input type="checkbox" name="facilities[]" value="{{ $facility }}"
                                                 class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
@@ -238,7 +238,7 @@
                             <div>
                                 <h3 class="font-semibold text-gray-700 mb-3">Tipe Akomodasi</h3>
                                 <div class="space-y-2">
-                                    @foreach (['Hotel', 'Villa', 'Apartemen', 'Hostel'] as $type)
+                                    @foreach (['Hotel', 'Villa', 'Hostel'] as $type)
                                         <label class="flex items-center space-x-3 cursor-pointer">
                                             <input type="checkbox" name="types[]" value="{{ $type }}"
                                                 class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
@@ -284,7 +284,16 @@
                                                     <div>
                                                         <h3
                                                             class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">
-                                                            {{ $acc->hotelName }}</h3>
+                                                            {{ $acc->hotelName }}
+                                                        </h3>
+
+                                                        {{-- Tipe Akomodasi --}}
+                                                        <span
+                                                            class="inline-block mt-1 mb-1 bg-green-50 text-[#2CB38B] text-xs font-semibold px-3 py-1 rounded-full">
+                                                            {{ $acc->type }}
+                                                        </span>
+
+                                                        {{-- Kota --}}
                                                         <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
                                                             <svg class="w-4 h-4 text-gray-400" fill="none"
                                                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -298,10 +307,12 @@
                                                             {{ $acc->city->cityName }}
                                                         </p>
                                                     </div>
+
                                                     <div class="hidden sm:flex text-yellow-400 text-sm">
                                                         {{ str_repeat('★', floor($acc->rating)) }}
                                                     </div>
                                                 </div>
+
 
                                                 @if ($acc->facilities)
                                                     <div class="mt-4 flex flex-wrap gap-2">

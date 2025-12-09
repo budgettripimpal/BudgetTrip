@@ -20,12 +20,6 @@
             font-family: 'Courier Prime', monospace;
         }
 
-        .barcode {
-            background-image: repeating-linear-gradient(90deg, black 0, black 2px, transparent 2px, transparent 4px);
-            height: 40px;
-            width: 100%;
-        }
-
         @media print {
             body {
                 background: white;
@@ -55,9 +49,7 @@
             Cetak / Simpan PDF
         </button>
         <button onclick="window.close()"
-            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition">
-            Tutup
-        </button>
+            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition">Tutup</button>
     </div>
 
     <div
@@ -101,34 +93,23 @@
 
             <div class="grid grid-cols-2 gap-6 mb-6">
                 <div>
-                    <p class="text-xs text-gray-400 uppercase mb-1">Penumpang</p>
+                    <p class="text-xs text-gray-400 uppercase mb-1">Pemesan</p>
                     <p class="font-bold text-gray-800">{{ Auth::user()->name }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 uppercase mb-1">Operator</p>
                     <p class="font-bold text-gray-800">{{ $item->providerName }}</p>
                 </div>
-                <div>
-                    <p class="text-xs text-gray-400 uppercase mb-1">Tipe Tiket</p>
-                    <p class="font-bold text-gray-800">{{ $item->description }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-400 uppercase mb-1">Jumlah</p>
-                    <p class="font-bold text-gray-800">{{ $item->quantity }} Pax</p>
-                </div>
             </div>
 
-            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                <p class="text-xs text-gray-500 uppercase mb-2 font-bold">Nomor Kursi Anda</p>
-                <div class="flex flex-wrap gap-2">
-                    @if ($item->seat_numbers)
-                        @foreach ($item->seat_numbers as $seat)
-                            <span
-                                class="bg-[#2CB38B] text-white px-3 py-1 rounded text-sm font-bold shadow-sm">{{ $seat }}</span>
-                        @endforeach
-                    @else
-                        <span class="text-gray-400 italic text-sm">Check-in counter</span>
-                    @endif
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase mb-1 font-bold">Total Penumpang</p>
+                    <p class="text-xl font-bold text-[#2CB38B]">{{ $item->quantity }} Orang</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 uppercase mb-1 font-bold text-right">Kategori</p>
+                    <p class="text-sm font-bold text-gray-800 text-right">{{ $item->description }}</p>
                 </div>
             </div>
 
@@ -137,7 +118,6 @@
 
         <div class="w-full md:w-64 bg-[#2CB38B] p-8 text-white flex flex-col justify-between relative overflow-hidden">
             <div class="absolute -left-4 top-1/2 w-8 h-8 bg-[#f3f4f6] rounded-full"></div>
-
             <div class="absolute left-0 top-4 bottom-4 border-l-2 border-dashed border-white/30"></div>
 
             <div class="text-center z-10">
@@ -160,11 +140,6 @@
             </div>
         </div>
     </div>
-
-    <p class="text-gray-400 text-xs mt-6 text-center max-w-md no-print">
-        Harap simpan tiket ini. Tunjukkan QR Code kepada petugas saat boarding. Selamat menikmati perjalanan Anda
-        bersama BudgetTrip.
-    </p>
 
     <script>
         window.onload = function() {

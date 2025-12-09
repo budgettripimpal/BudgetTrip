@@ -193,7 +193,7 @@
                             <div class="mb-6 pb-6 border-b border-gray-100">
                                 <h3 class="font-semibold text-gray-700 mb-3">Jenis Transportasi</h3>
                                 <div class="space-y-2">
-                                    @foreach (['Bus', 'Kereta', 'Pesawat', 'Kapal'] as $type)
+                                    @foreach (['Shuttle', 'Bus', 'Kereta', 'Pesawat', 'Kapal'] as $type)
                                         <label class="flex items-center space-x-3 cursor-pointer">
                                             <input type="checkbox" name="types[]" value="{{ $type }}"
                                                 class="w-5 h-5 text-[#2CB38B] rounded border-gray-300 focus:ring-[#2CB38B]"
@@ -282,7 +282,8 @@
                                                                     {{ number_format($transport->averagePrice, 0, ',', '.') }}
                                                                 </p>
                                                                 <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
-                                                                    class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm inline-block">Lihat Detail</a>
+                                                                    class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm inline-block">Lihat
+                                                                    Detail</a>
                                                             </div>
                                                         </div>
                                                     @endforeach
@@ -361,65 +362,143 @@
 
                                     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
                                         <div class="flex items-center gap-4">
+                                            {{-- ICON & TIPE TRANSPORTASI --}}
                                             <div
-                                                class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-2xl shadow-sm">
-                                                @if (str_contains($route->serviceProvider->providerName, 'KA') ||
-                                                        str_contains($route->serviceProvider->providerName, 'Kereta'))
-                                                    🚂
-                                                @elseif(str_contains($route->serviceProvider->providerName, 'Ferry') ||
-                                                        str_contains($route->serviceProvider->providerName, 'Kapal'))
-                                                    🚢
-                                                @elseif(str_contains($route->serviceProvider->providerName, 'Air') ||
-                                                        str_contains($route->serviceProvider->providerName, 'Plane') ||
-                                                        str_contains($route->serviceProvider->providerName, 'Garuda'))
-                                                    ✈️
-                                                @else
-                                                    🚌
-                                                @endif
+                                                class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-3xl shadow-sm border border-blue-100">
+                                                @php
+                                                    $pName = $route->serviceProvider->providerName;
+
+                                                    // Default: Shuttle/Travel
+                                                    $icon = '🚐';
+                                                    $typeLabel = 'Shuttle/Travel';
+
+                                                    // Bus
+                                                    if (
+                                                        str_contains($pName, 'Bus') ||
+                                                        str_contains($pName, 'DAMRI') ||
+                                                        str_contains($pName, 'Rosalia') ||
+                                                        str_contains($pName, 'Primajasa') ||
+                                                        str_contains($pName, 'Sinar Jaya')
+                                                    ) {
+                                                        $icon = '🚌';
+                                                        $typeLabel = 'Bus';
+                                                    }
+
+                                                    // Kereta Api
+                                                    elseif (
+                                                        str_contains($pName, 'KA') ||
+                                                        str_contains($pName, 'Kereta') ||
+                                                        str_contains($pName, 'Railink')
+                                                    ) {
+                                                        $icon = '🚂';
+                                                        $typeLabel = 'Kereta Api';
+                                                    }
+
+                                                    // Kapal Ferry
+                                                    elseif (
+                                                        str_contains($pName, 'Ferry') ||
+                                                        str_contains($pName, 'Kapal') ||
+                                                        str_contains($pName, 'Pelni') ||
+                                                        str_contains($pName, 'ASDP')
+                                                    ) {
+                                                        $icon = '🚢';
+                                                        $typeLabel = 'Kapal Ferry';
+                                                    }
+
+                                                    // Pesawat
+                                                    elseif (
+                                                        str_contains($pName, 'Air') ||
+                                                        str_contains($pName, 'Garuda') ||
+                                                        str_contains($pName, 'Lion') ||
+                                                        str_contains($pName, 'Super Air') ||
+                                                        str_contains($pName, 'Batik')
+                                                    ) {
+                                                        $icon = '✈️';
+                                                        $typeLabel = 'Pesawat';
+                                                    }
+                                                @endphp
+
+                                                {{ $icon }}
+
                                             </div>
+
                                             <div>
-                                                <h3
-                                                    class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">
-                                                    {{ $route->serviceProvider->providerName }}</h3>
+                                                {{-- NAMA PROVIDER & LABEL TIPE --}}
+                                                <div class="flex items-center gap-2">
+                                                    <h3
+                                                        class="text-xl font-bold text-gray-800 group-hover:text-[#2CB38B] transition">
+                                                        {{ $pName }}
+                                                    </h3>
+                                                    <span
+                                                        class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded border border-gray-200 uppercase font-bold tracking-wide">
+                                                        {{ $typeLabel }}
+                                                    </span>
+                                                </div>
+
                                                 <div class="flex items-center gap-2 mt-1">
                                                     <span
-                                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full font-medium">{{ $route->class }}</span>
+                                                        class="inline-block bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-md font-bold border border-blue-100">
+                                                        {{ $route->class }}
+                                                    </span>
                                                     @if ($isFull)
                                                         <span
                                                             class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-bold">Habis</span>
                                                     @else
                                                         <span
-                                                            class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold">Sisa
-                                                            {{ $route->remaining_seats }}</span>
+                                                            class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
+                                                            <span
+                                                                class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                                            Sisa {{ $route->remaining_seats }}
+                                                        </span>
                                                     @endif
                                                 </div>
+
                                                 @if ($route->facilities)
-                                                    <div class="flex gap-1 mt-2">
+                                                    <div class="flex flex-wrap gap-1 mt-2">
                                                         @foreach ($route->facilities as $facility)
                                                             <span
-                                                                class="text-[10px] bg-green-50 text-[#2CB38B] px-1.5 py-0.5 rounded border border-green-100">{{ $facility }}</span>
+                                                                class="text-[10px] bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200">
+                                                                {{ $facility }}
+                                                            </span>
                                                         @endforeach
                                                     </div>
                                                 @endif
                                             </div>
                                         </div>
-                                        <div class="text-left md:text-right mt-4 md:mt-0">
-                                            <p class="text-2xl font-bold text-[#2CB38B]">Rp
+
+                                        <div
+                                            class="text-left md:text-right mt-4 md:mt-0 bg-gray-50 p-3 rounded-xl border border-gray-100 md:bg-transparent md:border-0 md:p-0">
+                                            <p class="text-xs text-gray-400 font-bold uppercase mb-0.5">Harga Tiket</p>
+                                            <p class="text-2xl font-extrabold text-[#2CB38B]">Rp
                                                 {{ number_format($route->averagePrice, 0, ',', '.') }}</p>
-                                            <p class="text-xs text-gray-400">/ penumpang</p>
+                                            <p class="text-[10px] text-gray-400">/ penumpang</p>
                                         </div>
                                     </div>
 
+                                    {{-- JADWAL PERJALANAN --}}
                                     <div
-                                        class="flex flex-col md:flex-row items-center justify-between bg-gray-50 rounded-xl p-4 border border-gray-100">
-                                        <div class="flex items-center justify-between w-full md:w-auto gap-8">
-                                            <div class="text-center">
+                                        class="flex flex-col md:flex-row items-center justify-between bg-gray-50 rounded-xl p-5 border border-gray-200 relative">
+                                        <div
+                                            class="hidden md:block absolute top-1/2 left-20 right-40 h-0.5 border-t-2 border-dashed border-gray-300 -z-0">
+                                        </div>
+
+                                        <div
+                                            class="flex items-center justify-between w-full md:w-auto gap-8 relative z-10">
+                                            <div class="text-center min-w-[80px]">
                                                 <p class="text-xl font-bold text-gray-800">
                                                     {{ \Carbon\Carbon::parse($route->departureTime)->format('H:i') }}
                                                 </p>
-                                                <p class="text-xs text-gray-500">{{ $plan->originCity->cityName }}</p>
+                                                <div
+                                                    class="bg-white border border-gray-200 px-2 py-1 rounded-md mt-1 inline-block">
+                                                    <p class="text-[10px] font-bold text-gray-500 uppercase">
+                                                        {{ substr($plan->originCity->cityName, 0, 3) }}</p>
+                                                </div>
+                                                <p class="text-[10px] text-gray-400 mt-1">
+                                                    {{ $plan->originCity->cityName }}</p>
                                             </div>
-                                            <div class="flex flex-col items-center">
+
+                                            <div
+                                                class="flex flex-col items-center bg-white px-3 py-1 rounded-full border border-gray-200 shadow-sm">
                                                 @php
                                                     $start = \Carbon\Carbon::parse($route->departureTime);
                                                     $end = \Carbon\Carbon::parse($route->arrivalTime);
@@ -428,30 +507,38 @@
                                                     }
                                                     $diff = $start->diff($end);
                                                 @endphp
-                                                <p class="text-xs text-gray-400 font-medium mb-1">{{ $diff->h }}j
+                                                <p class="text-[10px] text-gray-400 font-bold mb-0.5">DURASI</p>
+                                                <p class="text-xs font-bold text-gray-700">{{ $diff->h }}j
                                                     {{ $diff->i }}m</p>
-                                                <div
-                                                    class="w-24 h-0.5 bg-gray-300 relative flex items-center justify-between">
-                                                    <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                                    <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                                </div>
                                             </div>
-                                            <div class="text-center">
+
+                                            <div class="text-center min-w-[80px]">
                                                 <p class="text-xl font-bold text-gray-800">
                                                     {{ \Carbon\Carbon::parse($route->arrivalTime)->format('H:i') }}</p>
-                                                <p class="text-xs text-gray-500">
+                                                <div
+                                                    class="bg-white border border-gray-200 px-2 py-1 rounded-md mt-1 inline-block">
+                                                    <p class="text-[10px] font-bold text-gray-500 uppercase">
+                                                        {{ substr($plan->destinationCity->cityName, 0, 3) }}</p>
+                                                </div>
+                                                <p class="text-[10px] text-gray-400 mt-1">
                                                     {{ $plan->destinationCity->cityName }}</p>
                                             </div>
                                         </div>
 
                                         @if ($isFull)
                                             <button disabled
-                                                class="w-full md:w-auto mt-4 md:mt-0 bg-gray-300 text-gray-500 px-6 py-3 rounded-xl font-semibold cursor-not-allowed">Kursi
-                                                Penuh</button>
+                                                class="w-full md:w-auto mt-4 md:mt-0 bg-gray-200 text-gray-400 px-6 py-3 rounded-xl font-bold cursor-not-allowed border border-gray-300">
+                                                Kursi Penuh
+                                            </button>
                                         @else
                                             <a href="{{ route('transport.show', ['travelPlan' => $plan->planID, 'id' => $route->routeID]) }}"
-                                                class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2">
-                                                Lihat Detail
+                                                class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-bold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2 transform active:scale-95">
+                                                Pilih Tiket
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                </svg>
                                             </a>
                                         @endif
                                     </div>

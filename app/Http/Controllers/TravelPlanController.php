@@ -107,11 +107,45 @@ class TravelPlanController extends Controller
             $types = $request->input('types');
             $query->whereHas('serviceProvider', function ($q) use ($types) {
                 $q->where(function ($subQ) use ($types) {
+
                     foreach ($types as $type) {
-                        if ($type == 'Bus') $subQ->orWhere('providerName', 'like', '%Bus%')->orWhere('providerName', 'like', '%Travel%')->orWhere('providerName', 'like', '%Shuttle%');
-                        if ($type == 'Kereta') $subQ->orWhere('providerName', 'like', '%KA%')->orWhere('providerName', 'like', '%Kereta%')->orWhere('providerName', 'like', '%Railink%');
-                        if ($type == 'Kapal') $subQ->orWhere('providerName', 'like', '%Ferry%')->orWhere('providerName', 'like', '%Kapal%')->orWhere('providerName', 'like', '%Pelni%');
-                        if ($type == 'Pesawat') $subQ->orWhere('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%')->orWhere('providerName', 'like', '%Lion%');
+
+                        if ($type === 'Shuttle') {
+                            $subQ->orWhere('providerName', 'like', '%Shuttle%')
+                                ->orWhere('providerName', 'like', '%Travel%')
+                                ->orWhere('providerName', 'like', '%Budgettrip%');
+                        }
+
+                        if ($type === 'Bus') {
+                            $subQ->orWhere(function ($b) {
+                                $b->where('providerName', 'like', '%Bus%')
+                                    ->orWhere('providerName', 'like', '%DAMRI%')
+                                    ->orWhere('providerName', 'like', '%Rosalia%')
+                                    ->orWhere('providerName', 'like', '%Sinar%')
+                                    ->orWhere('providerName', 'like', '%Primajasa%');
+                            });
+                        }
+
+                        if ($type === 'Kereta') {
+                            $subQ->orWhere('providerName', 'like', '%KA%')
+                                ->orWhere('providerName', 'like', '%Kereta%')
+                                ->orWhere('providerName', 'like', '%KAI%')
+                                ->orWhere('providerName', 'like', '%Railink%');
+                        }
+
+                        if ($type === 'Kapal') {
+                            $subQ->orWhere('providerName', 'like', '%Ferry%')
+                                ->orWhere('providerName', 'like', '%Kapal%')
+                                ->orWhere('providerName', 'like', '%Pelni%');
+                        }
+
+                        if ($type === 'Pesawat') {
+                            $subQ->orWhere('providerName', 'like', '%Air%')
+                                ->orWhere('providerName', 'like', '%Garuda%')
+                                ->orWhere('providerName', 'like', '%Lion%')
+                                ->orWhere('providerName', 'like', '%Batik%')
+                                ->orWhere('providerName', 'like', '%Citilink%');
+                        }
                     }
                 });
             });
