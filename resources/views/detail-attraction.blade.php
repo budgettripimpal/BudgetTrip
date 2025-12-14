@@ -197,6 +197,39 @@
                 <button @click="showModal = false"
                     class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✖</button>
                 <h3 class="text-2xl font-bold mb-4">Simpan ke Rencana</h3>
+                <div class="bg-green-50 p-4 rounded-xl mb-4 text-sm border border-green-100">
+                    <div class="flex justify-between mb-1 text-gray-600">
+                        <span>Jumlah Pengunjung:</span>
+                        <span class="font-bold text-gray-900">
+                            <span x-text="quantity"></span> Orang
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between mb-2 text-gray-600">
+                        <span>Harga / Orang:</span>
+                        <span class="font-bold text-gray-900">
+                            @if (($attraction->estimatedCost ?? 0) == 0)
+                                Gratis
+                            @else
+                                Rp {{ number_format($attraction->estimatedCost, 0, ',', '.') }}
+                            @endif
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between border-t border-green-200 pt-2 mt-2">
+                        <span class="font-bold text-gray-700">Total Estimasi:</span>
+                        <span class="font-bold text-xl text-[#2CB38B]">
+                            @if (($attraction->estimatedCost ?? 0) == 0)
+                                Gratis
+                            @else
+                                Rp <span
+                                    x-text="(quantity * {{ $attraction->estimatedCost }}).toLocaleString('id-ID')">
+                                </span>
+                            @endif
+                        </span>
+                    </div>
+                </div>
+
                 <form action="{{ route('plan.add-item', $travelPlan->planID ?? 1) }}" method="POST">
                     @csrf
                     <input type="hidden" name="item_type" value="Wisata">

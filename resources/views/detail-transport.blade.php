@@ -120,7 +120,11 @@
         </div>
     </nav>
 
-    <div class="min-h-screen pt-28 pb-12 bg-gray-50" x-data="{ showModal: false, quantity: 1 }">
+    <div class="min-h-screen pt-28 pb-12 bg-gray-50" x-data="{
+        showModal: false,
+        quantity: 1,
+        maxSeats: {{ $transport->remaining_seats ?? 0 }}
+    }">
         <div class="container mx-auto px-6">
             <button onclick="history.back()" class="mb-6 hover:bg-gray-200 p-2 rounded-full transition"><svg
                     class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,6 +159,87 @@
                             <p class="text-3xl font-bold text-gray-900">Rp
                                 {{ number_format($transport->averagePrice ?? 0, 0, ',', '.') }} <span
                                     class="text-sm text-gray-500 font-normal">/ Orang</span></p>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <span class="text-2xl">💺</span>
+                                Jumlah Kursi
+                            </h3>
+
+                            @php
+                                $isFull = ($transport->remaining_seats ?? 0) <= 0;
+                            @endphp
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {{-- KELAS --}}
+                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Kelas</p>
+                                    <p class="text-lg font-bold text-gray-800">
+                                        {{ $transport->class ?? 'Reguler' }}
+                                    </p>
+                                </div>
+
+                                {{-- TOTAL KURSI --}}
+                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Total Kursi</p>
+                                    <p class="text-lg font-bold text-gray-800">
+                                        {{ $transport->total_seats ?? '-' }}
+                                    </p>
+                                </div>
+
+                                {{-- SISA KURSI --}}
+                                <div
+                                    class="rounded-xl p-4 border
+            {{ $isFull ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200' }}">
+                                    <p
+                                        class="text-xs font-bold uppercase mb-1
+                {{ $isFull ? 'text-red-700' : 'text-green-700' }}">
+                                        Sisa Kursi
+                                    </p>
+
+                                    @if ($isFull)
+                                        <p class="text-lg font-extrabold text-red-600">
+                                            Habis
+                                        </p>
+                                    @else
+                                        <p class="text-lg font-extrabold text-green-700 flex items-center gap-2">
+                                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                            {{ $transport->remaining_seats }} kursi tersedia
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- ========================= --}}
+                            {{-- PROGRESS BAR KURSI --}}
+                            {{-- ========================= --}}
+                            @if (!empty($transport->total_seats) && $transport->total_seats > 0)
+                                @php
+                                    $percentage = max(
+                                        0,
+                                        min(100, round(($transport->remaining_seats / $transport->total_seats) * 100)),
+                                    );
+                                @endphp
+
+                                <div class="mt-6">
+                                    <div class="flex justify-between items-center text-xs text-gray-500 font-bold mb-1">
+                                        <span>Ketersediaan Kursi</span>
+                                        <span>{{ $percentage }}%</span>
+                                    </div>
+
+                                    <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                        <div class="h-3 rounded-full transition-all duration-500
+                    {{ $percentage > 30 ? 'bg-green-500' : 'bg-red-500' }}"
+                                            style="width: {{ $percentage }}%">
+                                        </div>
+                                    </div>
+
+                                    <p class="text-[11px] text-gray-400 mt-2">
+                                        {{ $transport->remaining_seats }} dari {{ $transport->total_seats }} kursi
+                                        tersedia
+                                    </p>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="space-y-4 mb-8 text-sm">
@@ -191,15 +276,27 @@
 
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center space-x-4 bg-gray-100 rounded-full px-6 py-3">
-                                <button @click="if(quantity > 1) quantity--"
-                                    class="w-8 h-8 font-bold hover:bg-gray-200 rounded-full">-</button>
-                                <span class="text-2xl font-bold min-w-[40px] text-center" x-text="quantity">1</span>
-                                <button @click="quantity++"
-                                    class="w-8 h-8 font-bold hover:bg-gray-200 rounded-full">+</button>
+                                <button @click="if(quantity > 1) quantity--" :disabled="quantity <= 1"
+                                    class="w-8 h-8 font-bold rounded-fulldisabled:opacity-40 disabled:cursor-not-allowedhover:bg-gray-200">
+                                    -
+                                </button>
+
+                                <span class="text-2xl font-bold min-w-[40px] text-center" x-text="quantity"></span>
+
+                                <button @click="if(quantity < maxSeats) quantity++" :disabled="quantity >= maxSeats"
+                                    class="w-8 h-8 font-bold rounded-full disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-200">
+                                    +
+                                </button>
+
                             </div>
-                            <button @click="showModal = true"
-                                class="flex-1 bg-primary hover:bg-green-600 text-white font-bold py-4 rounded-full shadow-lg transition">Tambah
-                                ke Rencana</button>
+                            <button @click="showModal = true" :disabled="maxSeats <= 0"
+                                class="flex-1 font-bold py-4 rounded-full shadow-lg transition
+        {{ ($transport->remaining_seats ?? 0) <= 0
+            ? 'bg-gray-400 cursor-not-allowed text-white'
+            : 'bg-primary hover:bg-green-600 text-white' }}">
+                                {{ ($transport->remaining_seats ?? 0) <= 0 ? 'Kursi Habis' : 'Tambah ke Rencana' }}
+                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -213,11 +310,36 @@
                 <button @click="showModal = false"
                     class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✖</button>
                 <h3 class="text-2xl font-bold mb-4">Simpan ke Rencana</h3>
+                <div class="bg-green-50 p-4 rounded-xl mb-4 text-sm border border-green-100">
+                    <div class="flex justify-between mb-1 text-gray-600">
+                        <span>Jumlah Penumpang:</span>
+                        <span class="font-bold text-gray-900">
+                            <span x-text="quantity"></span> Orang
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between mb-2 text-gray-600">
+                        <span>Harga / Orang:</span>
+                        <span class="font-bold text-gray-900">
+                            Rp {{ number_format($transport->averagePrice ?? 0, 0, ',', '.') }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between border-t border-green-200 pt-2 mt-2">
+                        <span class="font-bold text-gray-700">Total Estimasi:</span>
+                        <span class="font-bold text-xl text-[#2CB38B]">
+                            Rp <span
+                                x-text="(quantity * {{ $transport->averagePrice ?? 0 }}).toLocaleString('id-ID')">
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
                 <form action="{{ route('plan.add-item', $travelPlan->planID ?? 1) }}" method="POST">
                     @csrf
                     <input type="hidden" name="item_type" value="Transportasi">
                     <input type="hidden" name="item_id" value="{{ $transport->routeID ?? 0 }}">
-                    <input type="hidden" name="quantity" x-model="quantity">
+                    <input type="hidden" name="quantity" :value="Math.min(quantity, maxSeats)">
                     <div class="space-y-3 mb-6 max-h-60 overflow-y-auto">
                         @if (isset($itineraries))
                             @foreach ($itineraries as $itinerary)

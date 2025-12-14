@@ -24,4 +24,12 @@ class PlanItem extends Model
     {
         return $this->hasOne(Order::class, 'plan_item_id', 'planItemID');
     }
+    public function transportRoute()
+    {
+        return $this->belongsTo(
+            \App\Models\TransportRoute::class,
+            'transport_route_id',
+            'routeID'
+        );
+    }
 }

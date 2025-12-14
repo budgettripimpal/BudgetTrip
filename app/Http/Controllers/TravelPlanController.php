@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Itinerary;
 use App\Models\TransportRoute;
+use App\Models\PlanItem;
 
 class TravelPlanController extends Controller
 {
@@ -422,16 +423,58 @@ class TravelPlanController extends Controller
         if ($travelPlan->userID !== Auth::id()) {
             abort(403);
         }
-        $travelPlan->load('itineraries.planItems');
+
+        $travelPlan->load([
+            'itineraries.planItems.transportRoute',
+            'itineraries.planItems.order'
+        ]);
+
+        foreach ($travelPlan->itineraries as $itinerary) {
+            foreach ($itinerary->planItems as $item) {
+                if ($item->itemType === 'Transportasi' && $item->transportRoute) {
+
+                    $booked = \App\Models\PlanItem::where('transport_route_id', $item->transport_route_id)
+                        ->whereHas('order', function ($q) {
+                            $q->where('status', 'paid');
+                        })
+                        ->sum('quantity');
+
+                    $item->transportRoute->remaining_seats =
+                        ($item->transportRoute->total_seats ?? 40) - $booked;
+                }
+            }
+        }
+
+
         return view('manage-plan', ['plan' => $travelPlan]);
     }
 
+
     public function showTransport(TravelPlan $travelPlan, $id)
     {
-        $transport = \App\Models\TransportRoute::with('serviceProvider')->findOrFail($id);
+        $transport = TransportRoute::with([
+            'serviceProvider',
+            'originCity',
+            'destinationCity'
+        ])
+            ->where('routeID', $id)
+            ->firstOrFail();
+
+        $booked = \App\Models\PlanItem::where('transport_route_id', $transport->routeID)
+            ->whereHas('order', function ($q) {
+                $q->where('status', 'paid');
+            })
+            ->sum('quantity');
+
+        $transport->remaining_seats = ($transport->total_seats ?? 40) - $booked;
+
         $itineraries = $travelPlan->itineraries;
 
-        return view('detail-transport', compact('travelPlan', 'transport', 'itineraries'));
+        return view('detail-transport', compact(
+            'travelPlan',
+            'transport',
+            'itineraries'
+        ));
     }
 
     public function showAccommodation(TravelPlan $travelPlan, $id)
@@ -528,12 +571,13 @@ class TravelPlanController extends Controller
         }
 
         // Logic Merge: Hanya merge jika item sama & status BELUM PAID & Durasi sama (khusus hotel)
-        $query = \App\Models\PlanItem::where('itineraryID', $request->itinerary_id)
-            ->where('itemType', $itemTypeDB)
-            ->where('providerName', $providerName)
+        $query = PlanItem::where('itineraryID', $request->itinerary_id)
+            ->where('itemType', 'Transportasi')
+            ->where('transport_route_id', $transportRouteID)
             ->whereDoesntHave('order', function ($q) {
                 $q->where('status', 'paid');
             });
+
 
         if ($itemTypeDB == 'Akomodasi') {
             $query->where('duration', $duration);
@@ -597,15 +641,33 @@ class TravelPlanController extends Controller
 
     public function increaseItemQuantity(\App\Models\PlanItem $planItem)
     {
-        // Hitung harga satuan dasar (per item per durasi)
+        if ($planItem->itemType === 'Transportasi' && $planItem->transportRoute) {
+
+            $booked = \App\Models\PlanItem::where('transport_route_id', $planItem->transport_route_id)
+                ->whereHas('order', function ($q) {
+                    $q->where('status', 'paid');
+                })
+                ->sum('quantity');
+
+            $totalSeats = $planItem->transportRoute->total_seats ?? 40;
+            $remainingSeats = $totalSeats - $booked;
+
+            // 🔒 VALIDASI KETAT
+            if ($planItem->quantity >= $remainingSeats) {
+                return back()->with('error', 'Jumlah tiket tidak boleh melebihi sisa kursi yang tersedia.');
+            }
+        }
+
         $basePrice = $planItem->estimatedCost / $planItem->quantity;
 
         $planItem->quantity += 1;
         $planItem->estimatedCost = $basePrice * $planItem->quantity;
         $planItem->save();
 
-        return back()->with('success', 'Jumlah berhasil ditambahkan.');
+        return back();
     }
+
+
 
     public function decreaseItemQuantity(\App\Models\PlanItem $planItem)
     {
@@ -649,8 +711,10 @@ class TravelPlanController extends Controller
         $travelPlan->load([
             'originCity',
             'destinationCity',
-            'itineraries.planItems'
+            'itineraries.planItems.transportRoute',
+            'itineraries.planItems.order'
         ]);
+
 
         // 3. Tampilkan View
         return view('overview-plan', ['plan' => $travelPlan]);

@@ -337,22 +337,32 @@
                                                         {{ $item->providerName }}</p>
                                                     <p class="text-base text-gray-500">{{ $item->description }}</p>
 
-                                                    @if ($item->itemType === 'Transportasi')
+                                                    @if ($item->itemType === 'Transportasi' && $item->transportRoute)
                                                         <p class="text-sm text-gray-600 mt-1 flex items-center gap-1">
                                                             <span class="text-gray-500">⏱️</span>
                                                             <span>
                                                                 Berangkat:
                                                                 <span class="font-semibold text-gray-800">
-                                                                    {{ \Carbon\Carbon::parse($item->departureTime)->format('H:i') }}
+                                                                    {{ \Carbon\Carbon::parse($item->transportRoute->departureTime)->format('H:i') }}
                                                                 </span>
                                                                 —
                                                                 Tiba:
                                                                 <span class="font-semibold text-gray-800">
-                                                                    {{ \Carbon\Carbon::parse($item->arrivalTime)->format('H:i') }}
+                                                                    {{ \Carbon\Carbon::parse($item->transportRoute->arrivalTime)->format('H:i') }}
                                                                 </span>
                                                             </span>
                                                         </p>
                                                     @endif
+                                                    @if ($item->itemType === 'Transportasi' && $item->transportRoute)
+                                                        <p class="text-xs text-gray-500 mt-1">
+                                                            Sisa kursi tersedia:
+                                                            <span class="font-bold text-gray-700">
+                                                                {{ $item->transportRoute->remaining_seats }}
+                                                            </span>
+                                                        </p>
+                                                    @endif
+
+
 
 
                                                     @if ($isBudgettrip)
@@ -394,13 +404,14 @@
                                                                 @endif
                                                             </div>
                                                         @else
-                                                            {{-- BELUM LUNAS --}}
                                                             <form
                                                                 action="{{ route('payment.checkout', $item->planItemID) }}"
                                                                 method="POST" class="mt-2 w-full">
                                                                 @csrf
+                                                                <input type="hidden" name="origin" value="manage">
+
                                                                 <button type="submit"
-                                                                    class="w-full text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex justify-center items-center shadow-sm">
+                                                                    class="w-full text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex justify-center items-center shadow-sm transition">
                                                                     💳 Bayar Sekarang
                                                                 </button>
                                                             </form>
@@ -428,12 +439,29 @@
                                                         </form>
                                                         <span
                                                             class="px-3 py-1 text-sm font-bold text-gray-700 border-x border-gray-200 bg-white">{{ $item->quantity }}</span>
+                                                        @php
+                                                            $maxQty = $item->transportRoute
+                                                                ? $item->transportRoute->remaining_seats
+                                                                : null;
+                                                        @endphp
+
+
                                                         <form
                                                             action="{{ route('plan-item.increase', $item->planItemID) }}"
-                                                            method="POST">@csrf @method('PATCH')<button
-                                                                type="submit"
-                                                                class="px-3 py-1 hover:bg-gray-200 text-gray-600 font-bold transition">+</button>
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit"
+                                                                {{ $maxQty !== null && $item->quantity >= $maxQty ? 'disabled' : '' }}
+                                                                class="px-3 py-1 font-bold transition
+        {{ $maxQty !== null && $item->quantity >= $maxQty
+            ? 'opacity-50 cursor-not-allowed text-gray-400'
+            : 'hover:bg-gray-200 text-gray-600' }}">
+                                                                +
+                                                            </button>
+
                                                         </form>
+
                                                     </div>
                                                 @else
                                                     <div

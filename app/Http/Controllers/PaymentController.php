@@ -19,7 +19,7 @@ class PaymentController extends Controller
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    public function checkout(PlanItem $planItem)
+    public function checkout(Request $request, PlanItem $planItem)
     {
         // 1. Validasi Brand
         if (!str_contains(strtolower($planItem->providerName), 'budgettrip')) {
@@ -33,24 +33,24 @@ class PaymentController extends Controller
         // 3. Konfigurasi Midtrans
         $this->configureMidtrans();
 
-        // Cek Server Key
         if (empty(Config::$serverKey)) {
             return back()->with('error', 'Server Key Midtrans kosong. Cek .env Anda.');
         }
 
-        // 4. Buat/Cari Order
-        // Gunakan updateOrCreate agar tidak duplikat order untuk item yang sama
+        // 4. Order
         $order = Order::updateOrCreate(
             ['plan_item_id' => $planItem->planItemID],
             [
                 'user_id' => Auth::id(),
-                'order_number' => 'TRIP-' . uniqid() . '-' . $planItem->planItemID, // Order ID baru setiap klik
+                'order_number' => 'TRIP-' . uniqid() . '-' . $planItem->planItemID,
                 'total_price' => $grossAmount,
                 'status' => 'unpaid',
+                'origin' => $request->input('origin', 'manage'),
             ]
         );
 
-        // 5. Siapkan Parameter Snap
+
+        // 5. Parameter Snap
         $params = [
             'transaction_details' => [
                 'order_id' => $order->order_number,
@@ -71,20 +71,21 @@ class PaymentController extends Controller
             ]
         ];
 
-        // 6. Request Snap Token
         try {
             $snapToken = Snap::getSnapToken($params);
 
-            // Simpan token ke DB
             $order->snap_token = $snapToken;
             $order->save();
 
-            // Redirect dengan token
-            return back()->with('snapToken', $snapToken);
+            return back()->with([
+                'snapToken'   => $snapToken,
+                'snapOrigin' => $request->input('origin', 'manage'),
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
     }
+
 
     public function success(Request $request)
     {
@@ -132,7 +133,16 @@ class PaymentController extends Controller
                 $planItem->save();
             }
 
-            return redirect()->route('travel-plan.manage', $planItem->itinerary->planID)
+            $origin = $order->origin ?? 'manage';
+
+            if ($origin === 'overview') {
+                return redirect()
+                    ->route('travel-plan.overview', $planItem->itinerary->planID)
+                    ->with('success', 'Pembayaran Berhasil! Tiket/Voucher telah diterbitkan.');
+            }
+
+            return redirect()
+                ->route('travel-plan.manage', $planItem->itinerary->planID)
                 ->with('success', 'Pembayaran Berhasil! Tiket/Voucher telah diterbitkan.');
         }
 

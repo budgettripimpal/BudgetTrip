@@ -368,10 +368,17 @@
                                                                 {{-- BELUM LUNAS --}}
                                                                 <form
                                                                     action="{{ route('payment.checkout', $item->planItemID) }}"
-                                                                    method="POST" class="mt-2 w-full">
+                                                                    method="POST" class="mt-3 w-full">
                                                                     @csrf
+                                                                    <input type="hidden" name="origin"
+                                                                        value="overview">
+
                                                                     <button type="submit"
-                                                                        class="w-full text-white bg-[#2CB38B] hover:bg-green-700 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex justify-center items-center shadow-sm">
+                                                                        class="w-full text-white bg-[#2CB38B] hover:bg-green-700
+               font-medium rounded-lg text-xs
+               px-4 py-2
+               text-center inline-flex justify-center items-center
+               shadow-sm transition">
                                                                         💳 Bayar Sekarang
                                                                     </button>
                                                                 </form>
