@@ -499,7 +499,7 @@ class DatabaseSeeder extends Seeder
                     $seats = 30;
                 }
 
-                $routesData = array_merge($routesData, $createSchedules(99, $orig, $dest, $type, $price, $class, $seats, ['AC'], $routeID, $cities));
+                $routesData = array_merge($routesData, $createSchedules(99, $orig, $dest, $type, $price, $class, $seats, ['AC', 'Snack'], $routeID, $cities));
             }
         }
 
@@ -516,8 +516,8 @@ class DatabaseSeeder extends Seeder
 
             $routesData = array_merge(
                 $routesData,
-                $createSchedules(99, $cid, $destCityID, 'Airport Transfer', $price, 'Budgettrip Shuttle', 12, ['AC', 'Bagasi'], $routeID, $cities),
-                $createSchedules(99, $destCityID, $cid, 'Airport Transfer', $price, 'Budgettrip Shuttle', 12, ['AC', 'Bagasi'], $routeID, $cities)
+                $createSchedules(99, $cid, $destCityID, 'Airport Transfer', $price, 'Budgettrip Shuttle', 12, ['AC', 'Bagasi', 'WiFi'], $routeID, $cities),
+                $createSchedules(99, $destCityID, $cid, 'Airport Transfer', $price, 'Budgettrip Shuttle', 12, ['AC', 'Bagasi', 'WiFi'], $routeID, $cities)
             );
         }
 
@@ -536,7 +536,7 @@ class DatabaseSeeder extends Seeder
                 $price = round($basePrice + ($dist * 2000));
                 foreach ($airlines as $prov) {
                     $finalPrice = ($prov == 6 || $prov == 10) ? round($price * 1.3) : $price;
-                    $routesData = array_merge($routesData, $createSchedules($prov, $a, $b, 'Pesawat', $finalPrice, 'Economy', 150, ['Bagasi 20kg'], $routeID, $cities));
+                    $routesData = array_merge($routesData, $createSchedules($prov, $a, $b, 'Pesawat', $finalPrice, 'Economy', 150, ['Bagasi', 'Makanan', 'WiFi'] , $routeID, $cities));
                 }
             }
         }
@@ -549,7 +549,7 @@ class DatabaseSeeder extends Seeder
             [40, 30, 15000],
         ];
         foreach ($ferryPairs as [$a, $b, $price]) {
-            $routesData = array_merge($routesData, $createSchedules(8, $a, $b, 'Ferry ASDP', $price, 'Reguler', 400, ['Kantin'], $routeID, $cities));
+            $routesData = array_merge($routesData, $createSchedules(8, $a, $b, 'Ferry ASDP', $price, 'Reguler', 400, ['AC', 'Toilet', 'WiFi', 'Snack'] , $routeID, $cities));
         }
 
         // 7E) Bus & train realistic pairs
@@ -567,8 +567,8 @@ class DatabaseSeeder extends Seeder
         foreach ($longBusPairs as [$prov, $a, $b]) {
             $provID = in_array($prov, array_column($providers, 'id')) ? $prov : 15;
             $price = rand(400000, 850000);
-            $routesData = array_merge($routesData, $createSchedules($provID, $a, $b, 'Bus AKAP', $price, 'Executive', 30, ['AC', 'Toilet'], $routeID, $cities));
-            $routesData = array_merge($routesData, $createSchedules($provID, $b, $a, 'Bus AKAP', $price, 'Executive', 30, ['AC', 'Toilet'], $routeID, $cities));
+            $routesData = array_merge($routesData, $createSchedules($provID, $a, $b, 'Bus AKAP', $price, 'Executive', 30, ['AC', 'Toilet', 'WiFi', 'Snack'], $routeID, $cities));
+            $routesData = array_merge($routesData, $createSchedules($provID, $b, $a, 'Bus AKAP', $price, 'Executive', 30, ['AC', 'Toilet', 'WiFi', 'Snack'], $routeID, $cities));
         }
 
         $trainPairs = [
@@ -585,8 +585,8 @@ class DatabaseSeeder extends Seeder
         ];
         foreach ($trainPairs as [$a, $b]) {
             $price = rand(150000, 650000);
-            $routesData = array_merge($routesData, $createSchedules(5, $a, $b, 'Kereta', $price, 'Eksekutif', 60, ['AC'], $routeID, $cities));
-            $routesData = array_merge($routesData, $createSchedules(5, $b, $a, 'Kereta', $price, 'Eksekutif', 60, ['AC'], $routeID, $cities));
+            $routesData = array_merge($routesData, $createSchedules(5, $a, $b, 'Kereta', $price, 'Eksekutif', 60, ['AC', 'Snack'], $routeID, $cities));
+            $routesData = array_merge($routesData, $createSchedules(5, $b, $a, 'Kereta', $price, 'Eksekutif', 60, ['AC', 'Snack'], $routeID, $cities));
         }
 
         // 7F) Travel operators (shuttle) realistic pairs

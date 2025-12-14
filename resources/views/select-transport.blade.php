@@ -315,7 +315,7 @@
                                                                     {{ number_format($transport->averagePrice, 0, ',', '.') }}
                                                                 </p>
                                                                 <a href="{{ route('transport.show', [$plan->planID, $transport->routeID]) }}"
-                                                                    class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm inline-block">Pilih</a>
+                                                                    class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm inline-block">Lihat Detail</a>
                                                             </div>
                                                         </div>
                                                     @endforeach
@@ -533,7 +533,7 @@
                                         @else
                                             <a href="{{ route('transport.show', ['travelPlan' => $plan->planID, 'id' => $route->routeID]) }}"
                                                 class="w-full md:w-auto mt-4 md:mt-0 bg-[#2CB38B] hover:bg-[#249d78] text-white px-6 py-3 rounded-xl font-bold transition shadow-lg hover:shadow-green-200 flex items-center justify-center gap-2 transform active:scale-95">
-                                                Pilih Tiket
+                                                Lihat Detail
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"

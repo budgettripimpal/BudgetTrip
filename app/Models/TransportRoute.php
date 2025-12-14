@@ -16,6 +16,8 @@ class TransportRoute extends Model
         'images' => 'array',
         'departureTime' => 'datetime:H:i', // Format jam
         'arrivalTime' => 'datetime:H:i',
+        'remaining_seats' => 'integer',
+        'total_seats' => 'integer',
     ];
     public function serviceProvider()
     {

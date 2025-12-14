@@ -90,6 +90,23 @@
                         {{ $item->itinerary->travelPlan->destinationCity->cityName }}</p>
                 </div>
             </div>
+            @if ($item->itemType === 'Transportasi' && $item->transportRoute)
+                <div class="grid grid-cols-2 gap-6 mb-6 mt-4">
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                        <p class="text-xs text-gray-400 uppercase mb-1 font-bold">Waktu Berangkat</p>
+                        <p class="text-xl font-bold text-gray-800 ticket-font">
+                            {{ \Carbon\Carbon::parse($item->transportRoute->departureTime)->format('H:i') }}
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-right">
+                        <p class="text-xs text-gray-400 uppercase mb-1 font-bold">Waktu Tiba</p>
+                        <p class="text-xl font-bold text-gray-800 ticket-font">
+                            {{ \Carbon\Carbon::parse($item->transportRoute->arrivalTime)->format('H:i') }}
+                        </p>
+                    </div>
+                </div>
+            @endif
 
             <div class="grid grid-cols-2 gap-6 mb-6">
                 <div>
