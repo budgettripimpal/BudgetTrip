@@ -96,40 +96,15 @@ class PaymentController extends Controller
             $planItem = $order->planItem;
 
             // CEK BRAND BUDGETTRIP
+            // Menggunakan helper Str untuk mengecek apakah providerName mengandung kata 'budgettrip'
             $isBudgettrip = \Illuminate\Support\Str::contains(strtolower($planItem->providerName), 'budgettrip');
 
             if ($isBudgettrip && empty($planItem->ticket_code)) {
 
                 // 1. GENERATE KODE UNIK (Booking ID / Ticket ID)
+                // Kode ini wajib ada karena dipakai di tampilan tiket sebagai "Booking Ref"
                 $planItem->ticket_code = 'BGT-' . strtoupper(uniqid()) . '-' . $planItem->planItemID;
-
-                // 2. LOGIKA TRANSPORTASI (Kursi)
-                if ($planItem->itemType == 'Transportasi') {
-                    $seats = [];
-                    $startSeat = rand(1, 20);
-                    for ($i = 0; $i < $planItem->quantity; $i++) {
-                        $seats[] = 'Seat ' . ($startSeat + $i);
-                    }
-                    $planItem->seat_numbers = $seats;
-                }
-
-                // 3. LOGIKA AKOMODASI (Kamar)
-                elseif ($planItem->itemType == 'Akomodasi') {
-                    $rooms = [];
-                    // Anggap satu grup ditaruh di lantai yang sama
-                    $floor = rand(1, 5);
-                    // Mulai dari nomor acak, lalu berurutan
-                    $startRoom = rand(1, 15);
-
-                    for ($i = 0; $i < $planItem->quantity; $i++) {
-                        // Format: Lantai + Nomor Urut (Misal 305, 306, 307)
-                        $rooms[] = $floor . sprintf("%02d", $startRoom + $i);
-                    }
-
-                    // Simpan sebagai string dipisah koma: "305, 306, 307"
-                    $planItem->room_number = implode(', ', $rooms);
-                }
-
+                
                 $planItem->save();
             }
 
