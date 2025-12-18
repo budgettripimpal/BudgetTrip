@@ -145,7 +145,8 @@ class TravelPlanController extends Controller
                                 ->orWhere('providerName', 'like', '%Garuda%')
                                 ->orWhere('providerName', 'like', '%Lion%')
                                 ->orWhere('providerName', 'like', '%Batik%')
-                                ->orWhere('providerName', 'like', '%Citilink%');
+                                ->orWhere('providerName', 'like', '%Citilink%')
+                                ->orWhere('providerName', 'like', '%Pesawat%');
                         }
                     }
                 });
@@ -154,7 +155,11 @@ class TravelPlanController extends Controller
 
         // 2. Filter Fasilitas
         if ($request->has('facilities')) {
-            foreach ($request->input('facilities') as $facility) {
+            $facilities = $request->input('facilities');
+            // Jika user mengirim string, ubah jadi array
+            if (!is_array($facilities)) $facilities = [$facilities];
+
+            foreach ($facilities as $facility) {
                 $query->whereJsonContains('facilities', $facility);
             }
         }
@@ -231,7 +236,8 @@ class TravelPlanController extends Controller
                     ->where('originCityID', $terminalInfo->cityID)
                     ->where('destinationCityID', $travelPlan->destinationCityID)
                     ->whereHas('serviceProvider', function ($q) {
-                        $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%');
+                        $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%')
+                            ->orWhere('providerName', 'like', '%Pesawat%');
                     })
                     ->get();
 
@@ -258,7 +264,8 @@ class TravelPlanController extends Controller
                     ->where('originCityID', $travelPlan->originCityID)
                     ->where('destinationCityID', $terminalInfo->cityID)
                     ->whereHas('serviceProvider', function ($q) {
-                        $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%');
+                        $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%')
+                            ->orWhere('providerName', 'like', '%Pesawat%');
                     });
 
                 $this->applyFilters($flightQuery, $request);
@@ -336,14 +343,15 @@ class TravelPlanController extends Controller
 
         // 4. Filter: Fasilitas
         if ($request->has('facilities')) {
-            foreach ($request->input('facilities') as $facility) {
+            $facilities = (array) $request->input('facilities'); // Casting ke Array
+            foreach ($facilities as $facility) {
                 $query->whereJsonContains('facilities', $facility);
             }
         }
 
         // 5. Filter: Rating
         if ($request->has('ratings')) {
-            $ratings = $request->input('ratings');
+            $ratings = (array) $request->input('ratings'); // Casting ke Array
             $query->where(function ($q) use ($ratings) {
                 foreach ($ratings as $rating) {
                     $q->orWhereBetween('rating', [$rating, $rating + 0.9]);
@@ -532,7 +540,33 @@ class TravelPlanController extends Controller
         $duration = $request->duration ?? 1;
 
         if ($request->item_type == 'Transportasi') {
-            $item = \App\Models\TransportRoute::with('serviceProvider')->find($request->item_id);
+            $item = \App\Models\TransportRoute::with('serviceProvider')->findOrFail($request->item_id);
+            // 1. Hitung Sisa Kursi Real-time
+            $booked = \App\Models\PlanItem::where('transport_route_id', $item->routeID)
+                ->whereHas('order', function ($q) {
+                    $q->where('status', 'paid');
+                })->sum('quantity');
+
+            $remainingSeats = ($item->total_seats ?? 40) - $booked;
+
+            // 2. Cek Stok Awal
+            // Kita harus memperhitungkan jumlah yang mau ditambah ($request->quantity)
+            // ditambah jumlah yang MUNGKIN sudah ada di keranjang user (jika dia nambah lagi)
+            // Cari item eksisting di keranjang user (unpaid)
+            $existingInCart = \App\Models\PlanItem::where('itineraryID', $request->itinerary_id)
+                ->where('transport_route_id', $item->routeID)
+                ->whereDoesntHave('order', function ($q) {
+                    $q->where('status', 'paid');
+                })
+                ->first();
+
+            $currentQty = $existingInCart ? $existingInCart->quantity : 0;
+            $totalProposed = $currentQty + $request->quantity;
+
+            if ($totalProposed > $remainingSeats) {
+                return redirect()->back()
+                    ->with('error', "Gagal! Sisa kursi hanya $remainingSeats. Anda mencoba memesan total $totalProposed tiket.");
+            }
             $providerName = $item->serviceProvider->providerName;
             $description = "$providerName ({$item->class})";
             $unitPrice = $item->averagePrice;
@@ -542,7 +576,7 @@ class TravelPlanController extends Controller
             $long = $item->start_longitude;
             $transportRouteID = $item->routeID; // Simpan ID Rute
         } elseif ($request->item_type == 'Akomodasi') {
-            $item = \App\Models\Accommodation::find($request->item_id);
+            $item = \App\Models\Accommodation::findOrFail($request->item_id);
             $providerName = $item->hotelName;
             $description = "$providerName ({$item->type})";
             $unitPrice = $item->averagePricePerNight;
@@ -552,7 +586,7 @@ class TravelPlanController extends Controller
             $long = $item->longitude;
             $accommodationID = $item->accommodationID; // Simpan ID Hotel
         } elseif ($request->item_type == 'Wisata') {
-            $item = \App\Models\Attraction::find($request->item_id);
+            $item = \App\Models\Attraction::findOrFail($request->item_id);
             $providerName = $item->attractionName;
             $description = "Tiket $providerName";
             $unitPrice = $item->estimatedCost;
