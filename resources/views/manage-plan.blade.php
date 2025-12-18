@@ -380,12 +380,23 @@
                                                             <span>
                                                                 Berangkat:
                                                                 <span class="font-semibold text-gray-800">
-                                                                    {{ \Carbon\Carbon::parse($item->transportRoute->departureTime)->format('H:i') }}
+                                                                    {{-- Kode Perbaikan --}}
+                                                                    @if ($item->transportRoute)
+                                                                        {{ \Carbon\Carbon::parse($item->transportRoute->departureTime)->format('H:i') }}
+                                                                    @else
+                                                                        <span class="text-red-500">Jadwal Tidak
+                                                                            Tersedia (Rute Dihapus)</span>
+                                                                    @endif
                                                                 </span>
                                                                 —
                                                                 Tiba:
                                                                 <span class="font-semibold text-gray-800">
-                                                                    {{ \Carbon\Carbon::parse($item->transportRoute->arrivalTime)->format('H:i') }}
+                                                                    @if ($item->transportRoute)
+                                                                        {{ \Carbon\Carbon::parse($item->transportRoute->departureTime)->format('H:i') }}
+                                                                    @else
+                                                                        <span class="text-red-500">Jadwal Tidak
+                                                                            Tersedia (Rute Dihapus)</span>
+                                                                    @endif
                                                                 </span>
                                                             </span>
                                                         </p>

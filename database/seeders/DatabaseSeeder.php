@@ -243,7 +243,7 @@ class DatabaseSeeder extends Seeder
             ],
             28 => [ // Surabaya
                 ['name' => 'Tugu Pahlawan', 'category' => 'Sejarah & Budaya', 'price' => 0, 'link' => null],
-                ['name' => 'House of Sampoerna', 'category' => 'Museum', 'price' => 20000, 'link' => null],
+                ['name' => 'House of Sampoerna', 'category' => 'Sejarah & Budaya', 'price' => 20000, 'link' => null],
             ],
             41 => [ // Denpasar/Bali
                 ['name' => 'Pura Tanah Lot (Bali)', 'category' => 'Sejarah & Budaya', 'price' => 30000, 'link' => 'https://www.tanahlot.net/ticket'],
@@ -268,7 +268,7 @@ class DatabaseSeeder extends Seeder
                 ['name' => 'Jembatan Ampera', 'category' => 'Landmark', 'price' => 0, 'link' => null],
             ],
             15 => [ // Bandar Lampung
-                ['name' => 'Taman Gajah', 'category' => 'Rekreasi', 'price' => 0, 'link' => null],
+                ['name' => 'Taman Gajah', 'category' => 'Landmark', 'price' => 0, 'link' => null],
             ],
             26 => [ // Cirebon
                 ['name' => 'Keraton Kasepuhan', 'category' => 'Sejarah & Budaya', 'price' => 10000, 'link' => null],
@@ -367,6 +367,39 @@ class DatabaseSeeder extends Seeder
                         'created_at' => now(),
                         'updated_at' => now()
                     ];
+                    $attractions[] = [
+                        'attractionID' => $attID++,
+                        'cityID' => $city['id'],
+                        'attractionName' => "Kuliner Khas {$cityName}",
+                        'category' => 'Kuliner',
+                        'estimatedCost' => rand(20000, 80000),
+                        'rating' => round(rand(35, 48) / 10, 1),
+                        'reviewCount' => rand(100, 1500),
+                        'description' => "Pusat kuliner populer di {$cityName}.",
+                        'bookingLink' => null,
+                        'images' => json_encode(["https://placehold.co/600x400?text=Kuliner+{$slugCity}"]),
+                        'latitude' => $city['lat'] + 0.002,
+                        'longitude' => $city['lng'] + 0.002,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+
+                    $attractions[] = [
+                        'attractionID' => $attID++,
+                        'cityID' => $city['id'],
+                        'attractionName' => "Pusat Belanja {$cityName}",
+                        'category' => 'Belanja',
+                        'estimatedCost' => 0,
+                        'rating' => round(rand(30, 45) / 10, 1),
+                        'reviewCount' => rand(200, 3000),
+                        'description' => "Mall & pusat belanja di {$cityName}.",
+                        'bookingLink' => null,
+                        'images' => json_encode(["https://placehold.co/600x400?text=Belanja+{$slugCity}"]),
+                        'latitude' => $city['lat'] + 0.003,
+                        'longitude' => $city['lng'] + 0.003,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
                 }
             }
 
@@ -381,7 +414,7 @@ class DatabaseSeeder extends Seeder
                     'attractionID' => $attID++,
                     'cityID' => $city['id'],
                     'attractionName' => $name,
-                    'category' => $isFree ? 'Rekreasi' : 'Wisata',
+                    'category' => $isFree ? 'Alam' : 'Hiburan',
                     'estimatedCost' => $price,
                     'rating' => round(rand(25, 50) / 10, 1),
                     'reviewCount' => rand(5, 800),
@@ -536,7 +569,7 @@ class DatabaseSeeder extends Seeder
                 $price = round($basePrice + ($dist * 2000));
                 foreach ($airlines as $prov) {
                     $finalPrice = ($prov == 6 || $prov == 10) ? round($price * 1.3) : $price;
-                    $routesData = array_merge($routesData, $createSchedules($prov, $a, $b, 'Pesawat', $finalPrice, 'Economy', 150, ['Bagasi', 'Makanan', 'WiFi'] , $routeID, $cities));
+                    $routesData = array_merge($routesData, $createSchedules($prov, $a, $b, 'Pesawat', $finalPrice, 'Economy', 150, ['Bagasi', 'Makanan', 'WiFi'], $routeID, $cities));
                 }
             }
         }
@@ -549,7 +582,7 @@ class DatabaseSeeder extends Seeder
             [40, 30, 15000],
         ];
         foreach ($ferryPairs as [$a, $b, $price]) {
-            $routesData = array_merge($routesData, $createSchedules(8, $a, $b, 'Ferry ASDP', $price, 'Reguler', 400, ['AC', 'Toilet', 'WiFi', 'Snack'] , $routeID, $cities));
+            $routesData = array_merge($routesData, $createSchedules(8, $a, $b, 'Ferry ASDP', $price, 'Reguler', 400, ['AC', 'Toilet', 'WiFi', 'Snack'], $routeID, $cities));
         }
 
         // 7E) Bus & train realistic pairs
