@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class City extends Model
 {
     use HasFactory;
-    
+
     protected $primaryKey = 'cityID';
     protected $guarded = [];
 
@@ -47,5 +47,11 @@ class City extends Model
     public function travelPlanAccommodations()
     {
         return $this->hasMany(TravelPlan::class, 'accommodationCityID', 'cityID');
+    }
+
+    public function accessibleTerminals()
+    {
+        return $this->belongsToMany(Terminal::class, 'city_terminals', 'cityID', 'terminalID')
+            ->withPivot('distance_km');
     }
 }
