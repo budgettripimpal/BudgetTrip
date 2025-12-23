@@ -34,12 +34,6 @@ class TravelPlan extends Model
         return $this->hasMany(Itinerary::class, 'planID', 'planID');
     }
 
-    // Relasi Komposisi (TravelPlan berisi SharedPlan)
-    public function sharedPlans()
-    {
-        return $this->hasMany(SharedPlan::class, 'planID', 'planID');
-    }
-
     // Relasi dari Preference (gabungan)
     public function originCity()
     {
@@ -54,16 +48,5 @@ class TravelPlan extends Model
     public function accommodationCity()
     {
         return $this->belongsTo(City::class, 'accommodationCityID', 'cityID');
-    }
-
-    // Relasi Many-to-Many
-    public function promotions()
-    {
-        return $this->belongsToMany(
-            Promotion::class,       // Model tujuan
-            'plan_promotions',      // Nama tabel junction
-            'planID',               // Foreign key di junction untuk model INI
-            'promotionID'           // Foreign key di junction untuk model TUJUAN
-        );
     }
 }
