@@ -49,7 +49,6 @@ class User extends Authenticatable // (baris ini mungkin juga punya `implements 
 
     /**
      * Relasi Komposisi: User memiliki banyak TravelPlan.
-     * id adalah Primary Key bawaan Breeze untuk tabel users.
      */
     public function travelPlans()
     {
