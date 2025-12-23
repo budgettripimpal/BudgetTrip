@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Itinerary;
 use App\Models\TransportRoute;
 use App\Models\PlanItem;
+use App\Models\Terminal;
 
 class TravelPlanController extends Controller
 {
@@ -213,31 +214,35 @@ class TravelPlanController extends Controller
         // === 2. RUTE TRANSIT ===
         $transitRoutes = collect();
 
-        // Ambil info terminal transit
-        $originTerminals = DB::table('city_terminals')->where('cityID', $travelPlan->originCityID)->pluck('terminalID');
-        $destTerminals = DB::table('city_terminals')->where('cityID', $travelPlan->destinationCityID)->pluck('terminalID');
+        // Ambil Objek Kota & Terminal via Eloquent
+        $originCity = City::find($travelPlan->originCityID);
+        $destCity = City::find($travelPlan->destinationCityID);
+
+        // Mengambil Collection Objek Terminal (bukan ID)
+        $originTerminals = $originCity->accessibleTerminals; 
+        $destTerminals = $destCity->accessibleTerminals;
 
         // CASE A: DEPARTURE TRANSIT (Feeder Darat -> Pesawat)
-        foreach ($originTerminals as $termID) {
-            $terminalInfo = DB::table('transport_terminals')->where('terminalID', $termID)->first();
-
-            if ($terminalInfo && $terminalInfo->cityID != $travelPlan->originCityID) {
-                // 1. Feeder (Kena Filter Waktu & Tipe)
+        foreach ($originTerminals as $terminalInfo) {
+            // $terminalInfo sudah berupa OBJEK Terminal, jadi langsung pakai
+            
+            if ($terminalInfo->cityID != $travelPlan->originCityID) {
+                // 1. Feeder (Darat)
                 $feederQuery = TransportRoute::with('serviceProvider')
                     ->where('originCityID', $travelPlan->originCityID)
                     ->where('destinationCityID', $terminalInfo->cityID);
 
-                // Terapkan filter ke leg pertama (Feeder)
                 $this->applyFilters($feederQuery, $request);
                 $feeders = $feederQuery->get();
 
-                // 2. Flight
+                // 2. Flight (Pesawat)
                 $flights = TransportRoute::with('serviceProvider')
                     ->where('originCityID', $terminalInfo->cityID)
                     ->where('destinationCityID', $travelPlan->destinationCityID)
                     ->whereHas('serviceProvider', function ($q) {
-                        $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%')
-                            ->orWhere('providerName', 'like', '%Pesawat%');
+                        $q->where('providerName', 'like', '%Air%')
+                          ->orWhere('providerName', 'like', '%Garuda%')
+                          ->orWhere('providerName', 'like', '%Pesawat%');
                     })
                     ->get();
 
@@ -255,26 +260,30 @@ class TravelPlanController extends Controller
         }
 
         // CASE B: ARRIVAL TRANSIT (Pesawat -> Feeder Darat)
-        foreach ($destTerminals as $termID) {
-            $terminalInfo = DB::table('transport_terminals')->where('terminalID', $termID)->first();
-
-            if ($terminalInfo && $terminalInfo->cityID != $travelPlan->destinationCityID) {
-                // 1. Flight 
+        // PERBAIKAN UTAMA DI SINI:
+        // Gunakan $terminalInfo sebagai variabel loop, bukan $termID
+        foreach ($destTerminals as $terminalInfo) {
+            
+            // $terminalInfo sudah OBJEK, cek apakah kota terminal beda dengan kota tujuan
+            if ($terminalInfo->cityID != $travelPlan->destinationCityID) {
+                
+                // 1. Flight (Pesawat)
                 $flightQuery = TransportRoute::with('serviceProvider')
                     ->where('originCityID', $travelPlan->originCityID)
-                    ->where('destinationCityID', $terminalInfo->cityID)
+                    ->where('destinationCityID', $terminalInfo->cityID) // Terbang ke kota terminal transit (misal Sidoarjo/Juanda)
                     ->whereHas('serviceProvider', function ($q) {
-                        $q->where('providerName', 'like', '%Air%')->orWhere('providerName', 'like', '%Garuda%')
-                            ->orWhere('providerName', 'like', '%Pesawat%');
+                        $q->where('providerName', 'like', '%Air%')
+                          ->orWhere('providerName', 'like', '%Garuda%')
+                          ->orWhere('providerName', 'like', '%Pesawat%');
                     });
 
                 $this->applyFilters($flightQuery, $request);
                 $flights = $flightQuery->get();
 
-                // 2. Feeder
+                // 2. Feeder (Darat)
                 $feeders = TransportRoute::with('serviceProvider')
-                    ->where('originCityID', $terminalInfo->cityID)
-                    ->where('destinationCityID', $travelPlan->destinationCityID)
+                    ->where('originCityID', $terminalInfo->cityID) // Dari kota terminal
+                    ->where('destinationCityID', $travelPlan->destinationCityID) // Ke tujuan akhir
                     ->get();
 
                 if ($flights->isNotEmpty() && $feeders->isNotEmpty()) {
