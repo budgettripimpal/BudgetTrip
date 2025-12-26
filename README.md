@@ -1,4 +1,4 @@
-BudgetTrip 🎒✈️
+# BudgetTrip 🎒✈️
 
 **BudgetTrip** adalah aplikasi berbasis web yang dirancang untuk membantu wisatawan (*budget traveler*) dalam merencanakan perjalanan wisata, menyusun itinerary, mencari transportasi/akomodasi, serta melakukan estimasi anggaran secara terperinci.
 
