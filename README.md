@@ -1,61 +1,194 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BudgetTrip 🎒✈️
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**BudgetTrip** adalah aplikasi berbasis web yang dirancang untuk membantu wisatawan (*budget traveler*) dalam merencanakan perjalanan wisata, menyusun itinerary, mencari transportasi/akomodasi, serta melakukan estimasi anggaran secara terperinci.
 
-## About Laravel
+Aplikasi ini dibangun menggunakan Framework **Laravel 10**, **Tailwind CSS**, dan mengintegrasikan **Midtrans Payment Gateway**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 👥 Anggota Kelompok
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Kelompok 4 - Prodi Teknik Informatika, Universitas Telkom**
 
-## Learning Laravel
+1. **M Dani Riadi** (NIM: 103012300341)
+2. **Muhammad Haris Azmi** (NIM: 103012300044)
+3. **Fajril Ikhsan Ramadhan** (NIM: 103012300204)
+4. **Damar Wahyu Suwarno** (NIM: 103012300090)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 💻 Persyaratan Sistem (Prerequisites)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Pastikan perangkat Anda telah terinstal:
+- **PHP**: Versi 8.1 atau lebih baru.
+- **Composer**: Dependency manager untuk PHP.
+- **Node.js & NPM**: Untuk compile aset frontend (Vite/Tailwind).
+- **MySQL**: Database server (via XAMPP/Laragon).
+- **Git**: Untuk cloning repository.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 Panduan Instalasi Lengkap
 
-### Premium Partners
+Ikuti langkah-langkah berikut secara berurutan di terminal (Command Prompt/PowerShell/Terminal VS Code):
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 1. Clone Repository
+```bash
+git clone [https://github.com/username-anda/budgettrip.git](https://github.com/username-anda/budgettrip.git)
+cd budgettrip
 
-## Contributing
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 2. Install Dependensi Backend & Frontend
 
-## Code of Conduct
+Install library PHP dan JavaScript yang dibutuhkan:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Install library PHP (Laravel Framework)
+composer install
 
-## Security Vulnerabilities
+# Install library Frontend
+npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
 
-## License
+### 3. Konfigurasi Environment (.env)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Salin file konfigurasi contoh dan buat file `.env` baru:
+
+```bash
+cp .env.example .env
+
+```
+
+Buka file `.env` tersebut menggunakan teks editor, lalu sesuaikan konfigurasi berikut:
+
+**A. Koneksi Database:**
+Pastikan Anda sudah membuat database kosong bernama `budgettrip` di phpMyAdmin.
+
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=budgettrip
+DB_USERNAME=root
+DB_PASSWORD=
+
+```
+
+**B. Konfigurasi Midtrans (Payment Gateway):**
+Isi dengan Server Key dan Client Key dari akun Sandbox Midtrans Anda.
+
+```ini
+MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxxxxxxxxx
+MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxxxxxxx
+MIDTRANS_IS_PRODUCTION=false
+MIDTRANS_IS_SANITIZED=true
+MIDTRANS_IS_3DS=true
+
+```
+
+### 4. Generate Application Key
+
+```bash
+php artisan key:generate
+
+```
+
+### 5. Migrasi Database & Seeding Data (PENTING!)
+
+Perintah ini akan membuat tabel-tabel di database dan mengisi data dummy (Akun Admin, User, Kota, Transportasi, Hotel) agar aplikasi siap digunakan.
+
+```bash
+php artisan migrate:fresh --seed
+
+```
+
+### 6. Build Aset Frontend
+
+Compile file CSS dan JS menggunakan Vite:
+
+```bash
+npm run build
+
+```
+
+### 7. Jalankan Server
+
+Jalankan server lokal Laravel:
+
+```bash
+php artisan serve
+
+```
+
+Akses aplikasi melalui browser di alamat: **http://127.0.0.1:8000**
+
+---
+
+## 🔐 Akun Demo (Login)
+
+Gunakan akun berikut untuk masuk ke dalam sistem (Password default untuk semua akun seed adalah `password`):
+
+| Role | Email | Password |
+| --- | --- | --- |
+| **Administrator** | `admin@budgettrip.com` | `password` |
+| **User (Pengguna)** | `user@budgettrip.com` | `password` |
+
+---
+
+## ✅ Menjalankan Pengujian (Testing)
+
+Aplikasi ini dilengkapi dengan skenario pengujian otomatis menggunakan **PHPUnit**. Berikut cara menjalankannya:
+
+### 1. Menjalankan Semua Test
+
+Untuk memastikan seluruh sistem berjalan dengan baik:
+
+```bash
+php artisan test
+
+```
+
+### 2. Menjalankan Test Fitur Utama (Travel Plan)
+
+Menguji fitur CRUD Rencana Perjalanan, Validasi, dan Keamanan Akses:
+
+```bash
+php artisan test tests/Feature/TravelPlanTest.php
+
+```
+
+### 3. Menjalankan White Box Testing (Logika Kompleks)
+
+Menguji logika `addToPlan` (Validasi stok kursi, perhitungan harga durasi hotel, merge item):
+
+```bash
+php artisan test tests/Feature/WhiteBoxAddToPlanTest.php
+
+```
+
+---
+
+## 🛠 Troubleshooting (Kendala Umum)
+
+1. **Gambar tidak muncul?**
+Jalankan perintah ini untuk menghubungkan folder storage publik:
+```bash
+php artisan storage:link
+
+```
+
+
+2. **Error "Vite manifest not found"?**
+Pastikan Anda sudah menjalankan `npm run build`.
+3. **Error Database?**
+Pastikan XAMPP/MySQL sudah menyala dan database `budgettrip` sudah dibuat sebelum menjalankan migrasi.
+
+---
+
+**Dibuat untuk memenuhi Tugas Besar Mata Kuliah IMPAL.**
+
+```
+
+```
