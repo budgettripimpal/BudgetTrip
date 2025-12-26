@@ -38,3 +38,6 @@ Unduh source code ke komputer Anda:
 ```bash
 git clone [https://github.com/username-anda/budgettrip.git](https://github.com/username-anda/budgettrip.git)
 cd budgettrip
+
+### 1. Clone Repository
+Install Dependensi Backend & Frontend
