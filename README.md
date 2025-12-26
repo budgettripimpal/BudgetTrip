@@ -115,11 +115,15 @@ npm run build
 
 ### 7. Jalankan Server
 
-Jalankan server lokal Laravel:
+Jalankan server lokal Laravel di CMD:
 
 ```bash
 php artisan serve
+```
 
+Buka CMD baru dan jalankan NPM:
+```bash
+npm run dev
 ```
 
 Akses aplikasi melalui browser di alamat: **http://127.0.0.1:8000**
