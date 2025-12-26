@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         // -------------------------
         DB::table('users')->upsert([
             ['id' => 1, 'name' => 'Fajril Ikhsan', 'email' => 'fajril@example.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567890', 'role' => 'user', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 2, 'name' => 'Damar Wahyu', 'email' => 'damar@example.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567891', 'role' => 'user', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'name' => 'User Budgettrip', 'email' => 'user@budgettrip.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567891', 'role' => 'user', 'created_at' => now(), 'updated_at' => now()],
             ['id' => 99, 'name' => 'Admin BudgetTrip', 'email' => 'admin@budgettrip.com', 'password' => Hash::make('password'), 'phoneNumber' => '081234567899', 'role' => 'admin', 'created_at' => now(), 'updated_at' => now()],
         ], ['id']);
 

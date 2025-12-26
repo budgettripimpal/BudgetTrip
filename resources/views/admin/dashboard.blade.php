@@ -50,13 +50,52 @@
     modalType: '',
     isEdit: false,
     formAction: '',
-    formData: {},
+    formData: {
+        facilities: [],
+        providerID: '',
+        departureTime: '',
+        arrivalTime: ''
+    },
 
     openAddModal(type, url) {
         this.modalType = type;
         this.isEdit = false;
         this.formAction = url;
-        this.formData = { facilities: [], providerID: '' };
+
+        this.formData = {
+            facilities: [],
+            providerID: '',
+            departureTime: '',
+            arrivalTime: '',
+            cityName: '',
+            province: '',
+            latitude: '',
+            longitude: '',
+            locationType: 'Kota',
+            providerName: '',
+            serviceType: 'Transportasi',
+            originCityID: '',
+            destinationCityID: '',
+            averagePrice: '',
+            total_seats: '',
+            class: '',
+            description: '',
+            bookingLink: '',
+            start_latitude: '',
+            start_longitude: '',
+            end_latitude: '',
+            end_longitude: '',
+            hotelName: '',
+            cityID: '',
+            averagePricePerNight: '',
+            rating: '',
+            type: 'Hotel',
+            attractionName: '',
+            category: 'Alam',
+            estimatedCost: '',
+            reviewCount: '',
+            images: ''
+        };
         this.showModal = true;
     },
 
@@ -64,15 +103,23 @@
         this.modalType = type;
         this.isEdit = true;
         this.formAction = url;
+
         let dataClone = JSON.parse(JSON.stringify(data));
 
         if (dataClone.facilities) {
             if (typeof dataClone.facilities === 'string') {
                 try { dataClone.facilities = JSON.parse(dataClone.facilities); } catch (e) { dataClone.facilities = []; }
             }
-            if (!dataClone.facilities) dataClone.facilities = [];
+            if (!Array.isArray(dataClone.facilities)) dataClone.facilities = [];
         } else {
             dataClone.facilities = [];
+        }
+
+        if (dataClone.departureTime && dataClone.departureTime.length > 5) {
+            dataClone.departureTime = dataClone.departureTime.substring(0, 5);
+        }
+        if (dataClone.arrivalTime && dataClone.arrivalTime.length > 5) {
+            dataClone.arrivalTime = dataClone.arrivalTime.substring(0, 5);
         }
 
         this.formData = dataClone;
@@ -580,43 +627,100 @@
 
                 <template x-if="modalType === 'attraction'">
                     <div class="space-y-4">
-                        <input type="text" name="attractionName" x-model="formData.attractionName"
-                            placeholder="Nama Wisata" class="w-full border p-3 rounded-lg" required>
-                        <select name="cityID" x-model="formData.cityID" class="w-full border p-3 rounded-lg">
-                            <option value="" disabled>Kota</option>
-                            @foreach ($cities as $c)
-                                <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
-                            @endforeach
-                        </select>
-                        <select name="category" x-model="formData.category" class="w-full border p-3 rounded-lg">
-                            <option value="Alam">Alam</option>
-                            <option value="Sejarah & Budaya">Sejarah</option>
-                            <option value="Hiburan">Hiburan</option>
-                            <option value="Landmark">Landmark</option>
-                        </select>
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="number" name="estimatedCost" x-model="formData.estimatedCost"
-                                placeholder="Tiket Masuk (0 jika gratis)" class="w-full border p-3 rounded-lg">
-                            <input type="number" step="0.1" name="rating" x-model="formData.rating"
-                                placeholder="Rating" class="w-full border p-3 rounded-lg">
+                        {{-- Nama Wisata --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Wisata</label>
+                            <input type="text" name="attractionName" x-model="formData.attractionName"
+                                placeholder="Contoh: Pantai Pangandaran" class="w-full border p-3 rounded-lg"
+                                required>
                         </div>
-                        <input type="number" name="reviewCount" x-model="formData.reviewCount"
-                            placeholder="Jumlah Review" class="w-full border p-3 rounded-lg">
 
-                        <input type="text" name="bookingLink" x-model="formData.bookingLink"
-                            placeholder="Link Booking Tiket (Opsional)" class="w-full border p-3 rounded-lg">
-
-                        <input type="text" name="images" x-model="formData.images"
-                            placeholder="URL Gambar Utama" class="w-full border p-3 rounded-lg">
-
+                        {{-- Kota & Kategori --}}
                         <div class="grid grid-cols-2 gap-4">
-                            <input type="number" step="0.0001" name="latitude" x-model="formData.latitude"
-                                placeholder="Latitude" class="w-full border p-3 rounded-lg">
-                            <input type="number" step="0.0001" name="longitude" x-model="formData.longitude"
-                                placeholder="Longitude" class="w-full border p-3 rounded-lg">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kota</label>
+                                <select name="cityID" x-model="formData.cityID" class="w-full border p-3 rounded-lg"
+                                    required>
+                                    <option value="" disabled>Pilih Kota</option>
+                                    @foreach ($cities as $c)
+                                        <option value="{{ $c->cityID }}">{{ $c->cityName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                <select name="category" x-model="formData.category"
+                                    class="w-full border p-3 rounded-lg">
+                                    <option value="Alam">Alam</option>
+                                    <option value="Sejarah & Budaya">Sejarah & Budaya</option>
+                                    <option value="Hiburan">Hiburan</option>
+                                    <option value="Landmark">Landmark</option>
+                                </select>
+                            </div>
                         </div>
-                        <textarea name="description" x-model="formData.description" placeholder="Deskripsi"
-                            class="w-full border p-3 rounded-lg"></textarea>
+
+                        {{-- Harga & Rating (PERBAIKAN UTAMA DISINI) --}}
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Harga Tiket</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-3 text-gray-500">Rp</span>
+                                    <input type="number" name="estimatedCost" x-model="formData.estimatedCost"
+                                        min="0" placeholder="0" class="w-full border p-3 pl-10 rounded-lg"
+                                        required>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Wajib diisi. Isi <b>0</b> jika Gratis.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Rating (0-5)</label>
+                                <input type="number" step="0.1" min="0" max="5" name="rating"
+                                    x-model="formData.rating" placeholder="Contoh: 4.5"
+                                    class="w-full border p-3 rounded-lg">
+                            </div>
+                        </div>
+
+                        {{-- Review Count & Booking Link --}}
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Review</label>
+                                <input type="number" name="reviewCount" x-model="formData.reviewCount"
+                                    placeholder="Contoh: 150" class="w-full border p-3 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Link Booking
+                                    (Opsional)</label>
+                                <input type="text" name="bookingLink" x-model="formData.bookingLink"
+                                    placeholder="https://..." class="w-full border p-3 rounded-lg">
+                            </div>
+                        </div>
+
+                        {{-- Gambar --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
+                            <input type="text" name="images" x-model="formData.images"
+                                placeholder="https://example.com/image.jpg" class="w-full border p-3 rounded-lg">
+                        </div>
+
+                        {{-- Lokasi --}}
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                                <input type="number" step="0.0001" name="latitude" x-model="formData.latitude"
+                                    placeholder="-6.1234" class="w-full border p-3 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                                <input type="number" step="0.0001" name="longitude" x-model="formData.longitude"
+                                    placeholder="106.1234" class="w-full border p-3 rounded-lg">
+                            </div>
+                        </div>
+
+                        {{-- Deskripsi --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                            <textarea name="description" x-model="formData.description" placeholder="Jelaskan tentang tempat wisata ini..."
+                                class="w-full border p-3 rounded-lg h-24"></textarea>
+                        </div>
                     </div>
                 </template>
 
