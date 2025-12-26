@@ -8,13 +8,14 @@ Aplikasi ini dibangun menggunakan Framework **Laravel 10**, **Tailwind CSS**, da
 
 ## 👥 Anggota Kelompok
 
-**Kelompok 4 - Prodi Teknik Informatika, Universitas Telkom**
+**Kelompok 4 - Prodi S1 Informatika, Telkom University**
 
 1. **M Dani Riadi** (NIM: 103012300341)
 2. **Muhammad Haris Azmi** (NIM: 103012300044)
 3. **Fajril Ikhsan Ramadhan** (NIM: 103012300204)
 4. **Damar Wahyu Suwarno** (NIM: 103012300090)
 
+Kelas IF-47-12
 ---
 
 ## 💻 Persyaratan Sistem (Prerequisites)
@@ -145,16 +146,7 @@ Gunakan akun berikut untuk masuk ke dalam sistem (Password default untuk semua a
 
 Aplikasi ini dilengkapi dengan skenario pengujian otomatis menggunakan **PHPUnit**. Berikut cara menjalankannya:
 
-### 1. Menjalankan Semua Test
-
-Untuk memastikan seluruh sistem berjalan dengan baik:
-
-```bash
-php artisan test
-
-```
-
-### 2. Menjalankan Test Fitur Utama (Travel Plan)
+### 1. Menjalankan Test Fitur Utama (Travel Plan)
 
 Menguji fitur CRUD Rencana Perjalanan, Validasi, dan Keamanan Akses:
 
@@ -163,7 +155,7 @@ php artisan test tests/Feature/TravelPlanTest.php
 
 ```
 
-### 3. Menjalankan White Box Testing (Logika Kompleks)
+### 2. Menjalankan White Box Testing (Logika Kompleks)
 
 Menguji logika `addToPlan` (Validasi stok kursi, perhitungan harga durasi hotel, merge item):
 
