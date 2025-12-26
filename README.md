@@ -35,7 +35,7 @@ Ikuti langkah-langkah berikut secara berurutan di terminal (Command Prompt/Power
 
 ### 1. Clone Repository
 ```bash
-git clone [https://github.com/username-anda/budgettrip.git](https://github.com/username-anda/budgettrip.git)
+git clone https://github.com/budgettripimpal/BudgetTrip.git
 cd budgettrip
 
 ```
