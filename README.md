@@ -51,6 +51,8 @@ composer install
 # Install library Frontend
 npm install
 
+# Install library Midtrans (Fitur Pembayaran)
+composer require midtrans/midtrans-php
 ```
 
 ### 3. Konfigurasi Environment (.env)
